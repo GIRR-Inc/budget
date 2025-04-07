@@ -3,11 +3,15 @@ import { addTransaction } from "../api";
 import "./InputForm.css";
 
 const InputForm = () => {
+  const getToday = () => {
+    return new Date().toISOString().split("T")[0];
+  };
+  
   const [form, setForm] = useState({
     code: "",
     amount: "",
     description: "",
-    date: "",
+    date: getToday(), // 오늘 날짜로 기본값 설정
   });
 
   const [type, setType] = useState("expense"); // "expense" | "income"
@@ -105,7 +109,7 @@ const InputForm = () => {
         일자
         <input name="date" type="date" value={form.date} onChange={handleChange} required />
       </label>
-      <button type="submit">➕ 추가하기</button>
+      <button type="submit">추가하기</button>
     </form>
   );
 };

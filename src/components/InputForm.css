@@ -1,4 +1,19 @@
 /* src/components/InputForm.css */
+/* fontFamily: "'S-CoreDream-3Light', sans-serif", */
+@font-face {
+  font-family: 'S-CoreDream-3Light';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'GmarketSansMedium';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .form-container {
     display: flex;
     flex-direction: column;
@@ -15,12 +30,14 @@
     font-weight: bold;
     font-size: 14px;
     color: #333;
+    font-family: 'S-CoreDream-3Light';
   }
   
   input {
     margin-top: 6px;
     padding: 12px;
     border: 1px solid #ccc;
+    font-family: 'S-CoreDream-3Light';
     border-radius: 8px;
     font-size: 16px;
     width: 100%;
@@ -30,7 +47,8 @@
   button {
     padding: 14px;
     font-size: 16px;
-    background-color: #007bff;
+    background-color: #f4a8a8;
+    font-family: 'S-CoreDream-3Light';
     color: white;
     border: none;
     border-radius: 8px;
@@ -39,7 +57,7 @@
   }
   
   button:hover {
-    background-color: #0056b3;
+    background-color: #f4a8a8;
   }
   
   /* InputForm.css */
@@ -52,6 +70,7 @@ select {
     width: 100%;
     box-sizing: border-box;
     background-color: white;
+    font-family: 'S-CoreDream-3Light';
   }
 
   .amount-row {
@@ -81,8 +100,8 @@ select {
   }
   
   .type-tabs button.active {
-    background-color: #007bff;
+    background-color: #f4a8a8;
     color: white;
-    border-color: #007bff;
+    border-color: #f4a8a8;
   }
   

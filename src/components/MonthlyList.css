@@ -1,4 +1,18 @@
 /* src/components/MonthlyList.css */
+@font-face {
+  font-family: 'S-CoreDream-3Light';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'GmarketSansMedium';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
 .monthly-container {
     padding: 1rem;
     max-width: 600px;
@@ -19,6 +33,7 @@
     border-radius: 16px;
     background: #f8f8f8;
     font-size: 14px;
+    font-family: 'S-CoreDream-3Light';
     cursor: pointer;
     white-space: nowrap;
   }
@@ -26,6 +41,7 @@
   .tab.active {
     background: #007bff;
     color: white;
+    font-family: 'S-CoreDream-3Light';
     border-color: #007bff;
   }
   
@@ -38,11 +54,13 @@
   .item {
     border-bottom: 1px solid #eee;
     padding: 10px 0;
+    font-family: 'S-CoreDream-3Light';
   }
   
   .date {
     font-size: 13px;
     color: #888;
+    font-family: 'S-CoreDream-3Light';
   }
   
   .desc {
