@@ -1,0 +1,88 @@
+/* src/components/InputForm.css */
+.form-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: #f9f9f9;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  label {
+    display: flex;
+    flex-direction: column;
+    font-weight: bold;
+    font-size: 14px;
+    color: #333;
+  }
+  
+  input {
+    margin-top: 6px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  button {
+    padding: 14px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* InputForm.css */
+select {
+    margin-top: 6px;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: white;
+  }
+
+  .amount-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  
+  .amount-row input {
+    flex: 1;
+  }
+  
+  .type-tabs {
+    display: flex;
+    gap: 4px;
+  }
+  
+  .type-tabs button {
+    padding: 10px 14px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    min-width: 52px;
+    transition: 0.2s;
+  }
+  
+  .type-tabs button.active {
+    background-color: #007bff;
+    color: white;
+    border-color: #007bff;
+  }
+  

@@ -1,0 +1,78 @@
+/* src/components/MonthlyList.css */
+.monthly-container {
+    padding: 1rem;
+    max-width: 600px;
+    margin: auto;
+  }
+  
+  .tab-bar {
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+    margin-bottom: 1rem;
+  }
+  
+  .tab {
+    flex-shrink: 0;
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 16px;
+    background: #f8f8f8;
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  
+  .tab.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+  }
+  
+  .list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .item {
+    border-bottom: 1px solid #eee;
+    padding: 10px 0;
+  }
+  
+  .date {
+    font-size: 13px;
+    color: #888;
+  }
+  
+  .desc {
+    display: flex;
+    justify-content: space-between;
+    font-size: 16px;
+  }
+  
+  .amount {
+    font-weight: bold;
+  }
+  
+  .amount.expense {
+    color: crimson;
+  }
+  
+  .amount.income {
+    color: royalblue;
+  }
+  
+  
+  .memo {
+    font-size: 13px;
+    color: #444;
+    margin-top: 2px;
+  }
+  
+  .empty {
+    color: #999;
+    text-align: center;
+    margin-top: 20px;
+  }
+  

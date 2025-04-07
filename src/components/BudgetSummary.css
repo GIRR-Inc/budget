@@ -1,0 +1,103 @@
+/* src/components/BudgetSummary.css */
+.budget-container {
+    padding: 1rem;
+    background: #fefefe;
+    border-radius: 12px;
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .budget-form {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+  }
+  
+  .budget-form input,
+  .budget-form button {
+    padding: 8px 12px;
+    font-size: 16px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+  }
+  
+  .budget-form button {
+    background: #007bff;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .progress-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 24px;
+  }
+  
+  .progress-bar {
+    width: 100px;
+    height: 200px;
+    background: #eee;
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  
+  .fill {
+    background: #007bff;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 20px;
+    transition: height 0.5s ease;
+  }
+  
+  .summary-text {
+    margin-top: 12px;
+    font-size: 14px;
+    text-align: center;
+  }
+  
+  .progress-bar {
+    width: 60px;
+    height: 150px;
+    background: #eee;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  
+  .fill {
+    background: #007bff;
+    width: 100%;
+    position: absolute;
+    bottom: 0;
+    transition: height 0.3s ease;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    padding-bottom: 4px;
+  }
+  
+  .percent-label {
+    position: relative;
+    z-index: 1;
+  }
+  
