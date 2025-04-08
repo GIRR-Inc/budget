@@ -73,11 +73,9 @@ export const addTransaction = async ({ category, amount, memo, date }) => {
 
 // 예산 저장
 export const saveMonthlyBudget = async (month, budget) => {
-    console.log("[Supabase] 저장 요청:", month, budget); // 🔍 확인용
-  
     const { data, error } = await supabase
       .from("monthly_budget")
-      .upsert([{ month, budget }]);
+      .upsert([{ month, budget }], { onConflict: ['month'] }); // ← 여기!
   
     if (error) throw error;
     return { status: "success" };
