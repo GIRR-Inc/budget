@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { addTransaction } from "../api";
+import { addTransaction } from "../api/budgetApi"; 
 import "./InputForm.css";
 
 const InputForm = () => {
@@ -8,10 +8,10 @@ const InputForm = () => {
   };
   
   const [form, setForm] = useState({
-    code: "",
+    category: "",
     amount: "",
-    description: "",
-    date: getToday(), // 오늘 날짜로 기본값 설정
+    memo: "",
+    date: getToday(),
   });
 
   const [type, setType] = useState("expense"); // "expense" | "income"
@@ -43,7 +43,7 @@ const InputForm = () => {
     try {
       const result = await addTransaction({
         ...form,
-        amount: finalAmount.toString(),
+        amount: finalAmount,
       });
 
       if (result.status === "success") {
@@ -63,7 +63,7 @@ const InputForm = () => {
     <form className="form-container" onSubmit={handleSubmit}>
       <label>
         대분류코드
-        <select name="code" value={form.code} onChange={handleChange} required>
+        <select name="category" value={form.category} onChange={handleChange} required>
           <option value="">-- 선택하세요 --</option>
           <option value="TRANSPORT">교통비</option>
           <option value="COMMUNICATION">통신비</option>
@@ -103,7 +103,7 @@ const InputForm = () => {
 
       <label>
         세부설명
-        <input name="description" value={form.description} onChange={handleChange} />
+        <input name="memo" value={form.memo} onChange={handleChange} />
       </label>
       <label>
         일자

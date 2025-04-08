@@ -39,10 +39,10 @@
   }
   
   .tab.active {
-    background: #007bff;
+    background: #f4a8a8;
     color: white;
     font-family: 'S-CoreDream-3Light';
-    border-color: #007bff;
+    border-color: #f4a8a8;
   }
   
   .list {
@@ -92,5 +92,42 @@
     color: #999;
     text-align: center;
     margin-top: 20px;
+  }
+  
+  .summary-bar {
+    padding: 1.2rem;
+    background-color: #fff7f7;
+    border: 1px solid #f4a8a8;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    font-family: 'GmarketSansMedium';
+  }
+  
+  .summary-bar h3 {
+    font-size: 18px;
+    margin-bottom: 0.75rem;
+    color: #444;
+  }
+  
+  .summary-bar .summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+  
+  .summary-bar .label {
+    color: #666;
+    font-size: 15px;
+  }
+  
+  .summary-bar .value {
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+  }
+  
+  .summary-bar .value.over {
+    color: crimson;
   }
   
