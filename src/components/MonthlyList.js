@@ -49,7 +49,7 @@ const MonthlyList = () => {
         <div className="summary-row">
           <span className="label">지출</span>
           <span className={`value ${summary.spent > summary.budget ? "over" : ""}`}>
-            {summary.spent.toLocaleString()}원
+            {summary.spent.toLocaleString()}원   
           </span>
         </div>
       </div>
