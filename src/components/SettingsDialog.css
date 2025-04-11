@@ -1,0 +1,71 @@
+@font-face {
+    font-family: 'S-CoreDream-3Light';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
+  @font-face {
+    font-family: 'GmarketSansMedium';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
+  .settings-dialog-content {
+    font-family: 'S-CoreDream-3Light';
+  }
+  
+  .settings-list-wrapper {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background: #fdfdfd;
+    font-family: 'S-CoreDream-3Light';
+    font-size: 13px; /* 글씨 작게 */
+  }
+  
+  .settings-list-wrapper ul {
+    margin: 0;
+    padding: 0;
+  }
+  
+  .settings-input {
+    margin-top: 8px;
+  }
+  
+  .settings-button {
+    margin-top: 1rem;
+    background-color: #f4a8a8;
+    color: white;
+    border: none;
+    padding: 12px;
+    border-radius: 8px;
+    font-family: 'S-CoreDream-3Light';
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+  
+  .settings-button:hover {
+    background-color: #f19191;
+  }
+  
+  .settings-list-wrapper .MuiListItemText-primary {
+    font-size: 13px;
+    font-family: 'S-CoreDream-3Light';
+    color: #333;
+  }
+  
+  .settings-list-wrapper .MuiListItemText-secondary {
+    font-size: 12px;
+    font-family: 'S-CoreDream-3Light';
+    color: #777;
+  }
+  
+  .settings-list-wrapper .MuiListItem-root {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }

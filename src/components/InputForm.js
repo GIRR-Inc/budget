@@ -1,12 +1,10 @@
 import React, { useState } from "react";
-import { addTransaction } from "../api/budgetApi"; 
+import { addTransaction } from "../api/budgetApi";
 import "./InputForm.css";
 
-const InputForm = () => {
-  const getToday = () => {
-    return new Date().toISOString().split("T")[0];
-  };
-  
+const InputForm = ({ categories }) => {
+  const getToday = () => new Date().toISOString().split("T")[0];
+
   const [form, setForm] = useState({
     category: "",
     amount: "",
@@ -14,7 +12,7 @@ const InputForm = () => {
     date: getToday(),
   });
 
-  const [type, setType] = useState("expense"); // "expense" | "income"
+  const [type, setType] = useState("expense");
 
   const formatWithComma = (value) => {
     const num = value.replace(/,/g, "");
@@ -36,20 +34,15 @@ const InputForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     const rawAmount = parseInt(unmask(form.amount), 10);
     const finalAmount = type === "expense" ? rawAmount * -1 : rawAmount;
 
     try {
-      const result = await addTransaction({
-        ...form,
-        amount: finalAmount,
-      });
-
+      const result = await addTransaction({ ...form, amount: finalAmount });
       if (result.status === "success") {
         alert("입력 완료!");
-        setForm({ code: "", amount: "", description: "", date: "" });
-        setType("expense"); // 다시 지출로 리셋
+        setForm({ category: "", amount: "", memo: "", date: getToday() });
+        setType("expense");
       } else {
         alert("실패: " + (result.message || "알 수 없는 오류"));
       }
@@ -65,9 +58,11 @@ const InputForm = () => {
         대분류코드
         <select name="category" value={form.category} onChange={handleChange} required>
           <option value="">-- 선택하세요 --</option>
-          <option value="TRANSPORT">교통비</option>
-          <option value="COMMUNICATION">통신비</option>
-          <option value="FOOD">식비</option>
+          {categories.map(cat => (
+            <option key={cat.code} value={cat.code}>
+              {cat.description}
+            </option>
+          ))}
         </select>
       </label>
 
@@ -83,18 +78,10 @@ const InputForm = () => {
             required
           />
           <div className="type-tabs">
-            <button
-              type="button"
-              className={type === "expense" ? "active" : ""}
-              onClick={() => setType("expense")}
-            >
+            <button type="button" className={type === "expense" ? "active" : ""} onClick={() => setType("expense")}>
               지출
             </button>
-            <button
-              type="button"
-              className={type === "income" ? "active" : ""}
-              onClick={() => setType("income")}
-            >
+            <button type="button" className={type === "income" ? "active" : ""} onClick={() => setType("income")}>
               수입
             </button>
           </div>

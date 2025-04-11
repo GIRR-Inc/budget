@@ -45,7 +45,7 @@
   }
   
   button {
-    padding: 14px;
+    padding: 12px 18px;
     font-size: 16px;
     background-color: #f4a8a8;
     font-family: 'S-CoreDream-3Light';
@@ -53,11 +53,22 @@
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    transition: background 0.2s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s, transform 0.1s;
   }
   
   button:hover {
-    background-color: #f4a8a8;
+    background-color: #f19191;
+  }
+  
+  button:active {
+    background-color: #e87a7a;
+    transform: translateY(1px);
+  }
+  
+  button:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(244, 168, 168, 0.4);
   }
   
   /* InputForm.css */

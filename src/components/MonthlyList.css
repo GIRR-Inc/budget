@@ -131,3 +131,111 @@
     color: crimson;
   }
   
+  .item {
+    position: relative;
+    padding: 12px 12px 12px 0;
+    border-bottom: 1px solid #eee;
+    font-family: 'S-CoreDream-3Light';
+  }
+  
+  .item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+  
+  .delete-btn {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: none;
+    border: none;
+    color: #e74c3c;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    z-index: 1;
+  }
+  
+/* 아이콘 크기 줄이기 */
+.delete-btn svg {
+  font-size: 14px;
+}
+
+/* hover 효과 제거 */
+.delete-btn:hover {
+  background: none;
+  color: #e74c3c;
+}
+
+.deleted-category-label {
+  font-size: 12px;
+  color: crimson;
+  margin-left: 6px;
+  font-family: 'S-CoreDream-3Light';
+}
+
+.category {
+  display: flex;
+  align-items: center; /* ← 세로 중앙 정렬 */
+  gap: 6px;
+  font-size: 15px;
+  font-family: 'S-CoreDream-3Light';
+}
+
+.badge-deleted {
+  display: inline-block;
+  padding: 2px 6px;
+  font-size: 9px;
+  font-family: 'S-CoreDream-3Light';
+  color: #fff;
+  background-color: crimson;
+  border-radius: 8px;
+  line-height: 1; /* ← 높이 안정화 */
+}
+
+
+.edit-btn {
+  position: absolute;
+  top: 5px;
+  right: 36px; /* ← X 아이콘보다 왼쪽으로 살짝 떨어뜨리기 */
+  background: none;
+  border: none;
+  color: #888; /* 또는 #555, 눈에 띄지 않게 */
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  z-index: 1;
+}
+
+/* 아이콘 크기 동일하게 */
+.edit-btn svg {
+  font-size: 14px;
+}
+
+/* hover 효과 제거 */
+.edit-btn:hover {
+  background: none;
+  color: #888;
+}
+
+.edit-input {
+  font-family: 'S-CoreDream-3Light';
+  font-size: 15px;
+  color: #333;
+  padding: 4px 6px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background-color: transparent;
+  width: 100%;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.edit-input:focus {
+  border-color: #f19191;
+}

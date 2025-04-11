@@ -10,7 +10,8 @@ export const fetchBudgetData = async () => {
       category,
       memo,
       categories (
-        description
+        description,
+        is_deleted
       )
     `)
     .order("date", { ascending: false });
@@ -21,10 +22,12 @@ export const fetchBudgetData = async () => {
     date: row.date,
     amount: row.amount,
     category: row.category,
-    category_name: row.categories?.description || "Unknown",
+    category_name: row.categories?.description || "삭제된 카테고리",
+    is_deleted: row.categories?.is_deleted === true,
     memo: row.memo,
   }));
 };
+
 
 // 월별 예산 및 지출 요약
 export const fetchMonthlySummary = async (month) => {
@@ -71,6 +74,35 @@ export const addTransaction = async ({ category, amount, memo, date }) => {
   return { status: "success" };
 };
 
+export const updateTransaction = async (original, updated) => {
+  const { error } = await supabase
+    .from("transactions")
+    .update({
+      amount: updated.amount,
+      memo: updated.memo,
+    })
+    .match({
+      date: original.date,
+      amount: original.amount,
+      category: original.category,
+      memo: original.memo,
+    });
+
+  if (error) throw error;
+  return { status: "success" };
+};
+
+// 거래 삭제
+export const deleteTransaction = async (date, amount, category, memo) => {
+  const { error } = await supabase
+    .from("transactions")
+    .delete()
+    .match({ date, amount, category, memo });
+
+  if (error) throw error;
+  return { status: "success" };
+};
+
 // 예산 저장
 export const saveMonthlyBudget = async (month, budget) => {
     const { data, error } = await supabase
@@ -87,3 +119,48 @@ function getNextMonth(month) {
   const next = new Date(year, m, 1);
   return `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, "0")}`;
 }
+
+
+// 카테고리 전체 불러오기
+export const fetchCategories = async () => {
+  const { data, error } = await supabase
+    .from("categories")
+    .select("*")
+    .eq("is_deleted", false) // 삭제된 항목 제외
+    .order("sort", { ascending: true });
+
+  if (error) throw error;
+  return data;
+};
+
+// 카테고리 추가
+export const addCategory = async ({ code, description, sort }) => {
+  const { data, error } = await supabase
+    .from("categories")
+    .insert([{ code, description, sort }]);
+
+  if (error) throw error;
+  return { status: "success", data };
+};
+
+export const softDeleteCategory = async (code) => {
+  const { error } = await supabase
+    .from("categories")
+    .update({ is_deleted: true })
+    .eq("code", code);
+
+  if (error) throw error;
+  return { status: "success" };
+};
+
+
+// 카테고리 삭제
+export const deleteCategory = async (code) => {
+  const { error } = await supabase
+    .from("categories")
+    .delete()
+    .eq("code", code);
+
+  if (error) throw error;
+  return { status: "success" };
+};
