@@ -134,10 +134,19 @@ export const fetchCategories = async () => {
 };
 
 // 카테고리 추가
-export const addCategory = async ({ code, description, sort }) => {
+export const addCategory = async ({ code, description }) => {
+  const { data: existing } = await supabase
+    .from("categories")
+    .select("sort")
+    .eq("is_deleted", false)
+    .order("sort", { ascending: false })
+    .limit(1);
+
+  const nextSort = existing?.[0]?.sort != null ? existing[0].sort + 1 : 0;
+
   const { data, error } = await supabase
     .from("categories")
-    .insert([{ code, description, sort }]);
+    .insert([{ code, description, sort: nextSort }]);
 
   if (error) throw error;
   return { status: "success", data };
@@ -153,6 +162,22 @@ export const softDeleteCategory = async (code) => {
   return { status: "success" };
 };
 
+// 카테고리 정렬 순서 일괄 업데이트
+export const updateCategoriesSort = async (categories) => {
+  const updates = categories.map(({ code, sort }) =>
+    supabase
+      .from("categories")
+      .update({ sort })
+      .eq("code", code)
+  );
+
+  const results = await Promise.all(updates);
+
+  const errors = results.filter((r) => r.error);
+  if (errors.length > 0) throw new Error("정렬 순서 저장 중 오류 발생");
+
+  return { status: "success" };
+};
 
 // 카테고리 삭제
 export const deleteCategory = async (code) => {

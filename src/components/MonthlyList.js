@@ -47,10 +47,9 @@ const MonthlyList = () => {
         d === editItem
           ? {
               ...editItem,
-              amount:
-                editItem.amount < 0
-                  ? -Math.abs(updated.amount)
-                  : +updated.amount,
+              amount: updated.type === "expense"
+                ? -Math.abs(updated.amount)
+                : Math.abs(updated.amount),
               memo: updated.memo,
             }
           : d

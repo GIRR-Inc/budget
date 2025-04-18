@@ -33,10 +33,9 @@ const EditDialog = ({ open, onClose, item, onSave }) => {
   const unmask = (value) => value.replace(/,/g, "");
 
   const handleSave = () => {
-    const numeric = parseInt(unmask(amount), 10);
-    const finalAmount =
-      type === "expense" ? -Math.abs(numeric) : Math.abs(numeric);
-    onSave({ amount: finalAmount, memo });
+    const numeric = parseInt(unmask(amount), 10) || 0;
+    const finalAmount = type === "expense" ? -numeric : numeric;
+    onSave({ amount: finalAmount, memo, type });
   };
 
   return (
