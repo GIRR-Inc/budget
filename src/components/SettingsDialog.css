@@ -36,17 +36,11 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   }
   
-  .drag-handle,
-  .sortable-item,
-  .drag-preview {
-    user-select: none;
-    -webkit-user-select: none; /* iOS Safari */
-    touch-action: none;         /* Prevents scroll/zoom during drag */
-  }
-
   .drag-handle {
-    cursor: grab;
+    touch-action: none;
     user-select: none;
+    -webkit-user-select: none;
+    cursor: grab;
     font-size: 16px;
     color: #666;
     margin-right: 8px;
