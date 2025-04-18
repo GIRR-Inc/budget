@@ -21,6 +21,7 @@ import {
   useSensor,
   useSensors,
   PointerSensor,
+  TouchSensor
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -78,7 +79,19 @@ function SettingsDialog({ open, onClose, onCategoryChange }) {
   const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState({ description: "", sort: 0 });
 
-  const sensors = useSensors(useSensor(PointerSensor));
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 약간 움직여야 인식
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,      // 꾹 누른 후 250ms 뒤 인식
+        tolerance: 5,    // 5px 이상 움직여야 작동
+      },
+    })
+  );
 
   useEffect(() => {
     if (open) loadCategories();
