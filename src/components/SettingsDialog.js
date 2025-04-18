@@ -101,7 +101,7 @@ function SettingsDialog({ open, onClose, onCategoryChange }) {
     useSensor(TouchSensor, {
       activationConstraint: {
         delay: 250,
-        tolerance: 5,
+        tolerance: 0,
       },
     })
   );
