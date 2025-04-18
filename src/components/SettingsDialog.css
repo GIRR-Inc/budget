@@ -17,16 +17,31 @@
   }
   
   .settings-list-wrapper {
+    position: relative;
     max-height: 300px;
     overflow-y: auto;
+    touch-action: auto;
     margin-bottom: 1rem;
     border: 1px solid #eee;
     border-radius: 8px;
     background: #fdfdfd;
     font-family: 'S-CoreDream-3Light';
     font-size: 13px; /* 글씨 작게 */
-    touch-action: auto;
     -webkit-overflow-scrolling: touch;
+  }
+
+  .drag-preview {
+    opacity: 0.8;
+    background-color: #e8f0ff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+  
+  .drag-handle,
+  .sortable-item,
+  .drag-preview {
+    user-select: none;
+    -webkit-user-select: none; /* iOS Safari */
+    touch-action: none;         /* Prevents scroll/zoom during drag */
   }
 
   .drag-handle {
@@ -37,9 +52,11 @@
     margin-right: 8px;
   }
   
-  .settings-list-wrapper ul {
-    margin: 0;
-    padding: 0;
+  .settings-list-wrapper {
+    overflow-y: auto;
+    max-height: 300px;
+    touch-action: auto; /* 또는 manipulation */
+    -webkit-overflow-scrolling: touch;
   }
   
   .settings-input {
@@ -69,6 +86,7 @@
   }
 
   .sortable-item {
+    position: relative; /* ⭐ 필수! */
     display: flex;
     justify-content: space-between;
     align-items: center;

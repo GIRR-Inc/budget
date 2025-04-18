@@ -22,7 +22,9 @@ import {
   useSensors,
   PointerSensor,
   TouchSensor,
+  DragOverlay
 } from "@dnd-kit/core";
+
 import {
   arrayMove,
   SortableContext,
@@ -83,17 +85,23 @@ function SortableItem({ item, index, onDelete }) {
 function SettingsDialog({ open, onClose, onCategoryChange }) {
   const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState({ description: "", sort: 0 });
+  const [activeId, setActiveId] = useState(null);
+
+  const handleDragStart = (event) => {
+    setActiveId(event.active.id);
+    console.log("드래그 시작됨!");
+  };
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8, // 마우스는 8px 이상 움직이면 드래그
+        distance: 8,
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 250, // 터치 후 250ms 기다려야 드래그
-        tolerance: 5, // 5px 이내 움직임은 무시 → 스크롤 가능
+        delay: 250,
+        tolerance: 5,
       },
     })
   );
@@ -125,20 +133,21 @@ function SettingsDialog({ open, onClose, onCategoryChange }) {
   };
 
   const handleDragEnd = async (event) => {
+    setActiveId(null);
     const { active, over } = event;
     if (!over || active.id === over.id) return;
-
+  
     const oldIndex = categories.findIndex((c) => c.code === active.id);
     const newIndex = categories.findIndex((c) => c.code === over.id);
-
+  
     const newItems = arrayMove(categories, oldIndex, newIndex).map(
       (item, idx) => ({ ...item, sort: idx })
     );
-
+  
     setCategories(newItems);
-
+  
     try {
-      await updateCategoriesSort(newItems); // 🟢 서버 저장
+      await updateCategoriesSort(newItems);
       if (onCategoryChange) onCategoryChange();
     } catch (err) {
       alert("정렬 순서 저장 중 오류가 발생했습니다.");
@@ -149,15 +158,16 @@ function SettingsDialog({ open, onClose, onCategoryChange }) {
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>환경 설정 - 카테고리 관리</DialogTitle>
       <DialogContent dividers className="settings-dialog-content">
-        <DndContext
+      <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
+          onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-          <SortableContext
-            items={categories.map((c) => c.code)}
-            strategy={verticalListSortingStrategy}
-          >
+            <SortableContext
+              items={categories.map((c) => c.code)}
+              strategy={verticalListSortingStrategy}
+            >
             <div className="settings-list-wrapper">
               {categories.map((cat, index) => (
                 <SortableItem
@@ -169,6 +179,20 @@ function SettingsDialog({ open, onClose, onCategoryChange }) {
               ))}
             </div>
           </SortableContext>
+          <DragOverlay>
+    {activeId ? (
+      <div className="sortable-item drag-preview">
+        <div className="drag-handle">☰</div>
+        <div style={{ flexGrow: 1 }}>
+          <div className="item-text-primary">
+            {
+              categories.find((c) => c.code === activeId)?.description || ""
+            }
+          </div>
+        </div>
+      </div>
+    ) : null}
+  </DragOverlay>
         </DndContext>
 
         <TextField
