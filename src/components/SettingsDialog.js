@@ -13,7 +13,7 @@ import {
   fetchCategories,
   addCategory,
   softDeleteCategory,
-  updateCategoriesSort
+  updateCategoriesSort,
 } from "../api/budgetApi";
 import {
   DndContext,
@@ -21,7 +21,7 @@ import {
   useSensor,
   useSensors,
   PointerSensor,
-  TouchSensor
+  TouchSensor,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -40,34 +40,39 @@ function generateRandomCode() {
 
 // 🔁 SortableItem component
 function SortableItem({ item, index, onDelete }) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: item.code });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
     transition,
-    border: "1px solid #ddd",
-    padding: "12px",
-    marginBottom: "8px",
-    borderRadius: "8px",
-    backgroundColor: "#fff",
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-  };
+  } = useSortable({ id: item.code });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+      border: "1px solid #ddd",
+      padding: "12px",
+      marginBottom: "8px",
+      borderRadius: "8px",
+      backgroundColor: "#fff",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+    };
 
   return (
-    <div
-      ref={setNodeRef}
-      className="sortable-item"
-      style={style}
-      {...attributes}
-      {...listeners}
-    >
-      <div>
+    <div className="sortable-item" ref={setNodeRef} style={style} {...attributes}>
+      {/* ⬇ 드래그 핸들에만 listeners 붙임 */}
+      <div className="drag-handle" {...listeners} style={{ cursor: "grab", paddingRight: "8px" }}>
+        ☰
+      </div>
+
+      <div style={{ flexGrow: 1 }}>
         <div className="item-text-primary">{item.description}</div>
         <div className="item-text-secondary">정렬 순서: {index}</div>
       </div>
+
       <IconButton onClick={() => onDelete(item.code)}>
         <DeleteIcon />
       </IconButton>
@@ -82,13 +87,13 @@ function SettingsDialog({ open, onClose, onCategoryChange }) {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8, // 약간 움직여야 인식
+        distance: 8, // 마우스는 8px 이상 움직이면 드래그
       },
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 250,      // 꾹 누른 후 250ms 뒤 인식
-        tolerance: 5,    // 5px 이상 움직여야 작동
+        delay: 250, // 터치 후 250ms 기다려야 드래그
+        tolerance: 5, // 5px 이내 움직임은 무시 → 스크롤 가능
       },
     })
   );
@@ -122,15 +127,16 @@ function SettingsDialog({ open, onClose, onCategoryChange }) {
   const handleDragEnd = async (event) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
-  
-    const oldIndex = categories.findIndex(c => c.code === active.id);
-    const newIndex = categories.findIndex(c => c.code === over.id);
-  
-    const newItems = arrayMove(categories, oldIndex, newIndex)
-      .map((item, idx) => ({ ...item, sort: idx }));
-  
+
+    const oldIndex = categories.findIndex((c) => c.code === active.id);
+    const newIndex = categories.findIndex((c) => c.code === over.id);
+
+    const newItems = arrayMove(categories, oldIndex, newIndex).map(
+      (item, idx) => ({ ...item, sort: idx })
+    );
+
     setCategories(newItems);
-  
+
     try {
       await updateCategoriesSort(newItems); // 🟢 서버 저장
       if (onCategoryChange) onCategoryChange();

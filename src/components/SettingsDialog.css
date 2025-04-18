@@ -25,6 +25,16 @@
     background: #fdfdfd;
     font-family: 'S-CoreDream-3Light';
     font-size: 13px; /* 글씨 작게 */
+    touch-action: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .drag-handle {
+    cursor: grab;
+    user-select: none;
+    font-size: 16px;
+    color: #666;
+    margin-right: 8px;
   }
   
   .settings-list-wrapper ul {
