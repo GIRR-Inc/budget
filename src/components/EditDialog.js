@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import "./InputForm.css"; // 기존 스타일 활용
 
-const EditDialog = ({ open, onClose, item, onSave }) => {
+const EditDialog = ({ open, onClose, item, onSave, userId }) => {
   const [amount, setAmount] = useState("");
   const [memo, setMemo] = useState("");
   const [type, setType] = useState("expense"); // expense | income
@@ -35,7 +35,8 @@ const EditDialog = ({ open, onClose, item, onSave }) => {
   const handleSave = () => {
     const numeric = parseInt(unmask(amount), 10) || 0;
     const finalAmount = type === "expense" ? -numeric : numeric;
-    onSave({ amount: finalAmount, memo, type });
+
+    onSave({ amount: finalAmount, memo, type, userId });
   };
 
   return (

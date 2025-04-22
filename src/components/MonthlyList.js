@@ -8,9 +8,10 @@ import {
 import "./MonthlyList.css";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
-import EditDialog from "./EditDialog"; // 다이얼로그 컴포넌트 불러오기
+import EditDialog from "./EditDialog";
 
-const MonthlyList = () => {
+// ✅ userId props로 받기
+const MonthlyList = ({ userId }) => {
   const [data, setData] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState("");
   const [summary, setSummary] = useState({ budget: 0, spent: 0 });
@@ -23,7 +24,7 @@ const MonthlyList = () => {
     if (!confirmed) return;
 
     try {
-      await deleteTransaction(item.date, item.amount, item.category, item.memo);
+      await deleteTransaction(item.date, item.amount, item.category, item.memo, userId); // ✅ userId 추가
       const updated = data.filter(
         (d) =>
           !(
@@ -42,14 +43,15 @@ const MonthlyList = () => {
 
   const handleEditSave = async (updated) => {
     try {
-      await updateTransaction(editItem, updated);
+      await updateTransaction(editItem, updated, userId); // ✅ userId 추가
       const updatedData = data.map((d) =>
         d === editItem
           ? {
               ...editItem,
-              amount: updated.type === "expense"
-                ? -Math.abs(updated.amount)
-                : Math.abs(updated.amount),
+              amount:
+                updated.type === "expense"
+                  ? -Math.abs(updated.amount)
+                  : Math.abs(updated.amount),
               memo: updated.memo,
             }
           : d
@@ -63,20 +65,21 @@ const MonthlyList = () => {
   };
 
   useEffect(() => {
-    fetchBudgetData().then((res) => {
+    if (!userId) return;
+    fetchBudgetData(userId).then((res) => {
       setData(res);
       const months = [...new Set(res.map((d) => d.date?.slice(0, 7)))].sort().reverse();
       if (months.length > 0) setSelectedMonth(months[0]);
     });
-  }, []);
+  }, [userId]);
 
   useEffect(() => {
-    if (!selectedMonth) return;
+    if (!selectedMonth || !userId) return;
 
-    fetchMonthlySummary(selectedMonth).then((res) => {
+    fetchMonthlySummary(selectedMonth, userId).then((res) => {
       setSummary({ budget: res.budget, spent: res.spent });
     });
-  }, [selectedMonth]);
+  }, [selectedMonth, userId]);
 
   const months = [...new Set(data.map((d) => d.date?.slice(0, 7)))].sort().reverse();
   const filtered = data.filter((d) => d.date?.startsWith(selectedMonth));
@@ -158,6 +161,7 @@ const MonthlyList = () => {
         onClose={() => setEditDialogOpen(false)}
         item={editItem}
         onSave={handleEditSave}
+        userId={userId}
       />
     </div>
   );

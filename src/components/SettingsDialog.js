@@ -82,7 +82,7 @@ function SortableItem({ item, index, onDelete }) {
   );
 }
 
-function SettingsDialog({ open, onClose, onCategoryChange }) {
+function SettingsDialog({ open, onClose, onCategoryChange, userId  }) {
   const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState({ description: "", sort: 0 });
   const [activeId, setActiveId] = useState(null);
@@ -107,27 +107,31 @@ function SettingsDialog({ open, onClose, onCategoryChange }) {
   );
 
   useEffect(() => {
-    if (open) loadCategories();
-  }, [open]);
+    if (open && userId) loadCategories();
+  }, [open, userId]);
 
   const loadCategories = async () => {
-    const data = await fetchCategories();
-    const sorted = [...data].sort((a, b) => a.sort - b.sort);
-    setCategories(sorted);
+    try {
+      const data = await fetchCategories(userId); // ✅ 전달
+      const sorted = [...data].sort((a, b) => a.sort - b.sort);
+      setCategories(sorted);
+    } catch (err) {
+      console.error("카테고리 로딩 실패:", err);
+    }
   };
 
   const handleAdd = async () => {
     const code = generateRandomCode();
     const maxSort =
       categories.length > 0 ? Math.max(...categories.map((c) => c.sort)) : 0;
-    await addCategory({ ...newCategory, code, sort: maxSort + 1 });
+    await addCategory({ ...newCategory, code, sort: maxSort + 1 }, userId); // ✅ 전달
     setNewCategory({ code: "", description: "", sort: 0 });
     await loadCategories();
     if (onCategoryChange) onCategoryChange();
   };
 
   const handleDelete = async (code) => {
-    await softDeleteCategory(code);
+    await softDeleteCategory(code, userId); // ✅ 전달
     await loadCategories();
     if (onCategoryChange) onCategoryChange();
   };
@@ -136,18 +140,18 @@ function SettingsDialog({ open, onClose, onCategoryChange }) {
     setActiveId(null);
     const { active, over } = event;
     if (!over || active.id === over.id) return;
-  
+
     const oldIndex = categories.findIndex((c) => c.code === active.id);
     const newIndex = categories.findIndex((c) => c.code === over.id);
-  
+
     const newItems = arrayMove(categories, oldIndex, newIndex).map(
       (item, idx) => ({ ...item, sort: idx })
     );
-  
+
     setCategories(newItems);
-  
+
     try {
-      await updateCategoriesSort(newItems);
+      await updateCategoriesSort(newItems, userId); // ✅ 전달
       if (onCategoryChange) onCategoryChange();
     } catch (err) {
       alert("정렬 순서 저장 중 오류가 발생했습니다.");

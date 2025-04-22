@@ -1,31 +1,53 @@
-// src/App.js
 import React, { useState, useEffect } from "react";
 import InputForm from "./components/InputForm";
 import MonthlyList from "./components/MonthlyList";
 import BudgetSummary from "./components/BudgetSummary";
-import SettingsDialog from "./components/SettingsDialog"; // 새로 만들 컴포넌트
+import SettingsDialog from "./components/SettingsDialog";
 import SettingsIcon from "@mui/icons-material/Settings";
 import IconButton from "@mui/material/IconButton";
-import { fetchCategories } from "./api/budgetApi"; // API 추가
-import "./App.css"; // 스타일은 따로 작성
+import { fetchUsers, fetchCategories } from "./api/budgetApi"; // ✅ fetchUsers 추가
+import "./App.css";
 
 function App() {
   const [activeTab, setActiveTab] = useState("input");
-  const [settingsOpen, setSettingsOpen] = useState(false); // 다이얼로그 상태
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [activeUser, setActiveUser] = useState(null); // ✅ id + username
 
-  const loadCategories = async () => {
+  // 사용자 목록 불러오기
+  const loadUsers = async () => {
     try {
-      const data = await fetchCategories();
+      const data = await fetchUsers();
+      setUsers(data);
+      const bokyung = data.find((u) => u.username === "보경");
+      setActiveUser(bokyung ?? data[0]);
+    } catch (error) {
+      console.error("사용자 로딩 실패:", error);
+    }
+  };
+
+  const loadCategories = async (userId) => {
+    try {
+      const data = await fetchCategories(userId);
       setCategories(data);
     } catch (error) {
       console.error("카테고리 로딩 실패:", error);
     }
   };
-  
+
   useEffect(() => {
-    loadCategories();
+    loadUsers();
   }, []);
+
+  useEffect(() => {
+    if (activeUser) {
+      loadCategories(activeUser.id);
+    }
+  }, [activeUser]);
+
+  const mainColor = activeUser?.username === "보경" ? "#f4a8a8" : "#91bdf1";
+  const hoverColor = activeUser?.username === "보경" ? "#f19191" : "#619ee8";
 
   return (
     <div
@@ -36,7 +58,46 @@ function App() {
         position: "relative",
       }}
     >
-      {/* 오른쪽 상단 톱니바퀴 */}
+      {/* 사용자 탭 */}
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          marginBottom: "1.5rem",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            borderRadius: "30px",
+            overflow: "hidden",
+            border: `2px solid ${mainColor}`,
+          }}
+        >
+          {users.map((user, index) => (
+            <button
+              key={user.id}
+              onClick={() => setActiveUser(user)}
+              style={{
+                padding: "8px 24px",
+                border: "none",
+                backgroundColor: activeUser?.id === user.id ? mainColor : "white",
+                color: activeUser?.id === user.id ? "white" : mainColor,
+                fontWeight: 600,
+                fontFamily: "'GmarketSansMedium', sans-serif",
+                cursor: "pointer",
+                outline: "none",
+                borderRight: index === 0 ? `1px solid ${mainColor}` : "none",
+                transition: "all 0.2s",
+              }}
+            >
+              {user.username}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* 톱니바퀴 버튼 */}
       <div
         style={{
           position: "fixed",
@@ -49,7 +110,7 @@ function App() {
         }}
       >
         <IconButton onClick={() => setSettingsOpen(true)} size="large">
-          <SettingsIcon style={{ color: "#f19191" }} />
+          <SettingsIcon style={{ color: mainColor }} />
         </IconButton>
       </div>
 
@@ -59,7 +120,7 @@ function App() {
           fontFamily: "'GmarketSansMedium', sans-serif",
         }}
       >
-        우리 보경이의 부자 가계부
+        우리 {activeUser?.username}이의 부자 가계부
       </h2>
 
       {/* 탭 버튼 */}
@@ -71,99 +132,51 @@ function App() {
           marginBottom: "1rem",
         }}
       >
-        <button
-          onClick={() => setActiveTab("input")}
-          style={{
-            padding: "10px 10px",
-            borderRadius: "30px",
-            border: "1px solid #f4a8a8",
-            fontFamily: "'GmarketSansMedium', sans-serif",
-            fontWeight: 600,
-            backgroundColor: activeTab === "input" ? "#f4a8a8" : "white",
-            color: activeTab === "input" ? "white" : "#f4a8a8",
-            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-            cursor: "pointer",
-            transition: "all 0.2s ease-in-out",
-          }}
-          onMouseOver={(e) => {
-            e.target.style.backgroundColor =
-              activeTab === "input" ? "#006ae0" : "#e6f0ff";
-          }}
-          onMouseOut={(e) => {
-            e.target.style.backgroundColor =
-              activeTab === "input" ? "#f4a8a8" : "white";
-          }}
-        >
-          입력하기
-        </button>
-        <button
-          onClick={() => setActiveTab("monthly")}
-          style={{
-            padding: "10px 10px",
-            borderRadius: "30px",
-            border: "1px solid #f4a8a8",
-            fontFamily: "'GmarketSansMedium', sans-serif",
-            fontWeight: 600,
-            backgroundColor: activeTab === "monthly" ? "#f4a8a8" : "white",
-            color: activeTab === "monthly" ? "white" : "#f4a8a8",
-            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-            cursor: "pointer",
-            transition: "all 0.2s ease-in-out",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-          }}
-          onMouseOver={(e) => {
-            e.target.style.backgroundColor =
-              activeTab === "monthly" ? "#f19191" : "#faeaea";
-          }}
-          onMouseOut={(e) => {
-            e.target.style.backgroundColor =
-              activeTab === "monthly" ? "#f4a8a8" : "white";
-          }}
-        >
-          월별 보기
-        </button>
-        <button
-          onClick={() => setActiveTab("summary")}
-          style={{
-            padding: "10px 10px",
-            borderRadius: "30px",
-            border: "1px solid #f4a8a8",
-            fontFamily: "'GmarketSansMedium', sans-serif",
-            fontWeight: 600,
-            backgroundColor: activeTab === "summary" ? "#f4a8a8" : "white",
-            color: activeTab === "summary" ? "white" : "#f4a8a8",
-            boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-            cursor: "pointer",
-            transition: "all 0.2s ease-in-out",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-          }}
-          onMouseOver={(e) => {
-            e.target.style.backgroundColor =
-              activeTab === "summary" ? "#f19191" : "#faeaea";
-          }}
-          onMouseOut={(e) => {
-            e.target.style.backgroundColor =
-              activeTab === "summary" ? "#f4a8a8" : "white";
-          }}
-        >
-          월간 예산
-        </button>
+        {[
+          { label: "입력하기", key: "input" },
+          { label: "월별 보기", key: "monthly" },
+          { label: "월간 예산", key: "summary" },
+        ].map(({ label, key }) => (
+          <button
+            key={key}
+            onClick={() => setActiveTab(key)}
+            style={{
+              padding: "10px 10px",
+              borderRadius: "30px",
+              border: `1px solid ${mainColor}`,
+              fontFamily: "'GmarketSansMedium', sans-serif",
+              fontWeight: 600,
+              backgroundColor: activeTab === key ? mainColor : "white",
+              color: activeTab === key ? "white" : mainColor,
+              boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
+              cursor: "pointer",
+              transition: "all 0.2s ease-in-out",
+            }}
+            onMouseOver={(e) => {
+              e.target.style.backgroundColor =
+                activeTab === key ? hoverColor : "#f0f0f0";
+            }}
+            onMouseOut={(e) => {
+              e.target.style.backgroundColor =
+                activeTab === key ? mainColor : "white";
+            }}
+          >
+            {label}
+          </button>
+        ))}
       </div>
 
-      {/* 탭 컨텐츠 */}
-      {activeTab === "input" && <InputForm categories={categories} />}
-      {activeTab === "monthly" && <MonthlyList />}
-      {activeTab === "summary" && <BudgetSummary />}
+      {/* 탭 콘텐츠 */}
+      {activeTab === "input" && <InputForm categories={categories} userId={activeUser?.id} />}
+      {activeTab === "monthly" && <MonthlyList userId={activeUser?.id} />}
+      {activeTab === "summary" && <BudgetSummary userId={activeUser?.id} />}
 
-      {/* 환경설정 다이얼로그 */}
+      {/* 설정 다이얼로그 */}
       <SettingsDialog
         open={settingsOpen}
         onClose={() => setSettingsOpen(false)}
-        onCategoryChange={loadCategories} // 추가
+        onCategoryChange={() => loadCategories(activeUser?.id)}
+        userId={activeUser?.id}
       />
     </div>
   );

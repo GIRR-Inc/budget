@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { addTransaction } from "../api/budgetApi";
 import "./InputForm.css";
 
-const InputForm = ({ categories }) => {
+const InputForm = ({ categories, userId }) => {
   const getToday = () => new Date().toISOString().split("T")[0];
 
   const [form, setForm] = useState({
@@ -38,7 +38,7 @@ const InputForm = ({ categories }) => {
     const finalAmount = type === "expense" ? rawAmount * -1 : rawAmount;
 
     try {
-      const result = await addTransaction({ ...form, amount: finalAmount });
+      const result = await addTransaction({ ...form, amount: finalAmount }, userId); // ✅ userId 전달
       if (result.status === "success") {
         alert("입력 완료!");
         setForm({ category: "", amount: "", memo: "", date: getToday() });

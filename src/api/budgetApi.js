@@ -1,7 +1,18 @@
 import supabase from "./supabase";
 
+
+export const fetchUsers = async () => {
+  const { data, error } = await supabase
+    .from("users")
+    .select("id, username");
+
+  if (error) throw error;
+  return data;
+};
+
+
 // 거래 내역 전체 불러오기 (카테고리 이름 포함)
-export const fetchBudgetData = async () => {
+export const fetchBudgetData = async (userId) => {
   const { data, error } = await supabase
     .from("transactions")
     .select(`
@@ -14,6 +25,7 @@ export const fetchBudgetData = async () => {
         is_deleted
       )
     `)
+    .eq("user_id", userId)
     .order("date", { ascending: false });
 
   if (error) throw error;
@@ -30,22 +42,22 @@ export const fetchBudgetData = async () => {
 
 
 // 월별 예산 및 지출 요약
-export const fetchMonthlySummary = async (month) => {
-  // 예산 불러오기
+export const fetchMonthlySummary = async (month, userId) => {
   const { data: budgetData, error: budgetError } = await supabase
-  .from("monthly_budget")
-  .select("budget")
-  .eq("month", month)
-  .maybeSingle(); // ← 여기를 수정
+    .from("monthly_budget")
+    .select("budget")
+    .eq("month", month)
+    .eq("user_id", userId)
+    .maybeSingle();
 
   if (budgetError) throw new Error("예산 정보 불러오기 실패");
 
   const budget = budgetData?.budget || 0;
 
-  // 해당 월 거래 가져오기
   const { data: txData, error: txError } = await supabase
     .from("transactions")
     .select("amount, date")
+    .eq("user_id", userId)
     .gte("date", `${month}-01`)
     .lt("date", `${getNextMonth(month)}-01`);
 
@@ -64,17 +76,18 @@ export const fetchMonthlySummary = async (month) => {
   };
 };
 
+
 // 거래 추가
-export const addTransaction = async ({ category, amount, memo, date }) => {
+export const addTransaction = async ({ category, amount, memo, date }, userId) => {
   const { data, error } = await supabase
     .from("transactions")
-    .insert([{ category, amount, memo, date }]);
+    .insert([{ category, amount, memo, date, user_id: userId }]);
 
   if (error) throw error;
   return { status: "success" };
 };
 
-export const updateTransaction = async (original, updated) => {
+export const updateTransaction = async (original, updated, userId) => {
   const { error } = await supabase
     .from("transactions")
     .update({
@@ -86,6 +99,7 @@ export const updateTransaction = async (original, updated) => {
       amount: original.amount,
       category: original.category,
       memo: original.memo,
+      user_id: userId,  // ✅ 사용자 조건 추가!
     });
 
   if (error) throw error;
@@ -93,25 +107,34 @@ export const updateTransaction = async (original, updated) => {
 };
 
 // 거래 삭제
-export const deleteTransaction = async (date, amount, category, memo) => {
+export const deleteTransaction = async (date, amount, category, memo, userId) => {
   const { error } = await supabase
     .from("transactions")
     .delete()
-    .match({ date, amount, category, memo });
+    .match({
+      date,
+      amount,
+      category,
+      memo,
+      user_id: userId,  // ✅ 사용자 조건 추가!
+    });
 
   if (error) throw error;
   return { status: "success" };
 };
 
 // 예산 저장
-export const saveMonthlyBudget = async (month, budget) => {
-    const { data, error } = await supabase
-      .from("monthly_budget")
-      .upsert([{ month, budget }], { onConflict: ['month'] }); // ← 여기!
-  
-    if (error) throw error;
-    return { status: "success" };
-  };
+export const saveMonthlyBudget = async (month, budget, userId) => {
+  const { data, error } = await supabase
+    .from("monthly_budget")
+    .upsert([{ month, budget, user_id: userId }], {
+      onConflict: ['month', 'user_id']
+    });
+
+  if (error) throw error;
+  return { status: "success" };
+};
+
 
 // 월 이름 계산 유틸
 function getNextMonth(month) {
@@ -122,11 +145,12 @@ function getNextMonth(month) {
 
 
 // 카테고리 전체 불러오기
-export const fetchCategories = async () => {
+export const fetchCategories = async (userId) => {
   const { data, error } = await supabase
     .from("categories")
     .select("*")
-    .eq("is_deleted", false) // 삭제된 항목 제외
+    .eq("is_deleted", false)
+    .eq("user_id", userId)
     .order("sort", { ascending: true });
 
   if (error) throw error;
@@ -134,11 +158,12 @@ export const fetchCategories = async () => {
 };
 
 // 카테고리 추가
-export const addCategory = async ({ code, description }) => {
+export const addCategory = async ({ code, description }, userId) => {
   const { data: existing } = await supabase
     .from("categories")
     .select("sort")
     .eq("is_deleted", false)
+    .eq("user_id", userId)
     .order("sort", { ascending: false })
     .limit(1);
 
@@ -146,7 +171,7 @@ export const addCategory = async ({ code, description }) => {
 
   const { data, error } = await supabase
     .from("categories")
-    .insert([{ code, description, sort: nextSort }]);
+    .insert([{ code, description, sort: nextSort, user_id: userId }]);
 
   if (error) throw error;
   return { status: "success", data };
@@ -163,12 +188,13 @@ export const softDeleteCategory = async (code) => {
 };
 
 // 카테고리 정렬 순서 일괄 업데이트
-export const updateCategoriesSort = async (categories) => {
+export const updateCategoriesSort = async (categories, userId) => {
   const updates = categories.map(({ code, sort }) =>
     supabase
       .from("categories")
       .update({ sort })
       .eq("code", code)
+      .eq("user_id", userId)
   );
 
   const results = await Promise.all(updates);
@@ -179,12 +205,14 @@ export const updateCategoriesSort = async (categories) => {
   return { status: "success" };
 };
 
+
 // 카테고리 삭제
-export const deleteCategory = async (code) => {
+export const deleteCategory = async (code, userId) => {
   const { error } = await supabase
     .from("categories")
     .delete()
-    .eq("code", code);
+    .eq("code", code)
+    .eq("user_id", userId);  // ✅ 필수!
 
   if (error) throw error;
   return { status: "success" };

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { saveMonthlyBudget, fetchMonthlySummary } from "../api/budgetApi";
 import "./BudgetSummary.css";
 
-const BudgetSummary = () => {
+const BudgetSummary = ({ userId }) => {
     const [month, setMonth] = useState(() => new Date().toISOString().slice(0, 7)); // YYYY-MM
     const [budget, setBudget] = useState("");
     const [spent, setSpent] = useState(0);
@@ -40,7 +40,7 @@ const BudgetSummary = () => {
     const loadSummary = async () => {
         setLoading(true);
         try {
-            const res = await fetchMonthlySummary(month);
+            const res = await fetchMonthlySummary(month, userId);
             if (res.status === "success") {
                 setBudget(res.budget.toString());
                 setSpent(res.spent);
@@ -57,11 +57,11 @@ const BudgetSummary = () => {
 
     useEffect(() => {
         loadSummary();
-    }, [month]);
+      }, [month, userId]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const res = await saveMonthlyBudget(month, budget);
+        const res = await saveMonthlyBudget(month, budget, userId);
         if (res.status === "success") {
             alert("예산이 저장되었습니다!");
             loadSummary(); // 저장 후 요약 정보 다시 불러오기
