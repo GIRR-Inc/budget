@@ -127,9 +127,10 @@ export const deleteTransaction = async (date, amount, category, memo, userId) =>
 export const saveMonthlyBudget = async (month, budget, userId) => {
   const { data, error } = await supabase
     .from("monthly_budget")
-    .upsert([{ month, budget, user_id: userId }], {
-      onConflict: ['month', 'user_id']
-    });
+    .upsert(
+      [{ month, budget, user_id: userId }],
+      { onConflict: ["month", "user_id"] }
+    );
 
   if (error) throw error;
   return { status: "success" };

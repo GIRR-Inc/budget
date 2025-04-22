@@ -2,7 +2,12 @@ import React, { useState } from "react";
 import { addTransaction } from "../api/budgetApi";
 import "./InputForm.css";
 
-const InputForm = ({ categories, userId }) => {
+const InputForm = ({
+  categories,
+  userId,
+  userColor = "#f4a8a8",
+  hoverColor = "#f19191",
+}) => {
   const getToday = () => new Date().toISOString().split("T")[0];
 
   const [form, setForm] = useState({
@@ -38,7 +43,10 @@ const InputForm = ({ categories, userId }) => {
     const finalAmount = type === "expense" ? rawAmount * -1 : rawAmount;
 
     try {
-      const result = await addTransaction({ ...form, amount: finalAmount }, userId); // ✅ userId 전달
+      const result = await addTransaction(
+        { ...form, amount: finalAmount },
+        userId
+      ); // ✅ userId 전달
       if (result.status === "success") {
         alert("입력 완료!");
         setForm({ category: "", amount: "", memo: "", date: getToday() });
@@ -56,9 +64,14 @@ const InputForm = ({ categories, userId }) => {
     <form className="form-container" onSubmit={handleSubmit}>
       <label>
         대분류코드
-        <select name="category" value={form.category} onChange={handleChange} required>
+        <select
+          name="category"
+          value={form.category}
+          onChange={handleChange}
+          required
+        >
           <option value="">-- 선택하세요 --</option>
-          {categories.map(cat => (
+          {categories.map((cat) => (
             <option key={cat.code} value={cat.code}>
               {cat.description}
             </option>
@@ -78,12 +91,28 @@ const InputForm = ({ categories, userId }) => {
             required
           />
           <div className="type-tabs">
-            <button type="button" className={type === "expense" ? "active" : ""} onClick={() => setType("expense")}>
-              지출
-            </button>
-            <button type="button" className={type === "income" ? "active" : ""} onClick={() => setType("income")}>
-              수입
-            </button>
+            {["expense", "income"].map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setType(t)}
+                style={{
+                  padding: "10px 14px",
+                  fontSize: "14px",
+                  border: "1px solid",
+                  borderRadius: "6px",
+                  backgroundColor: type === t ? userColor : "#f0f0f0",
+                  color: type === t ? "white" : "#333",
+                  borderColor: type === t ? userColor : "#ccc",
+                  minWidth: "52px",
+                  cursor: "pointer",
+                  fontFamily: "'S-CoreDream-3Light'",
+                  transition: "0.2s",
+                }}
+              >
+                {t === "expense" ? "지출" : "수입"}
+              </button>
+            ))}
           </div>
         </div>
       </label>
@@ -94,9 +123,37 @@ const InputForm = ({ categories, userId }) => {
       </label>
       <label>
         일자
-        <input name="date" type="date" value={form.date} onChange={handleChange} required />
+        <input
+          name="date"
+          type="date"
+          value={form.date}
+          onChange={handleChange}
+          required
+        />
       </label>
-      <button type="submit">추가하기</button>
+      <button
+        type="submit"
+        style={{
+          backgroundColor: userColor,
+          color: "white",
+          border: "none",
+          borderRadius: "8px",
+          fontSize: "16px",
+          fontFamily: "'S-CoreDream-3Light'",
+          padding: "12px 18px",
+          boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
+          cursor: "pointer",
+          transition: "background-color 0.2s, transform 0.1s",
+        }}
+        onMouseOver={(e) => {
+          e.target.style.backgroundColor = hoverColor;
+        }}
+        onMouseOut={(e) => {
+          e.target.style.backgroundColor = userColor;
+        }}
+      >
+        추가하기
+      </button>
     </form>
   );
 };

@@ -167,7 +167,7 @@ function App() {
       </div>
 
       {/* 탭 콘텐츠 */}
-      {activeTab === "input" && <InputForm categories={categories} userId={activeUser?.id} />}
+      {activeTab === "input" && <InputForm categories={categories} userId={activeUser?.id} userColor={mainColor} hoverColor={hoverColor} />}
       {activeTab === "monthly" && <MonthlyList userId={activeUser?.id} />}
       {activeTab === "summary" && <BudgetSummary userId={activeUser?.id} />}
 
