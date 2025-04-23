@@ -11,7 +11,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import EditDialog from "./EditDialog";
 import { getMatchedIcon } from "../util/iconMap";
 
-const MonthlyList = ({ userId }) => {
+const MonthlyList = ({ userId, userColor }) => {
   const [data, setData] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState("");
   const [summary, setSummary] = useState({ budget: 0, spent: 0 });
@@ -108,19 +108,30 @@ const MonthlyList = ({ userId }) => {
 
   return (
     <div className="monthly-container">
-      <div className="tab-bar">
+      <div className="tab-bar"
+      >
         {months.map((month) => (
           <button
             key={month}
             className={`tab ${month === selectedMonth ? "active" : ""}`}
             onClick={() => setSelectedMonth(month)}
+            style={{
+              backgroundColor: userColor ,
+              border: `1px solid ${userColor || "#f4a8a8"}`,
+            }}
           >
             {month}
           </button>
         ))}
       </div>
 
-      <div className="summary-bar">
+      <div
+          className="summary-bar"
+          style={{
+            backgroundColor: userColor ? `${userColor}15` : "#fff7f7", // 투명도 조정
+            border: `1px solid ${userColor || "#f4a8a8"}`,
+          }}
+        >
         <h3>{selectedMonth} 예산 요약</h3>
         <div className="summary-row">
           <span className="label">예산</span>

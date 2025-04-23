@@ -168,7 +168,10 @@ function App() {
 
       {/* 탭 콘텐츠 */}
       {activeTab === "input" && <InputForm categories={categories} userId={activeUser?.id} userColor={mainColor} hoverColor={hoverColor} />}
-      {activeTab === "monthly" && <MonthlyList userId={activeUser?.id} />}
+      {activeTab === "monthly" &&   <MonthlyList
+                                      userId={activeUser?.id}
+                                      userColor={mainColor}  // ✅ 추가
+                                    />}
       {activeTab === "summary" && <BudgetSummary userId={activeUser?.id} />}
 
       {/* 설정 다이얼로그 */}

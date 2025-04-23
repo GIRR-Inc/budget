@@ -86,6 +86,7 @@
     font-size: 13px;
     color: #444;
     margin-top: 2px;
+    font-weight: 600; /* ← 추가 */
   }
   
   .empty {
@@ -241,8 +242,8 @@
 }
 
 .memo-icon {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;          /* 원형 모양 */
   object-fit: cover;           /* 이미지 비율 유지하며 자르기 */
   margin-right: 6px;
