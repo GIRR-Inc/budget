@@ -129,8 +129,8 @@ export const saveMonthlyBudget = async (month, budget, userId) => {
     .from("monthly_budget")
     .upsert(
       [{ month, budget, user_id: userId }],
-      { onConflict: ["month", "user_id"] }
-    );
+      { onConflict: ["month", "user_id"] } // ✅ 이걸 DB 제약 조건과 맞춰야 작동함
+    )
 
   if (error) throw error;
   return { status: "success" };
