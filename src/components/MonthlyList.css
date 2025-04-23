@@ -239,3 +239,14 @@
 .edit-input:focus {
   border-color: #f19191;
 }
+
+.memo-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;          /* 원형 모양 */
+  object-fit: cover;           /* 이미지 비율 유지하며 자르기 */
+  margin-right: 6px;
+  vertical-align: middle;      /* 세로 정렬 */
+  display: inline-block;       /* inline 요소처럼 표시 */
+  transform: translateY(-1px); /* 미세한 수직 보정 */
+}

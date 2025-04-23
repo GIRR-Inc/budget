@@ -9,6 +9,8 @@ import "./MonthlyList.css";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import EditDialog from "./EditDialog";
+import { getMatchedIcon } from "../util/iconMap";
+
 
 // ✅ userId props로 받기
 const MonthlyList = ({ userId }) => {
@@ -148,8 +150,18 @@ const MonthlyList = ({ userId }) => {
                   {formatted}원
                 </span>
               </div>
-
-              {item.memo && <div className="memo">({item.memo})</div>}
+              {item.memo && (
+                <div className="memo">
+                  {getMatchedIcon(item.memo) && (
+                    <img
+                      src={getMatchedIcon(item.memo)}
+                      alt="memo icon"
+                      className="memo-icon"
+                    />
+                  )}
+                  {item.memo}
+                </div>
+              )}
             </li>
           );
         })}
