@@ -11,8 +11,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import EditDialog from "./EditDialog";
 import { getMatchedIcon } from "../util/iconMap";
 
-
-// ✅ userId props로 받기
 const MonthlyList = ({ userId }) => {
   const [data, setData] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState("");
@@ -20,13 +18,18 @@ const MonthlyList = ({ userId }) => {
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editItem, setEditItem] = useState(null);
+  const [visibleCount, setVisibleCount] = useState(15);
+
+  const months = [...new Set(data.map((d) => d.date?.slice(0, 7)))].sort().reverse();
+  const filtered = data.filter((d) => d.date?.startsWith(selectedMonth));
+  const visibleItems = filtered.slice(0, visibleCount);
 
   const handleDelete = async (item) => {
     const confirmed = window.confirm("정말 삭제하시겠습니까?");
     if (!confirmed) return;
 
     try {
-      await deleteTransaction(item.date, item.amount, item.category, item.memo, userId); // ✅ userId 추가
+      await deleteTransaction(item.date, item.amount, item.category, item.memo, userId);
       const updated = data.filter(
         (d) =>
           !(
@@ -45,7 +48,7 @@ const MonthlyList = ({ userId }) => {
 
   const handleEditSave = async (updated) => {
     try {
-      await updateTransaction(editItem, updated, userId); // ✅ userId 추가
+      await updateTransaction(editItem, updated, userId);
       const updatedData = data.map((d) =>
         d === editItem
           ? {
@@ -77,14 +80,31 @@ const MonthlyList = ({ userId }) => {
 
   useEffect(() => {
     if (!selectedMonth || !userId) return;
-
     fetchMonthlySummary(selectedMonth, userId).then((res) => {
       setSummary({ budget: res.budget, spent: res.spent });
     });
   }, [selectedMonth, userId]);
 
-  const months = [...new Set(data.map((d) => d.date?.slice(0, 7)))].sort().reverse();
-  const filtered = data.filter((d) => d.date?.startsWith(selectedMonth));
+  // 스크롤 시 visibleCount 증가
+  useEffect(() => {
+    const handleScroll = () => {
+      const nearBottom =
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
+
+      if (nearBottom) {
+        setVisibleCount((prev) => Math.min(prev + 15, filtered.length));
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [filtered]);
+
+  useEffect(() => {
+    setVisibleCount(15); // 월 변경 시 초기화
+  }, [selectedMonth]);
+
+
 
   return (
     <div className="monthly-container">
@@ -115,7 +135,7 @@ const MonthlyList = ({ userId }) => {
       </div>
 
       <ul className="list">
-        {filtered.map((item, idx) => {
+        {visibleItems.map((item, idx) => {
           const amount = Number(item.amount);
           const isExpense = amount < 0;
           const formatted = Math.abs(amount).toLocaleString();
@@ -167,7 +187,6 @@ const MonthlyList = ({ userId }) => {
         })}
       </ul>
 
-      {/* ✏️ 수정 다이얼로그 */}
       <EditDialog
         open={editDialogOpen}
         onClose={() => setEditDialogOpen(false)}
