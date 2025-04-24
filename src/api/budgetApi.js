@@ -11,15 +11,16 @@ export const fetchUsers = async () => {
 };
 
 
-// 거래 내역 전체 불러오기 (카테고리 이름 포함)
 export const fetchBudgetData = async (userId) => {
   const { data, error } = await supabase
     .from("transactions")
     .select(`
+      id,
       date,
       amount,
       category,
       memo,
+      created_at,
       categories (
         description,
         is_deleted
@@ -27,11 +28,12 @@ export const fetchBudgetData = async (userId) => {
     `)
     .eq("user_id", userId)
     .order("date", { ascending: false })
-    .order("created_at", { ascending: false }); // 추가된 정렬 기준
+    .order("created_at", { ascending: false });
 
   if (error) throw error;
 
   return data.map(row => ({
+    id: row.id, // ✅ id 포함
     date: row.date,
     amount: row.amount,
     category: row.category,
@@ -107,22 +109,17 @@ export const updateTransaction = async (original, updated, userId) => {
   return { status: "success" };
 };
 
-// 거래 삭제
-export const deleteTransaction = async (date, amount, category, memo, userId) => {
+// 거래 삭제 (id 기준)
+export const deleteTransaction = async (id) => {
   const { error } = await supabase
     .from("transactions")
     .delete()
-    .match({
-      date,
-      amount,
-      category,
-      memo,
-      user_id: userId,  // ✅ 사용자 조건 추가!
-    });
+    .eq("id", id); // 고유 id로 삭제
 
   if (error) throw error;
   return { status: "success" };
 };
+
 
 // 예산 저장
 export const saveMonthlyBudget = async (month, budget, userId) => {

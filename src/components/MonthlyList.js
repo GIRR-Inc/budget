@@ -29,31 +29,17 @@ const MonthlyList = ({ userId, userColor }) => {
   const handleDelete = async (item) => {
     const confirmed = window.confirm("정말 삭제하시겠습니까?");
     if (!confirmed) return;
-
+  
     try {
-      await deleteTransaction(
-        item.date,
-        item.amount,
-        item.category,
-        item.memo,
-        userId
-      );
-      const updated = data.filter(
-        (d) =>
-          !(
-            d.date === item.date &&
-            d.amount === item.amount &&
-            d.category === item.category &&
-            d.memo === item.memo
-          )
-      );
+      await deleteTransaction(item.id); // 🔥 id 기준으로 삭제
+      const updated = data.filter((d) => d.id !== item.id);
       setData(updated);
     } catch (err) {
       console.error("삭제 실패:", err);
       alert("삭제 중 오류가 발생했습니다.");
     }
   };
-
+  
   const handleEditSave = async (updated) => {
     try {
       await updateTransaction(editItem, updated, userId);
