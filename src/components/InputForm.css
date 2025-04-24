@@ -117,3 +117,19 @@ select {
     border-color: #f4a8a8;
   }
   
+  /* 공통 텍스트 레이블 스타일 */
+.label-span {
+  display: flex;
+  flex-direction: column;
+  font-weight: bold;
+  font-size: 14px;
+  color: #333;
+  font-family: 'S-CoreDream-3Light';
+}
+
+.label-small {
+  font-size: 12px;
+  font-weight: normal;
+  color: #666;
+  font-family: 'S-CoreDream-3Light';
+}

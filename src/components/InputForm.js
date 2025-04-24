@@ -8,7 +8,11 @@ const InputForm = ({
   userColor = "#f4a8a8",
   hoverColor = "#f19191",
 }) => {
-  const getToday = () => new Date().toISOString().split("T")[0];
+  const getToday = () => {
+    const now = new Date();
+    now.setMinutes(now.getMinutes() + now.getTimezoneOffset() + 540); // 540분 = 9시간
+    return now.toISOString().split("T")[0];
+  };
 
   const [form, setForm] = useState({
     category: "",
@@ -16,6 +20,8 @@ const InputForm = ({
     memo: "",
     date: getToday(),
   });
+
+  const [fixDate, setFixDate] = useState(false);
 
   const [type, setType] = useState("expense");
 
@@ -49,7 +55,12 @@ const InputForm = ({
       ); // ✅ userId 전달
       if (result.status === "success") {
         alert("입력 완료!");
-        setForm({ category: "", amount: "", memo: "", date: getToday() });
+        setForm({
+          category: "",
+          amount: "",
+          memo: "",
+          date: fixDate ? form.date : getToday(), // ✅ 날짜 유지 여부 결정
+        });
         setType("expense");
       } else {
         alert("실패: " + (result.message || "알 수 없는 오류"));
@@ -121,16 +132,48 @@ const InputForm = ({
         세부설명
         <input name="memo" value={form.memo} onChange={handleChange} />
       </label>
-      <label>
-        일자
+      <div style={{ marginBottom: "8px" }}>
+        {/* 일자 + 날짜 고정 */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <span className="label-span">일자</span>
+          <span
+            className="label-span"
+            style={{
+              flexDirection: "row",
+              alignItems: "center", // ✅ 중요!
+              gap: "4px",
+              whiteSpace: "nowrap",
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={fixDate}
+              onChange={(e) => setFixDate(e.target.checked)}
+              style={{ verticalAlign: "middle" }} // ✅ 체크박스 정렬 보정
+            />
+            <span className="label-small" style={{ lineHeight: "1" }}>
+              날짜 고정
+            </span>
+          </span>
+        </div>
+
+        {/* 날짜 입력 필드 */}
         <input
           name="date"
           type="date"
           value={form.date}
           onChange={handleChange}
           required
+          style={{ width: "100%", marginTop: "6px" }}
         />
-      </label>
+      </div>
+
       <button
         type="submit"
         style={{
