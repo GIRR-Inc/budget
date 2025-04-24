@@ -223,8 +223,8 @@ const InputForm = ({
             className="popup-content"
             style={{
               backgroundColor: "white",
-              width: "100%", // ✅ 모바일 기준 꽉 차지 않도록 조절
-              maxWidth: "360px", // ✅ 데스크탑/태블릿에서는 고정폭
+              width: "80%",           // ✅ 화면 너비의 90% 사용
+              maxWidth: "360px",      // ✅ 데스크탑에서는 최대 360px 제한
               padding: "20px",
               borderRadius: "12px",
               boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",
@@ -233,9 +233,9 @@ const InputForm = ({
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 style={{ marginBottom: "12px", fontSize: "18px" }}>
-              입력 완료!
-            </h3>
+          <h3 style={{ marginBottom: "12px", fontSize: "4.5vw" }}>
+            입력 완료!
+          </h3>
             <button
               onClick={() => setShowPopup(false)}
               style={{
