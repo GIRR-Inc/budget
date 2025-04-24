@@ -60,11 +60,19 @@
   .desc {
     display: flex;
     justify-content: space-between;
-    font-size: 16px;
+    align-items: center; /* ⭐ 중앙 정렬 */
+    padding-right: 4px;
+  }
+
+  .left-block {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
   
   .amount {
     font-weight: bold;
+    white-space: nowrap;
   }
   
   .amount.expense {
@@ -128,7 +136,7 @@
   
   .item {
     position: relative;
-    padding: 20px 0;
+    padding: 15px 0;
     border-bottom: 1px solid #eee;
     font-family: 'S-CoreDream-3Light';
   }
@@ -142,7 +150,7 @@
   
   .delete-btn {
     position: absolute;
-    top: 0px;
+    top: 6px;
     right: 0px;
     background: none;
     border: none;
@@ -194,7 +202,7 @@
 
 .edit-btn {
   position: absolute;
-  top: 0px;
+  top: 6px;
   right: 18px; /* ← X 아이콘보다 왼쪽으로 살짝 떨어뜨리기 */
   background: none;
   border: none;

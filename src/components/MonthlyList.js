@@ -168,7 +168,10 @@ const MonthlyList = ({ userId, userColor }) => {
               {isNewDay && (
                 <div className="date-label">{day}일</div> // 날짜를 그룹 헤더처럼
               )}
-               <li className="item" style={isNewDay ? { borderTop: "3px solid #ddd" } : {}}>
+              <li
+                className="item"
+                style={isNewDay ? { borderTop: "3px solid #ddd" } : {}}
+              >
                 <button
                   className="delete-btn"
                   onClick={() => handleDelete(item)}
@@ -187,12 +190,28 @@ const MonthlyList = ({ userId, userColor }) => {
                 </button>
 
                 <div className="desc">
-                  <div className="category">
-                    <span>{item.category_name || item.category}</span>
-                    {item.is_deleted && (
-                      <span className="badge-deleted">삭제된 카테고리</span>
+                  <div className="left-block">
+                    <div className="category">
+                      <span>{item.category_name || item.category}</span>
+                      {item.is_deleted && (
+                        <span className="badge-deleted">삭제된 카테고리</span>
+                      )}
+                    </div>
+
+                    {item.memo && (
+                      <div className="memo">
+                        {getMatchedIcon(item.memo) && (
+                          <img
+                            src={getMatchedIcon(item.memo)}
+                            alt="memo icon"
+                            className="memo-icon"
+                          />
+                        )}
+                        {item.memo}
+                      </div>
                     )}
                   </div>
+
                   <span
                     className={`amount ${isExpense ? "expense" : "income"}`}
                   >
@@ -200,25 +219,11 @@ const MonthlyList = ({ userId, userColor }) => {
                     {formatted}원
                   </span>
                 </div>
-
-                {item.memo && (
-                  <div className="memo">
-                    {getMatchedIcon(item.memo) && (
-                      <img
-                        src={getMatchedIcon(item.memo)}
-                        alt="memo icon"
-                        className="memo-icon"
-                      />
-                    )}
-                    {item.memo}
-                  </div>
-                )}
               </li>
             </React.Fragment>
           );
         })}
       </ul>
-
       <EditDialog
         open={editDialogOpen}
         onClose={() => setEditDialogOpen(false)}
