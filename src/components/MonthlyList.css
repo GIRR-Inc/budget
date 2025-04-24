@@ -50,13 +50,7 @@
     padding: 0;
     margin: 0;
   }
-  
-  .item {
-    border-bottom: 1px solid #eee;
-    padding: 10px 0;
-    font-family: 'S-CoreDream-3Light';
-  }
-  
+
   .date {
     font-size: 13px;
     color: #888;
@@ -134,7 +128,7 @@
   
   .item {
     position: relative;
-    padding: 12px 12px 12px 0;
+    padding: 20px 0;
     border-bottom: 1px solid #eee;
     font-family: 'S-CoreDream-3Light';
   }
@@ -148,8 +142,8 @@
   
   .delete-btn {
     position: absolute;
-    top: 5px;
-    right: 10px;
+    top: 0px;
+    right: 0px;
     background: none;
     border: none;
     color: #e74c3c;
@@ -200,8 +194,8 @@
 
 .edit-btn {
   position: absolute;
-  top: 5px;
-  right: 36px; /* ← X 아이콘보다 왼쪽으로 살짝 떨어뜨리기 */
+  top: 0px;
+  right: 18px; /* ← X 아이콘보다 왼쪽으로 살짝 떨어뜨리기 */
   background: none;
   border: none;
   color: #888; /* 또는 #555, 눈에 띄지 않게 */
@@ -250,4 +244,13 @@
   vertical-align: middle;      /* 세로 정렬 */
   display: inline-block;       /* inline 요소처럼 표시 */
   transform: translateY(-1px); /* 미세한 수직 보정 */
+}
+
+.date-label {
+  font-weight: bold;
+  font-size: 15px;
+  color: #555;
+  margin-top: 16px;
+  margin-bottom: 8px;
+  font-family: 'GmarketSansMedium';
 }

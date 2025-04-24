@@ -20,7 +20,9 @@ const MonthlyList = ({ userId, userColor }) => {
   const [editItem, setEditItem] = useState(null);
   const [visibleCount, setVisibleCount] = useState(15);
 
-  const months = [...new Set(data.map((d) => d.date?.slice(0, 7)))].sort().reverse();
+  const months = [...new Set(data.map((d) => d.date?.slice(0, 7)))]
+    .sort()
+    .reverse();
   const filtered = data.filter((d) => d.date?.startsWith(selectedMonth));
   const visibleItems = filtered.slice(0, visibleCount);
 
@@ -29,7 +31,13 @@ const MonthlyList = ({ userId, userColor }) => {
     if (!confirmed) return;
 
     try {
-      await deleteTransaction(item.date, item.amount, item.category, item.memo, userId);
+      await deleteTransaction(
+        item.date,
+        item.amount,
+        item.category,
+        item.memo,
+        userId
+      );
       const updated = data.filter(
         (d) =>
           !(
@@ -73,7 +81,9 @@ const MonthlyList = ({ userId, userColor }) => {
     if (!userId) return;
     fetchBudgetData(userId).then((res) => {
       setData(res);
-      const months = [...new Set(res.map((d) => d.date?.slice(0, 7)))].sort().reverse();
+      const months = [...new Set(res.map((d) => d.date?.slice(0, 7)))]
+        .sort()
+        .reverse();
       if (months.length > 0) setSelectedMonth(months[0]);
     });
   }, [userId]);
@@ -104,19 +114,16 @@ const MonthlyList = ({ userId, userColor }) => {
     setVisibleCount(15); // 월 변경 시 초기화
   }, [selectedMonth]);
 
-
-
   return (
     <div className="monthly-container">
-      <div className="tab-bar"
-      >
+      <div className="tab-bar">
         {months.map((month) => (
           <button
             key={month}
             className={`tab ${month === selectedMonth ? "active" : ""}`}
             onClick={() => setSelectedMonth(month)}
             style={{
-              backgroundColor: userColor ,
+              backgroundColor: userColor,
               border: `1px solid ${userColor || "#f4a8a8"}`,
             }}
           >
@@ -126,12 +133,12 @@ const MonthlyList = ({ userId, userColor }) => {
       </div>
 
       <div
-          className="summary-bar"
-          style={{
-            backgroundColor: userColor ? `${userColor}15` : "#fff7f7", // 투명도 조정
-            border: `1px solid ${userColor || "#f4a8a8"}`,
-          }}
-        >
+        className="summary-bar"
+        style={{
+          backgroundColor: userColor ? `${userColor}15` : "#fff7f7", // 투명도 조정
+          border: `1px solid ${userColor || "#f4a8a8"}`,
+        }}
+      >
         <h3>{selectedMonth} 예산 요약</h3>
         <div className="summary-row">
           <span className="label">예산</span>
@@ -139,7 +146,9 @@ const MonthlyList = ({ userId, userColor }) => {
         </div>
         <div className="summary-row">
           <span className="label">지출</span>
-          <span className={`value ${summary.spent > summary.budget ? "over" : ""}`}>
+          <span
+            className={`value ${summary.spent > summary.budget ? "over" : ""}`}
+          >
             {summary.spent.toLocaleString()}원
           </span>
         </div>
@@ -150,50 +159,62 @@ const MonthlyList = ({ userId, userColor }) => {
           const amount = Number(item.amount);
           const isExpense = amount < 0;
           const formatted = Math.abs(amount).toLocaleString();
+          const day = item.date?.slice(8, 10);
+          const prevDay = visibleItems[idx - 1]?.date?.slice(8, 10);
+          const isNewDay = day !== prevDay;
 
           return (
-            <li key={idx} className="item">
-              <button className="delete-btn" onClick={() => handleDelete(item)}>
-                <CloseIcon fontSize="small" />
-              </button>
-
-              <button
-                className="edit-btn"
-                onClick={() => {
-                  setEditItem(item);
-                  setEditDialogOpen(true);
-                }}
-              >
-                <EditIcon fontSize="small" />
-              </button>
-
-              <div className="date">{item.date?.slice(8, 10)}일</div>
-
-              <div className="desc">
-                <div className="category">
-                  <span>{item.category_name || item.category}</span>
-                  {item.is_deleted && (
-                    <span className="badge-deleted">삭제된 카테고리</span>
-                  )}
-                </div>
-                <span className={`amount ${isExpense ? "expense" : "income"}`}>
-                  {isExpense ? "-" : "+"}
-                  {formatted}원
-                </span>
-              </div>
-              {item.memo && (
-                <div className="memo">
-                  {getMatchedIcon(item.memo) && (
-                    <img
-                      src={getMatchedIcon(item.memo)}
-                      alt="memo icon"
-                      className="memo-icon"
-                    />
-                  )}
-                  {item.memo}
-                </div>
+            <React.Fragment key={idx}>
+              {isNewDay && (
+                <div className="date-label">{day}일</div> // 날짜를 그룹 헤더처럼
               )}
-            </li>
+               <li className="item" style={isNewDay ? { borderTop: "3px solid #ddd" } : {}}>
+                <button
+                  className="delete-btn"
+                  onClick={() => handleDelete(item)}
+                >
+                  <CloseIcon fontSize="small" />
+                </button>
+
+                <button
+                  className="edit-btn"
+                  onClick={() => {
+                    setEditItem(item);
+                    setEditDialogOpen(true);
+                  }}
+                >
+                  <EditIcon fontSize="small" />
+                </button>
+
+                <div className="desc">
+                  <div className="category">
+                    <span>{item.category_name || item.category}</span>
+                    {item.is_deleted && (
+                      <span className="badge-deleted">삭제된 카테고리</span>
+                    )}
+                  </div>
+                  <span
+                    className={`amount ${isExpense ? "expense" : "income"}`}
+                  >
+                    {isExpense ? "-" : "+"}
+                    {formatted}원
+                  </span>
+                </div>
+
+                {item.memo && (
+                  <div className="memo">
+                    {getMatchedIcon(item.memo) && (
+                      <img
+                        src={getMatchedIcon(item.memo)}
+                        alt="memo icon"
+                        className="memo-icon"
+                      />
+                    )}
+                    {item.memo}
+                  </div>
+                )}
+              </li>
+            </React.Fragment>
           );
         })}
       </ul>
