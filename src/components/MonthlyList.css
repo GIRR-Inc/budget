@@ -85,10 +85,10 @@
   
   
   .memo {
-    font-size: 13px;
+    font-size: 15px;
     color: #444;
     margin-top: 2px;
-    font-weight: 600; /* ← 추가 */
+    font-family: 'S-CoreDream-3Light';
   }
   
   .empty {
@@ -184,14 +184,22 @@
   display: flex;
   align-items: center; /* ← 세로 중앙 정렬 */
   gap: 6px;
-  font-size: 15px;
-  font-family: 'S-CoreDream-3Light';
+  font-size: 12px;
+  font-family: 'GmarketSansMedium';
+}
+
+.category-badge {
+  background-color: #f0f0f0;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 0.85em;
+  color: #555;
 }
 
 .badge-deleted {
   display: inline-block;
   padding: 2px 6px;
-  font-size: 9px;
+  gap: 6px;
   font-family: 'S-CoreDream-3Light';
   color: #fff;
   background-color: crimson;
@@ -244,8 +252,8 @@
 }
 
 .memo-icon {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
   border-radius: 50%;          /* 원형 모양 */
   object-fit: cover;           /* 이미지 비율 유지하며 자르기 */
   margin-right: 6px;

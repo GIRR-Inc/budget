@@ -192,7 +192,7 @@ const MonthlyList = ({ userId, userColor }) => {
                 <div className="desc">
                   <div className="left-block">
                     <div className="category">
-                      <span>{item.category_name || item.category}</span>
+                      <span className="category-badge">{item.category_name || item.category}</span>
                       {item.is_deleted && (
                         <span className="badge-deleted">삭제된 카테고리</span>
                       )}
