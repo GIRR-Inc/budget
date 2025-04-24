@@ -26,7 +26,8 @@ export const fetchBudgetData = async (userId) => {
       )
     `)
     .eq("user_id", userId)
-    .order("date", { ascending: false });
+    .order("date", { ascending: false })
+    .order("created_at", { ascending: false }); // 추가된 정렬 기준
 
   if (error) throw error;
 
