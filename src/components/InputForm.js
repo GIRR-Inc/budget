@@ -233,9 +233,14 @@ const InputForm = ({
             }}
             onClick={(e) => e.stopPropagation()}
           >
-          <h3 style={{ marginBottom: "12px", fontSize: "4.5vw" }}>
-            입력 완료!
-          </h3>
+            <h3
+              style={{
+                marginBottom: "12px",
+                fontSize: "clamp(16px, 4vw, 24px)", // ⬅️ 여기!
+              }}
+            >
+              입력 완료!
+            </h3>
             <button
               onClick={() => setShowPopup(false)}
               style={{
