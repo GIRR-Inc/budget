@@ -215,7 +215,6 @@ const InputForm = ({
             justifyContent: "center",
             alignItems: "center",
             zIndex: 1000,
-            padding: "16px", // ✅ 모바일에서 내용이 너무 붙지 않도록 padding 추가
           }}
           onClick={() => setShowPopup(false)}
         >
