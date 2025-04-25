@@ -98,7 +98,7 @@
   }
   
   .summary-bar {
-    padding: 1.2rem;
+    padding: 1px 1.2rem;
     background-color: #fff7f7;
     border: 1px solid #f4a8a8;
     border-radius: 12px;
@@ -116,7 +116,7 @@
   .summary-bar .summary-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 6px;
+    margin-bottom: 2px;
   }
   
   .summary-bar .label {
@@ -270,4 +270,76 @@
   margin-top: 16px;
   margin-bottom: 8px;
   font-family: 'GmarketSansMedium';
+}
+
+.toggle-button-wrapper {
+  display: flex;
+  justify-content: center; /* 중앙 정렬 */
+  margin: 8px 0;
+}
+
+.toggle-button-wrapper button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #888;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.toggle-button-wrapper button:hover {
+  color: #f19191;
+}
+
+.toggle-button-wrapper svg {
+  font-size: 24px;
+}
+
+.category-summary {
+  margin-top: 10px;
+  margin-bottom: 20px;
+  padding-left: 8px;
+  font-family: 'S-CoreDream-3Light';
+}
+
+.category-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.category-item {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  padding: 4px 0;
+  border-bottom: 1px dashed #eee;
+}
+
+.category-name {
+  color: #333;
+}
+
+.category-amount {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 120px; /* 필요한 경우 너비 조정 */
+  justify-content: flex-end;
+  color: crimson;
+  font-weight: bold;
+  font-variant-numeric: tabular-nums; /* 숫자 자릿수 맞춤 */
+  font-family: 'S-CoreDream-3Light';
+}
+
+.category-percent {
+  display: inline-block;
+  width: 48px; /* 최대 (100%) 기준으로 맞춤 */
+  text-align: right;
+  font-family: monospace;
+  color: #888;
+  font-family: 'S-CoreDream-3Light';
 }

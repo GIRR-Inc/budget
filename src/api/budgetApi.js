@@ -216,3 +216,39 @@ export const deleteCategory = async (code, userId) => {
   if (error) throw error;
   return { status: "success" };
 };
+
+
+// category별 지출 요약
+export const fetchCategorySummary = async (month, userId) => {
+  const { data, error } = await supabase
+    .from("transactions")
+    .select(`
+      category,
+      amount,
+      categories:category ( description )
+    `)
+    .eq("user_id", userId)
+    .gte("date", `${month}-01`)
+    .lt("date", `${getNextMonth(month)}-01`);
+
+  if (error) throw error;
+
+  // 카테고리별 지출 합계 계산
+  const summaryMap = {};
+
+  data.forEach((tx) => {
+    const amt = Number(tx.amount);
+    if (amt < 0) {
+      const key = tx.category;
+      if (!summaryMap[key]) {
+        summaryMap[key] = {
+          name: tx.categories?.description || "삭제된 카테고리",
+          total: 0,
+        };
+      }
+      summaryMap[key].total += -amt;
+    }
+  });
+
+  return Object.values(summaryMap);
+};

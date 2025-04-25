@@ -4,10 +4,13 @@ import {
   fetchMonthlySummary,
   deleteTransaction,
   updateTransaction,
+  fetchCategorySummary,
 } from "../api/budgetApi";
 import "./MonthlyList.css";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import EditDialog from "./EditDialog";
 import { getMatchedIcon } from "../util/iconMap";
 
@@ -20,6 +23,9 @@ const MonthlyList = ({ userId, userColor }) => {
   const [editItem, setEditItem] = useState(null);
   const [visibleCount, setVisibleCount] = useState(15);
 
+  const [categorySummary, setCategorySummary] = useState([]);
+  const [showDetail, setShowDetail] = useState(false);
+
   const months = [...new Set(data.map((d) => d.date?.slice(0, 7)))]
     .sort()
     .reverse();
@@ -29,7 +35,7 @@ const MonthlyList = ({ userId, userColor }) => {
   const handleDelete = async (item) => {
     const confirmed = window.confirm("정말 삭제하시겠습니까?");
     if (!confirmed) return;
-  
+
     try {
       await deleteTransaction(item.id); // 🔥 id 기준으로 삭제
       const updated = data.filter((d) => d.id !== item.id);
@@ -39,7 +45,7 @@ const MonthlyList = ({ userId, userColor }) => {
       alert("삭제 중 오류가 발생했습니다.");
     }
   };
-  
+
   const handleEditSave = async (updated) => {
     try {
       await updateTransaction(editItem, updated, userId);
@@ -76,8 +82,13 @@ const MonthlyList = ({ userId, userColor }) => {
 
   useEffect(() => {
     if (!selectedMonth || !userId) return;
+
     fetchMonthlySummary(selectedMonth, userId).then((res) => {
       setSummary({ budget: res.budget, spent: res.spent });
+    });
+
+    fetchCategorySummary(selectedMonth, userId).then((res) => {
+      setCategorySummary(res);
     });
   }, [selectedMonth, userId]);
 
@@ -138,6 +149,39 @@ const MonthlyList = ({ userId, userColor }) => {
             {summary.spent.toLocaleString()}원
           </span>
         </div>
+
+        <div className="toggle-button-wrapper">
+          <button onClick={() => setShowDetail((prev) => !prev)}>
+            {showDetail ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </button>
+        </div>
+
+        {showDetail && (
+          <div className="category-summary">
+            {categorySummary.length === 0 ? (
+              <p className="empty">지출 내역이 없습니다.</p>
+            ) : (
+              <ul className="category-list">
+                {categorySummary.map((cat, idx) => {
+                  const percent =
+                    summary.spent > 0
+                      ? Math.round((cat.total / summary.spent) * 100)
+                      : 0;
+
+                  return (
+                    <li key={idx} className="category-item">
+                      <span className="category-name">{cat.name}</span>
+                      <span className="category-amount">
+                        {cat.total.toLocaleString()}원{" "}
+                        <span className="category-percent">({percent}%)</span>
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        )}
       </div>
 
       <ul className="list">
@@ -178,7 +222,9 @@ const MonthlyList = ({ userId, userColor }) => {
                 <div className="desc">
                   <div className="left-block">
                     <div className="category">
-                      <span className="category-badge">{item.category_name || item.category}</span>
+                      <span className="category-badge">
+                        {item.category_name || item.category}
+                      </span>
                       {item.is_deleted && (
                         <span className="badge-deleted">삭제된 카테고리</span>
                       )}
