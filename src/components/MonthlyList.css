@@ -321,6 +321,8 @@
 
 .category-name {
   color: #333;
+  font-weight: bold;
+  font-family: 'S-CoreDream-3Light';
 }
 
 .category-amount {
@@ -339,7 +341,6 @@
   display: inline-block;
   width: 48px; /* 최대 (100%) 기준으로 맞춤 */
   text-align: right;
-  font-family: monospace;
   color: #888;
   font-family: 'S-CoreDream-3Light';
 }
