@@ -9,11 +9,15 @@ import {
   IconButton,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import CheckIcon from "@mui/icons-material/Check";
+import CloseIcon from "@mui/icons-material/Close";
 import {
   fetchCategories,
   addCategory,
   softDeleteCategory,
   updateCategoriesSort,
+  updateCategoryName,
 } from "../api/budgetApi";
 import {
   DndContext,
@@ -22,9 +26,8 @@ import {
   useSensors,
   PointerSensor,
   TouchSensor,
-  DragOverlay
+  DragOverlay,
 } from "@dnd-kit/core";
-
 import {
   arrayMove,
   SortableContext,
@@ -40,8 +43,8 @@ function generateRandomCode() {
   return `cat_${random}${timestamp}`;
 }
 
-// 🔁 SortableItem component
-function SortableItem({ item, index, onDelete }) {
+// 🔁 SortableItem (인라인 수정 지원)
+function SortableItem({ item, index, onDelete, onEditStart, onEditSave, onEditCancel, editing, editValue, setEditValue }) {
   const {
     attributes,
     listeners,
@@ -50,60 +53,76 @@ function SortableItem({ item, index, onDelete }) {
     transition,
   } = useSortable({ id: item.code });
 
-    const style = {
-      transform: CSS.Transform.toString(transform),
-      transition,
-      border: "1px solid #ddd",
-      padding: "12px",
-      marginBottom: "8px",
-      borderRadius: "8px",
-      backgroundColor: "#fff",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "space-between",
-    };
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    border: editing ? "2px solid #f4a8a8" : "1px solid #ddd",
+    padding: "12px",
+    marginBottom: "8px",
+    borderRadius: "8px",
+    backgroundColor: editing ? "#fff7f0" : "#fff",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+  };
 
   return (
     <div className="sortable-item" ref={setNodeRef} style={style} {...attributes}>
-      {/* ⬇ 드래그 핸들에만 listeners 붙임 */}
       <div className="drag-handle" {...listeners} style={{ cursor: "grab", paddingRight: "8px" }}>
         ☰
       </div>
 
       <div style={{ flexGrow: 1 }}>
-        <div className="item-text-primary">{item.description}</div>
-        <div className="item-text-secondary">정렬 순서: {index}</div>
+        {editing ? (
+          <TextField
+            value={editValue}
+            onChange={(e) => setEditValue(e.target.value)}
+            size="small"
+            fullWidth
+          />
+        ) : (
+          <>
+            <div className="item-text-primary">{item.description}</div>
+            <div className="item-text-secondary">정렬 순서: {index}</div>
+          </>
+        )}
       </div>
 
-      <IconButton onClick={() => onDelete(item.code)}>
-        <DeleteIcon />
-      </IconButton>
+      <div style={{ display: "flex", gap: "4px" }}>
+        {editing ? (
+          <>
+            <IconButton onClick={() => onEditSave(item.code)}>
+              <CheckIcon fontSize="small" />
+            </IconButton>
+            <IconButton onClick={onEditCancel}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          </>
+        ) : (
+          <IconButton onClick={() => onEditStart(item)}>
+            <EditIcon fontSize="small" />
+          </IconButton>
+        )}
+        <IconButton onClick={() => onDelete(item.code)}>
+          <DeleteIcon fontSize="small" />
+        </IconButton>
+      </div>
     </div>
   );
 }
 
-function SettingsDialog({ open, onClose, onCategoryChange, userId  }) {
+// ⚙ SettingsDialog 메인
+function SettingsDialog({ open, onClose, onCategoryChange, userId }) {
   const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState({ description: "", sort: 0 });
   const [activeId, setActiveId] = useState(null);
 
-  const handleDragStart = (event) => {
-    setActiveId(event.active.id);
-    console.log("드래그 시작됨!");
-  };
+  const [editingCode, setEditingCode] = useState(null);
+  const [editValue, setEditValue] = useState("");
 
   const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 250,
-        tolerance: 0,
-      },
-    })
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 0 } })
   );
 
   useEffect(() => {
@@ -112,7 +131,7 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId  }) {
 
   const loadCategories = async () => {
     try {
-      const data = await fetchCategories(userId); // ✅ 전달
+      const data = await fetchCategories(userId);
       const sorted = [...data].sort((a, b) => a.sort - b.sort);
       setCategories(sorted);
     } catch (err) {
@@ -122,18 +141,44 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId  }) {
 
   const handleAdd = async () => {
     const code = generateRandomCode();
-    const maxSort =
-      categories.length > 0 ? Math.max(...categories.map((c) => c.sort)) : 0;
-    await addCategory({ ...newCategory, code, sort: maxSort + 1 }, userId); // ✅ 전달
+    const maxSort = categories.length > 0 ? Math.max(...categories.map((c) => c.sort)) : 0;
+    await addCategory({ ...newCategory, code, sort: maxSort + 1 }, userId);
     setNewCategory({ code: "", description: "", sort: 0 });
     await loadCategories();
     if (onCategoryChange) onCategoryChange();
   };
 
   const handleDelete = async (code) => {
-    await softDeleteCategory(code, userId); // ✅ 전달
+    await softDeleteCategory(code, userId);
     await loadCategories();
     if (onCategoryChange) onCategoryChange();
+  };
+
+  const handleEditStart = (item) => {
+    setEditingCode(item.code);
+    setEditValue(item.description);
+  };
+
+  const handleEditCancel = () => {
+    setEditingCode(null);
+    setEditValue("");
+  };
+
+  const handleEditSave = async (code) => {
+    if (!editValue.trim()) return;
+    try {
+      await updateCategoryName(code, editValue, userId);
+      await loadCategories();
+      setEditingCode(null);
+      setEditValue("");
+      if (onCategoryChange) onCategoryChange();
+    } catch (err) {
+      alert("수정 중 오류 발생");
+    }
+  };
+
+  const handleDragStart = (event) => {
+    setActiveId(event.active.id);
   };
 
   const handleDragEnd = async (event) => {
@@ -144,14 +189,15 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId  }) {
     const oldIndex = categories.findIndex((c) => c.code === active.id);
     const newIndex = categories.findIndex((c) => c.code === over.id);
 
-    const newItems = arrayMove(categories, oldIndex, newIndex).map(
-      (item, idx) => ({ ...item, sort: idx })
-    );
+    const newItems = arrayMove(categories, oldIndex, newIndex).map((item, idx) => ({
+      ...item,
+      sort: idx,
+    }));
 
     setCategories(newItems);
 
     try {
-      await updateCategoriesSort(newItems, userId); // ✅ 전달
+      await updateCategoriesSort(newItems, userId);
       if (onCategoryChange) onCategoryChange();
     } catch (err) {
       alert("정렬 순서 저장 중 오류가 발생했습니다.");
@@ -162,16 +208,14 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId  }) {
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>환경 설정 - 카테고리 관리</DialogTitle>
       <DialogContent dividers className="settings-dialog-content">
-      <DndContext
+        {/* ✅ DND 시작 */}
+        <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-            <SortableContext
-              items={categories.map((c) => c.code)}
-              strategy={verticalListSortingStrategy}
-            >
+          <SortableContext items={categories.map((c) => c.code)} strategy={verticalListSortingStrategy}>
             <div className="settings-list-wrapper">
               {categories.map((cat, index) => (
                 <SortableItem
@@ -179,33 +223,36 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId  }) {
                   item={cat}
                   index={index}
                   onDelete={handleDelete}
+                  onEditStart={handleEditStart}
+                  onEditSave={handleEditSave}
+                  onEditCancel={handleEditCancel}
+                  editing={editingCode === cat.code}
+                  editValue={editValue}
+                  setEditValue={setEditValue}
                 />
               ))}
             </div>
           </SortableContext>
           <DragOverlay>
-    {activeId ? (
-      <div className="sortable-item drag-preview">
-        <div className="drag-handle">☰</div>
-        <div style={{ flexGrow: 1 }}>
-          <div className="item-text-primary">
-            {
-              categories.find((c) => c.code === activeId)?.description || ""
-            }
-          </div>
-        </div>
-      </div>
-    ) : null}
-  </DragOverlay>
+            {activeId ? (
+              <div className="sortable-item drag-preview">
+                <div className="drag-handle">☰</div>
+                <div style={{ flexGrow: 1 }}>
+                  <div className="item-text-primary">
+                    {categories.find((c) => c.code === activeId)?.description || ""}
+                  </div>
+                </div>
+              </div>
+            ) : null}
+          </DragOverlay>
         </DndContext>
 
+        {/* ✅ 새 카테고리 추가 */}
         <TextField
           className="settings-input"
           label="카테고리"
           value={newCategory.description}
-          onChange={(e) =>
-            setNewCategory({ ...newCategory, description: e.target.value })
-          }
+          onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })}
           fullWidth
           margin="dense"
         />
@@ -218,6 +265,7 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId  }) {
           카테고리 추가
         </Button>
       </DialogContent>
+
       <DialogActions>
         <Button onClick={onClose}>닫기</Button>
       </DialogActions>

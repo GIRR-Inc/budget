@@ -108,3 +108,15 @@
     color: #777;
   }
   
+  /* 수정 중인 아이템 하이라이트 */
+.sortable-item.editing {
+  background-color: #fff7f0;
+  border-color: #f4a8a8;
+}
+
+/* 수정 영역 구분선 */
+.edit-section {
+  margin-top: 20px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}

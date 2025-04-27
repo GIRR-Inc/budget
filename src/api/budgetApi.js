@@ -176,6 +176,19 @@ export const addCategory = async ({ code, description }, userId) => {
   return { status: "success", data };
 };
 
+// 카테고리 이름 수정
+export const updateCategoryName = async (code, newDescription, userId) => {
+  const { error } = await supabase
+    .from("categories")
+    .update({ description: newDescription })
+    .eq("code", code)
+    .eq("user_id", userId);  // ✅ 본인 소유 데이터만 수정
+
+  if (error) throw error;
+  return { status: "success" };
+};
+
+
 export const softDeleteCategory = async (code) => {
   const { error } = await supabase
     .from("categories")
