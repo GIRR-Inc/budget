@@ -96,6 +96,7 @@ export const updateTransaction = async (original, updated, userId) => {
     .update({
       amount: updated.amount,
       memo: updated.memo,
+      category: updated.category, 
     })
     .match({
       date: original.date,
