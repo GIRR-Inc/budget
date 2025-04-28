@@ -10,10 +10,11 @@ import {
 } from "@mui/material";
 import "./InputForm.css"; // 기존 스타일 활용
 
-const EditDialog = ({ open, onClose, item, onSave, userId }) => {
+const EditDialog = ({ open, onClose, item, onSave, userId, categories }) => {
   const [amount, setAmount] = useState("");
   const [memo, setMemo] = useState("");
   const [type, setType] = useState("expense"); // expense | income
+  const [category, setCategory] = useState("");
 
   useEffect(() => {
     if (item) {
@@ -21,6 +22,7 @@ const EditDialog = ({ open, onClose, item, onSave, userId }) => {
       setAmount(absAmount);
       setMemo(item.memo || "");
       setType(item.amount < 0 ? "expense" : "income");
+      setCategory(item.category); // 추가
     }
   }, [item]);
 
@@ -35,8 +37,8 @@ const EditDialog = ({ open, onClose, item, onSave, userId }) => {
   const handleSave = () => {
     const numeric = parseInt(unmask(amount), 10) || 0;
     const finalAmount = type === "expense" ? -numeric : numeric;
-
-    onSave({ amount: finalAmount, memo, type, userId });
+  
+    onSave({ amount: finalAmount, memo, category, type, userId }); // ✅ category 추가
   };
 
   return (
@@ -72,7 +74,22 @@ const EditDialog = ({ open, onClose, item, onSave, userId }) => {
             </div>
           </div>
         </label>
-
+        <label>
+  카테고리
+  <select
+    value={category}
+    onChange={(e) => setCategory(e.target.value)}
+    required
+    style={{ width: "100%", padding: "8px", marginTop: "4px", fontFamily: "'S-CoreDream-3Light'" }}
+  >
+    <option value="" disabled>카테고리 선택</option>
+    {categories.map((c) => (
+      <option key={c.code} value={c.code}>
+        {c.description}
+      </option>
+    ))}
+  </select>
+</label>
         <label>
           메모
           <input

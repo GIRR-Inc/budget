@@ -5,6 +5,7 @@ import {
   deleteTransaction,
   updateTransaction,
   fetchCategorySummary,
+  fetchCategories,
 } from "../api/budgetApi";
 import "./MonthlyList.css";
 import CloseIcon from "@mui/icons-material/Close";
@@ -22,10 +23,11 @@ const MonthlyList = ({ userId, userColor }) => {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [visibleCount, setVisibleCount] = useState(15);
+  const [categories, setCategories] = useState([]);
 
   const [categorySummary, setCategorySummary] = useState([]);
   const [showDetail, setShowDetail] = useState(false);
-
+  
   const months = [...new Set(data.map((d) => d.date?.slice(0, 7)))]
     .sort()
     .reverse();
@@ -58,6 +60,8 @@ const MonthlyList = ({ userId, userColor }) => {
                   ? -Math.abs(updated.amount)
                   : Math.abs(updated.amount),
               memo: updated.memo,
+              category: updated.category, // ✅ 추가
+              category_name: categories.find((c) => c.code === updated.category)?.description || "카테고리 수정",
             }
           : d
       );
@@ -68,15 +72,19 @@ const MonthlyList = ({ userId, userColor }) => {
       alert("수정 중 오류가 발생했습니다.");
     }
   };
+  
 
   useEffect(() => {
     if (!userId) return;
+  
     fetchBudgetData(userId).then((res) => {
       setData(res);
-      const months = [...new Set(res.map((d) => d.date?.slice(0, 7)))]
-        .sort()
-        .reverse();
+      const months = [...new Set(res.map((d) => d.date?.slice(0, 7)))].sort().reverse();
       if (months.length > 0) setSelectedMonth(months[0]);
+    });
+  
+    fetchCategories(userId).then((res) => {
+      setCategories(res);
     });
   }, [userId]);
 
@@ -257,12 +265,13 @@ const MonthlyList = ({ userId, userColor }) => {
         })}
       </ul>
       <EditDialog
-        open={editDialogOpen}
-        onClose={() => setEditDialogOpen(false)}
-        item={editItem}
-        onSave={handleEditSave}
-        userId={userId}
-      />
+          open={editDialogOpen}
+          onClose={() => setEditDialogOpen(false)}
+          item={editItem}
+          onSave={handleEditSave}
+          userId={userId}
+          categories={categories} // ✅ 추가
+        />
     </div>
   );
 };
