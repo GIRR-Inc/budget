@@ -256,6 +256,7 @@ export const fetchCategorySummary = async (month, userId) => {
       const key = tx.category;
       if (!summaryMap[key]) {
         summaryMap[key] = {
+          category: key,
           name: tx.categories?.description || "삭제된 카테고리",
           total: 0,
         };

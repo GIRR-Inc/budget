@@ -314,9 +314,18 @@
 .category-item {
   display: flex;
   justify-content: space-between;
-  font-size: 14px;
+  border-radius: 8px;
+  transition: background-color 0.3s, color 0.3s;
   padding: 4px 0;
-  border-bottom: 1px dashed #eee;
+}
+
+.category-item:hover {
+  background-color: #f5f5f5;
+}
+
+.category-item.clicked {
+  background-color: #d1e7ff; /* 파란빛 강조 */
+  font-weight: bold;
 }
 
 .category-name {

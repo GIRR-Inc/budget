@@ -19,19 +19,20 @@ const MonthlyList = ({ userId, userColor }) => {
   const [data, setData] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState("");
   const [summary, setSummary] = useState({ budget: 0, spent: 0 });
-
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editItem, setEditItem] = useState(null);
   const [visibleCount, setVisibleCount] = useState(15);
   const [categories, setCategories] = useState([]);
-
   const [categorySummary, setCategorySummary] = useState([]);
   const [showDetail, setShowDetail] = useState(false);
-  
-  const months = [...new Set(data.map((d) => d.date?.slice(0, 7)))]
-    .sort()
-    .reverse();
-  const filtered = data.filter((d) => d.date?.startsWith(selectedMonth));
+  const [selectedCategory, setSelectedCategory] = useState(null); // ✅ 추가
+
+  const months = [...new Set(data.map((d) => d.date?.slice(0, 7)))].sort().reverse();
+
+  const filtered = data
+    .filter((d) => d.date?.startsWith(selectedMonth))
+    .filter((d) => (selectedCategory ? d.category === selectedCategory : true)); // ✅ 카테고리 필터
+
   const visibleItems = filtered.slice(0, visibleCount);
 
   const handleDelete = async (item) => {
@@ -39,7 +40,7 @@ const MonthlyList = ({ userId, userColor }) => {
     if (!confirmed) return;
 
     try {
-      await deleteTransaction(item.id); // 🔥 id 기준으로 삭제
+      await deleteTransaction(item.id);
       const updated = data.filter((d) => d.id !== item.id);
       setData(updated);
     } catch (err) {
@@ -55,12 +56,9 @@ const MonthlyList = ({ userId, userColor }) => {
         d === editItem
           ? {
               ...editItem,
-              amount:
-                updated.type === "expense"
-                  ? -Math.abs(updated.amount)
-                  : Math.abs(updated.amount),
+              amount: updated.type === "expense" ? -Math.abs(updated.amount) : Math.abs(updated.amount),
               memo: updated.memo,
-              category: updated.category, // ✅ 추가
+              category: updated.category,
               category_name: categories.find((c) => c.code === updated.category)?.description || "카테고리 수정",
             }
           : d
@@ -72,17 +70,16 @@ const MonthlyList = ({ userId, userColor }) => {
       alert("수정 중 오류가 발생했습니다.");
     }
   };
-  
 
   useEffect(() => {
     if (!userId) return;
-  
+
     fetchBudgetData(userId).then((res) => {
       setData(res);
       const months = [...new Set(res.map((d) => d.date?.slice(0, 7)))].sort().reverse();
       if (months.length > 0) setSelectedMonth(months[0]);
     });
-  
+
     fetchCategories(userId).then((res) => {
       setCategories(res);
     });
@@ -100,12 +97,9 @@ const MonthlyList = ({ userId, userColor }) => {
     });
   }, [selectedMonth, userId]);
 
-  // 스크롤 시 visibleCount 증가
   useEffect(() => {
     const handleScroll = () => {
-      const nearBottom =
-        window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
-
+      const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
       if (nearBottom) {
         setVisibleCount((prev) => Math.min(prev + 15, filtered.length));
       }
@@ -116,8 +110,8 @@ const MonthlyList = ({ userId, userColor }) => {
   }, [filtered]);
 
   useEffect(() => {
-    setVisibleCount(15); // 월 변경 시 초기화
-  }, [selectedMonth]);
+    setVisibleCount(15);
+  }, [selectedMonth, selectedCategory]); // ✅ 카테고리 바뀔 때도 초기화
 
   return (
     <div className="monthly-container">
@@ -126,7 +120,10 @@ const MonthlyList = ({ userId, userColor }) => {
           <button
             key={month}
             className={`tab ${month === selectedMonth ? "active" : ""}`}
-            onClick={() => setSelectedMonth(month)}
+            onClick={() => {
+              setSelectedMonth(month);
+              setSelectedCategory(null); // ✅ 월 변경 시 카테고리 초기화
+            }}
             style={{
               backgroundColor: userColor,
               border: `1px solid ${userColor || "#f4a8a8"}`,
@@ -140,7 +137,7 @@ const MonthlyList = ({ userId, userColor }) => {
       <div
         className="summary-bar"
         style={{
-          backgroundColor: userColor ? `${userColor}15` : "#fff7f7", // 투명도 조정
+          backgroundColor: userColor ? `${userColor}15` : "#fff7f7",
           border: `1px solid ${userColor || "#f4a8a8"}`,
         }}
       >
@@ -151,9 +148,7 @@ const MonthlyList = ({ userId, userColor }) => {
         </div>
         <div className="summary-row">
           <span className="label">지출</span>
-          <span
-            className={`value ${summary.spent > summary.budget ? "over" : ""}`}
-          >
+          <span className={`value ${summary.spent > summary.budget ? "over" : ""}`}>
             {summary.spent.toLocaleString()}원
           </span>
         </div>
@@ -172,12 +167,26 @@ const MonthlyList = ({ userId, userColor }) => {
               <ul className="category-list">
                 {categorySummary.map((cat, idx) => {
                   const percent =
-                    summary.spent > 0
-                      ? Math.round((cat.total / summary.spent) * 100)
-                      : 0;
+                    summary.spent > 0 ? Math.round((cat.total / summary.spent) * 100) : 0;
+                  const isSelected = selectedCategory === cat.category;
 
                   return (
-                    <li key={idx} className="category-item">
+                    <li
+                      key={idx}
+                      className={`category-item ${isSelected ? "clicked" : ""}`}
+                      onClick={() => {
+                        if (isSelected) {
+                          setSelectedCategory(null); // ✅ 이미 선택된 걸 다시 누르면 전체 보기
+                        } else {
+                          setSelectedCategory(cat.category); // ✅ 새로 선택
+                        }
+                        window.scrollTo({ top: 0, behavior: "smooth" }); // ✅ 누르면 부드럽게 위로
+                      }}
+                      style={{
+                        cursor: "pointer",
+                        backgroundColor: isSelected ? (userColor || "#d1e7ff") : "transparent",
+                      }}
+                    >
                       <span className="category-name">{cat.name}</span>
                       <span className="category-amount">
                         {cat.total.toLocaleString()}원{" "}
@@ -203,17 +212,12 @@ const MonthlyList = ({ userId, userColor }) => {
 
           return (
             <React.Fragment key={idx}>
-              {isNewDay && (
-                <div className="date-label">{day}일</div> // 날짜를 그룹 헤더처럼
-              )}
+              {isNewDay && <div className="date-label">{day}일</div>}
               <li
                 className="item"
                 style={isNewDay ? { borderTop: "3px solid #ddd" } : {}}
               >
-                <button
-                  className="delete-btn"
-                  onClick={() => handleDelete(item)}
-                >
+                <button className="delete-btn" onClick={() => handleDelete(item)}>
                   <CloseIcon fontSize="small" />
                 </button>
 
@@ -252,9 +256,7 @@ const MonthlyList = ({ userId, userColor }) => {
                     )}
                   </div>
 
-                  <span
-                    className={`amount ${isExpense ? "expense" : "income"}`}
-                  >
+                  <span className={`amount ${isExpense ? "expense" : "income"}`}>
                     {isExpense ? "-" : "+"}
                     {formatted}원
                   </span>
@@ -264,14 +266,15 @@ const MonthlyList = ({ userId, userColor }) => {
           );
         })}
       </ul>
+
       <EditDialog
-          open={editDialogOpen}
-          onClose={() => setEditDialogOpen(false)}
-          item={editItem}
-          onSave={handleEditSave}
-          userId={userId}
-          categories={categories} // ✅ 추가
-        />
+        open={editDialogOpen}
+        onClose={() => setEditDialogOpen(false)}
+        item={editItem}
+        onSave={handleEditSave}
+        userId={userId}
+        categories={categories}
+      />
     </div>
   );
 };
