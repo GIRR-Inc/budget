@@ -314,9 +314,10 @@
 .category-item {
   display: flex;
   justify-content: space-between;
+  align-items: center; /* 세로 정렬 추가 */
   border-radius: 8px;
   transition: background-color 0.3s, color 0.3s;
-  padding: 4px 0;
+  padding: 6px 8px; /* 위아래 약간 키워서 더 안정감 */
 }
 
 .category-item:hover {
@@ -324,7 +325,6 @@
 }
 
 .category-item.clicked {
-  background-color: #d1e7ff; /* 파란빛 강조 */
   font-weight: bold;
 }
 
@@ -332,24 +332,27 @@
   color: #333;
   font-weight: bold;
   font-family: 'S-CoreDream-3Light';
+  font-size: 13px; /* ✅ 폰트 크기 추가 */
 }
 
 .category-amount {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  min-width: 120px; /* 필요한 경우 너비 조정 */
+  min-width: 120px;
   justify-content: flex-end;
   color: crimson;
   font-weight: bold;
-  font-variant-numeric: tabular-nums; /* 숫자 자릿수 맞춤 */
+  font-variant-numeric: tabular-nums;
   font-family: 'S-CoreDream-3Light';
+  font-size: 13px; /* ✅ 폰트 크기 추가 */
 }
 
 .category-percent {
   display: inline-block;
-  width: 48px; /* 최대 (100%) 기준으로 맞춤 */
+  width: 48px;
   text-align: right;
   color: #888;
   font-family: 'S-CoreDream-3Light';
+  font-size: 12px; /* ✅ 퍼센트는 약간 더 작게 */
 }

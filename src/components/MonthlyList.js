@@ -55,12 +55,12 @@ const MonthlyList = ({ userId, userColor }) => {
       const updatedData = data.map((d) =>
         d === editItem
           ? {
-              ...editItem,
-              amount: updated.type === "expense" ? -Math.abs(updated.amount) : Math.abs(updated.amount),
-              memo: updated.memo,
-              category: updated.category,
-              category_name: categories.find((c) => c.code === updated.category)?.description || "카테고리 수정",
-            }
+            ...editItem,
+            amount: updated.type === "expense" ? -Math.abs(updated.amount) : Math.abs(updated.amount),
+            memo: updated.memo,
+            category: updated.category,
+            category_name: categories.find((c) => c.code === updated.category)?.description || "카테고리 수정",
+          }
           : d
       );
       setData(updatedData);
@@ -83,6 +83,8 @@ const MonthlyList = ({ userId, userColor }) => {
     fetchCategories(userId).then((res) => {
       setCategories(res);
     });
+
+    setSelectedCategory(null);
   }, [userId]);
 
   useEffect(() => {
@@ -165,36 +167,39 @@ const MonthlyList = ({ userId, userColor }) => {
               <p className="empty">지출 내역이 없습니다.</p>
             ) : (
               <ul className="category-list">
-                {categorySummary.map((cat, idx) => {
-                  const percent =
-                    summary.spent > 0 ? Math.round((cat.total / summary.spent) * 100) : 0;
-                  const isSelected = selectedCategory === cat.category;
+                {categorySummary
+                  .slice() // 원본 배열을 복사 (state 불변성 유지)
+                  .sort((a, b) => b.total - a.total) // 🔥 총합(total)이 높은 순으로 정렬
+                  .map((cat, idx) => {
+                    const percent = summary.spent > 0 ? Math.round((cat.total / summary.spent) * 100) : 0;
+                    const isSelected = selectedCategory === cat.category;
 
-                  return (
-                    <li
-                      key={idx}
-                      className={`category-item ${isSelected ? "clicked" : ""}`}
-                      onClick={() => {
-                        if (isSelected) {
-                          setSelectedCategory(null); // ✅ 이미 선택된 걸 다시 누르면 전체 보기
-                        } else {
-                          setSelectedCategory(cat.category); // ✅ 새로 선택
-                        }
-                        window.scrollTo({ top: 0, behavior: "smooth" }); // ✅ 누르면 부드럽게 위로
-                      }}
-                      style={{
-                        cursor: "pointer",
-                        backgroundColor: isSelected ? (userColor || "#d1e7ff") : "transparent",
-                      }}
-                    >
-                      <span className="category-name">{cat.name}</span>
-                      <span className="category-amount">
-                        {cat.total.toLocaleString()}원{" "}
-                        <span className="category-percent">({percent}%)</span>
-                      </span>
-                    </li>
-                  );
-                })}
+                    return (
+                      <li
+                        key={idx}
+                        className={`category-item ${isSelected ? "clicked" : ""}`}
+                        onClick={() => {
+                          if (isSelected) {
+                            setSelectedCategory(null);
+                          } else {
+                            setSelectedCategory(cat.category);
+                          }
+                          window.scrollTo({ top: 0, behavior: "smooth" });
+                        }}
+                        style={{
+                          cursor: "pointer",
+                          backgroundColor: isSelected ? (userColor || "#d1e7ff") : "transparent",
+                        }}
+                      >
+                        <span className="category-name">{cat.name}</span>
+                        <span className="category-amount">
+                          {cat.total.toLocaleString()}원{" "}
+                          <span className="category-percent">({percent}%)</span>
+                        </span>
+                      </li>
+                    );
+                  })}
+
               </ul>
             )}
           </div>
