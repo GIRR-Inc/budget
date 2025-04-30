@@ -117,24 +117,26 @@ const MonthlyList = ({ userId, userColor }) => {
 
   return (
     <div className="monthly-container">
-      <div className="tab-bar">
-        {months.map((month) => (
-          <button
-            key={month}
-            className={`tab ${month === selectedMonth ? "active" : ""}`}
-            onClick={() => {
-              setSelectedMonth(month);
-              setSelectedCategory(null); // ✅ 월 변경 시 카테고리 초기화
-            }}
-            style={{
-              backgroundColor: userColor,
-              border: `1px solid ${userColor || "#f4a8a8"}`,
-            }}
-          >
-            {month}
-          </button>
-        ))}
-      </div>
+<div className="tab-bar">
+  {months.map((month) => (
+    <button
+      key={month}
+      className={`tab ${month === selectedMonth ? "active" : ""}`}
+      onClick={() => {
+        setSelectedMonth(month);
+        setSelectedCategory(null); // ✅ 월 변경 시 카테고리 초기화
+      }}
+      style={{
+        backgroundColor: month === selectedMonth ? userColor : "transparent",
+        color: month === selectedMonth ? "white" : "black", // 선택된 경우 글자색도 조정 (선택 사항)
+        border: `1px solid ${userColor || "#f4a8a8"}`,
+      }}
+    >
+      {month}
+    </button>
+  ))}
+</div>
+
 
       <div
         className="summary-bar"

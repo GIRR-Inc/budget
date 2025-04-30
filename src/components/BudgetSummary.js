@@ -3,8 +3,8 @@ import React, { useEffect, useState } from "react";
 import { saveMonthlyBudget, fetchMonthlySummary } from "../api/budgetApi";
 import "./BudgetSummary.css";
 
-const BudgetSummary = ({ userId }) => {
-    const [month, setMonth] = useState(() => new Date().toISOString().slice(0, 7)); // YYYY-MM
+const BudgetSummary = ({ userId, userColor }) => {
+    const [month, setMonth] = useState(() => getKSTMonth());
     const [budget, setBudget] = useState("");
     const [spent, setSpent] = useState(0);
     const [loading, setLoading] = useState(false);
@@ -13,6 +13,16 @@ const BudgetSummary = ({ userId }) => {
         : 0;
 
     const [animatedPercent, setAnimatedPercent] = useState(0);
+
+    function getKSTMonth() {
+        const now = new Date();
+        const kstOffset = 9 * 60 * 60 * 1000; // 9시간
+        const kstDate = new Date(now.getTime() + kstOffset);
+
+        const year = kstDate.getFullYear();
+        const month = String(kstDate.getMonth() + 1).padStart(2, "0");
+        return `${year}-${month}`;
+    }
 
     useEffect(() => {
         let start = null;
@@ -57,7 +67,7 @@ const BudgetSummary = ({ userId }) => {
 
     useEffect(() => {
         loadSummary();
-      }, [month, userId]);
+    }, [month, userId]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -73,7 +83,7 @@ const BudgetSummary = ({ userId }) => {
 
     return (
         <div className="budget-container">
-            <h3>{month} 예산 요약</h3>
+            <h3 className="budget-title">{month} 예산 요약</h3>
             <form onSubmit={handleSubmit} className="budget-form">
                 <input
                     type="month"
@@ -91,7 +101,16 @@ const BudgetSummary = ({ userId }) => {
                     }}
                     required
                 />
-                <button type="submit">저장</button>
+                <button
+                    type="submit"
+                    style={{
+                        backgroundColor: userColor,
+                        border: `1px solid ${userColor}`,
+                        color: "white",
+                    }}
+                >
+                    저장
+                </button>
             </form>
 
             {loading ? (
@@ -101,7 +120,10 @@ const BudgetSummary = ({ userId }) => {
                     <div className="progress-bar">
                         <div
                             className={`fill ${percent > 100 ? "over" : ""}`}
-                            style={{ height: `${Math.min(animatedPercent, 100)}%` }}
+                            style={{
+                                height: `${Math.min(animatedPercent, 100)}%`,
+                                backgroundColor: userColor, // 여기 적용
+                            }}
                         >
                             <span className="percent-label">{Math.round(animatedPercent)}%</span>
                         </div>
@@ -112,6 +134,14 @@ const BudgetSummary = ({ userId }) => {
                     <div className="summary-text">
                         사용: {spent.toLocaleString()}원 / 예산: {Number(budget).toLocaleString()}원
                     </div>
+                    {percent < 100 && (
+                        <div
+                            className="remaining-text"
+                            style={{ color: userColor }}
+                            >
+                            예산까지 {Number(Number(budget) - spent).toLocaleString()}원 남았어요!
+                            </div>
+                    )}
                 </div>
 
             )}

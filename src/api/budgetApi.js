@@ -139,8 +139,15 @@ export const saveMonthlyBudget = async (month, budget, userId) => {
 // 월 이름 계산 유틸
 function getNextMonth(month) {
   const [year, m] = month.split("-").map(Number);
-  const next = new Date(year, m, 1);
-  return `${next.getFullYear()}-${String(next.getMonth() + 1).padStart(2, "0")}`;
+  const utcDate = new Date(Date.UTC(year, m, 1)); // 다음 달 1일의 UTC 날짜
+  const kstOffsetMs = 9 * 60 * 60 * 1000; // KST는 UTC+9시간
+
+  const kstDate = new Date(utcDate.getTime() + kstOffsetMs); // KST 기준으로 보정
+
+  const nextYear = kstDate.getFullYear();
+  const nextMonth = String(kstDate.getMonth() + 1).padStart(2, "0");
+
+  return `${nextYear}-${nextMonth}`;
 }
 
 

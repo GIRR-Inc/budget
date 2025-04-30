@@ -10,8 +10,9 @@ const InputForm = ({
 }) => {
   const getToday = () => {
     const now = new Date();
-    now.setMinutes(now.getMinutes() + now.getTimezoneOffset() + 540); // 540분 = 9시간
-    return now.toISOString().split("T")[0];
+    const kstOffsetMs = 9 * 60 * 60 * 1000; // KST = UTC+9
+    const kstDate = new Date(now.getTime() + kstOffsetMs);
+    return kstDate.toISOString().split("T")[0];
   };
 
   const [form, setForm] = useState({

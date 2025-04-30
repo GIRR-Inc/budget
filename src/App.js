@@ -172,7 +172,7 @@ function App() {
                                       userId={activeUser?.id}
                                       userColor={mainColor}  // ✅ 추가
                                     />}
-      {activeTab === "summary" && <BudgetSummary userId={activeUser?.id} />}
+      {activeTab === "summary" && <BudgetSummary userId={activeUser?.id} userColor={mainColor}/>}
 
       {/* 설정 다이얼로그 */}
       <SettingsDialog

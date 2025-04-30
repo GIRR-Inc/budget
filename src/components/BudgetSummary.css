@@ -124,3 +124,17 @@
     font-family: 'S-CoreDream-3Light';
   }
   
+  /* BudgetSummary.css */
+.remaining-text {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.budget-title {
+  font-family: 'GmarketSansMedium';
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 10px;
+}
