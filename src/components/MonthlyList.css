@@ -272,6 +272,13 @@
   font-family: 'GmarketSansMedium';
 }
 
+.day-total {
+  float: right;
+  font-size: 12px;
+  font-style: italic;
+  color: #999;
+}
+
 .toggle-button-wrapper {
   display: flex;
   justify-content: center; /* 중앙 정렬 */

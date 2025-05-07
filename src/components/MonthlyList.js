@@ -49,6 +49,14 @@ const MonthlyList = ({ userId, userColor }) => {
     }
   };
 
+  const dailyTotals = filtered.reduce((acc, item) => {
+    const day = item.date?.slice(8, 10);
+    if (!acc[day]) acc[day] = 0;
+    acc[day] += Number(item.amount);
+    return acc;
+  }, {});
+  
+
   const handleEditSave = async (updated) => {
     try {
       await updateTransaction(editItem, updated, userId);
@@ -219,7 +227,14 @@ const MonthlyList = ({ userId, userColor }) => {
 
           return (
             <React.Fragment key={idx}>
-              {isNewDay && <div className="date-label">{day}일</div>}
+              {isNewDay && (
+                <div className="date-label">
+                  {day}일
+                  <span className="day-total">
+                    {dailyTotals[day]?.toLocaleString()}원
+                  </span>
+                </div>
+              )}
               <li
                 className="item"
                 style={isNewDay ? { borderTop: "3px solid #ddd" } : {}}
