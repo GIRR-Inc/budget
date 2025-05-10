@@ -15,7 +15,7 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import EditDialog from "./EditDialog";
 import { getMatchedIcon } from "../util/iconMap";
 
-const MonthlyList = ({ userId, userColor }) => {
+const MonthlyList = ({ userId, groupId, userColor }) => {
   const [data, setData] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState("");
   const [summary, setSummary] = useState({ budget: 0, spent: 0 });
@@ -49,14 +49,6 @@ const MonthlyList = ({ userId, userColor }) => {
     }
   };
 
-  const dailyTotals = filtered.reduce((acc, item) => {
-    const day = item.date?.slice(8, 10);
-    if (!acc[day]) acc[day] = 0;
-    acc[day] += Number(item.amount);
-    return acc;
-  }, {});
-  
-
   const handleEditSave = async (updated) => {
     try {
       await updateTransaction(editItem, updated, userId);
@@ -80,32 +72,32 @@ const MonthlyList = ({ userId, userColor }) => {
   };
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId && !groupId) return;
 
-    fetchBudgetData(userId).then((res) => {
+    fetchBudgetData({ userId, groupId }).then((res) => {
       setData(res);
       const months = [...new Set(res.map((d) => d.date?.slice(0, 7)))].sort().reverse();
       if (months.length > 0) setSelectedMonth(months[0]);
     });
 
-    fetchCategories(userId).then((res) => {
+    fetchCategories({ userId, groupId }).then((res) => {
       setCategories(res);
     });
 
     setSelectedCategory(null);
-  }, [userId]);
+  }, [userId, groupId]);
 
   useEffect(() => {
-    if (!selectedMonth || !userId) return;
+    if (!selectedMonth || (!userId && !groupId)) return;
 
-    fetchMonthlySummary(selectedMonth, userId).then((res) => {
+    fetchMonthlySummary(selectedMonth, userId, groupId).then((res) => {
       setSummary({ budget: res.budget, spent: res.spent });
     });
 
-    fetchCategorySummary(selectedMonth, userId).then((res) => {
+    fetchCategorySummary(selectedMonth, userId, groupId).then((res) => {
       setCategorySummary(res);
     });
-  }, [selectedMonth, userId]);
+  }, [selectedMonth, userId, groupId]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -227,14 +219,7 @@ const MonthlyList = ({ userId, userColor }) => {
 
           return (
             <React.Fragment key={idx}>
-              {isNewDay && (
-                <div className="date-label">
-                  {day}일
-                  <span className="day-total">
-                    {dailyTotals[day]?.toLocaleString()}원
-                  </span>
-                </div>
-              )}
+              {isNewDay && <div className="date-label">{day}일</div>}
               <li
                 className="item"
                 style={isNewDay ? { borderTop: "3px solid #ddd" } : {}}

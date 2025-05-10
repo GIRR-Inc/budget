@@ -112,7 +112,7 @@ function SortableItem({ item, index, onDelete, onEditStart, onEditSave, onEditCa
 }
 
 // ⚙ SettingsDialog 메인
-function SettingsDialog({ open, onClose, onCategoryChange, userId }) {
+function SettingsDialog({ open, onClose, onCategoryChange, userId, groupId }) {
   const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState({ description: "", sort: 0 });
   const [activeId, setActiveId] = useState(null);
@@ -131,7 +131,10 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId }) {
 
   const loadCategories = async () => {
     try {
-      const data = await fetchCategories(userId);
+      const data = await fetchCategories({
+        userId: userId ?? null,
+        groupId: groupId ?? null,
+      });
       const sorted = [...data].sort((a, b) => a.sort - b.sort);
       setCategories(sorted);
     } catch (err) {
@@ -142,14 +145,14 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId }) {
   const handleAdd = async () => {
     const code = generateRandomCode();
     const maxSort = categories.length > 0 ? Math.max(...categories.map((c) => c.sort)) : 0;
-    await addCategory({ ...newCategory, code, sort: maxSort + 1 }, userId);
+    await addCategory({ ...newCategory, code, sort: maxSort + 1 }, userId, groupId);
     setNewCategory({ code: "", description: "", sort: 0 });
     await loadCategories();
     if (onCategoryChange) onCategoryChange();
   };
 
   const handleDelete = async (code) => {
-    await softDeleteCategory(code, userId);
+    await softDeleteCategory(code, userId, groupId);
     await loadCategories();
     if (onCategoryChange) onCategoryChange();
   };
@@ -167,7 +170,7 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId }) {
   const handleEditSave = async (code) => {
     if (!editValue.trim()) return;
     try {
-      await updateCategoryName(code, editValue, userId);
+      await updateCategoryName(code, editValue, userId, groupId);
       await loadCategories();
       setEditingCode(null);
       setEditValue("");
@@ -197,7 +200,7 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId }) {
     setCategories(newItems);
 
     try {
-      await updateCategoriesSort(newItems, userId);
+      await updateCategoriesSort(newItems, userId, groupId);
       if (onCategoryChange) onCategoryChange();
     } catch (err) {
       alert("정렬 순서 저장 중 오류가 발생했습니다.");

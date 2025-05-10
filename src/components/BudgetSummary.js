@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { saveMonthlyBudget, fetchMonthlySummary } from "../api/budgetApi";
 import "./BudgetSummary.css";
 
-const BudgetSummary = ({ userId, userColor }) => {
+const BudgetSummary = ({ userId, groupId, userColor }) => {
     const [month, setMonth] = useState(() => getKSTMonth());
     const [budget, setBudget] = useState("");
     const [spent, setSpent] = useState(0);
@@ -48,38 +48,38 @@ const BudgetSummary = ({ userId, userColor }) => {
     }, [percent]);
 
     const loadSummary = async () => {
-        setLoading(true);
-        try {
-            const res = await fetchMonthlySummary(month, userId);
-            if (res.status === "success") {
-                setBudget(res.budget.toString());
-                setSpent(res.spent);
-            } else {
-                alert("데이터 불러오기 실패: " + res.message);
-            }
-        } catch (err) {
-            alert("요청 실패: " + err.message);
-        } finally {
-            setLoading(false);
+    setLoading(true);
+    try {
+        const res = await fetchMonthlySummary(month, userId, groupId);
+        if (res.status === "success") {
+        setBudget(res.budget.toString());
+        setSpent(res.spent);
+        } else {
+        alert("데이터 불러오기 실패: " + res.message);
         }
+    } catch (err) {
+        alert("요청 실패: " + err.message);
+    } finally {
+        setLoading(false);
+    }
     };
-
 
     useEffect(() => {
+    if (userId || groupId) {
         loadSummary();
-    }, [month, userId]);
+    }
+    }, [month, userId, groupId]);
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        const res = await saveMonthlyBudget(month, budget, userId);
-        if (res.status === "success") {
-            alert("예산이 저장되었습니다!");
-            loadSummary(); // 저장 후 요약 정보 다시 불러오기
-        } else {
-            alert("저장 실패: " + res.message);
-        }
+    e.preventDefault();
+    const res = await saveMonthlyBudget(month, budget, userId, groupId);
+    if (res.status === "success") {
+        alert("예산이 저장되었습니다!");
+        loadSummary();
+    } else {
+        alert("저장 실패: " + res.message);
+    }
     };
-
 
     return (
         <div className="budget-container">

@@ -5,6 +5,7 @@ import "./InputForm.css";
 const InputForm = ({
   categories,
   userId,
+  groupId, // ✅ 추가
   userColor = "#f4a8a8",
   hoverColor = "#f19191",
 }) => {
@@ -54,7 +55,8 @@ const InputForm = ({
     try {
       const result = await addTransaction(
         { ...form, amount: finalAmount },
-        userId
+        userId,
+        groupId
       ); // ✅ userId 전달
       if (result.status === "success") {
         setShowPopup(true);
