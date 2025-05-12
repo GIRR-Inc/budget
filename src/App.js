@@ -3,6 +3,7 @@ import InputForm from "./components/InputForm";
 import MonthlyList from "./components/MonthlyList";
 import BudgetSummary from "./components/BudgetSummary";
 import SettingsDialog from "./components/SettingsDialog";
+import TotalSummary from "./components/TotalSummary";
 import SettingsIcon from "@mui/icons-material/Settings";
 import IconButton from "@mui/material/IconButton";
 import { fetchUsers, fetchCategories, fetchSharedGroups, createSharedGroup, addUsersToSharedGroup } from "./api/budgetApi"; // ✅ fetchUsers 추가
@@ -231,23 +232,36 @@ function App() {
       </div>
 
       {/* 탭 콘텐츠 */}
-      {activeTab === "input" && <InputForm
-                                              categories={categories}
-                                              userId={activeUser?.id ?? null}
-                                              groupId={activeGroup?.id ?? null}
-                                              userColor={mainColor}
-                                              hoverColor={hoverColor}
-                                            />}
-      {activeTab === "monthly" &&   <MonthlyList
-                                              userId={activeUser?.id ?? null}
-                                              groupId={activeGroup?.id ?? null}
-                                              userColor={mainColor}
-                                            />}
-      {activeTab === "summary" && <BudgetSummary
-                                              userId={activeUser?.id ?? null}
-                                              groupId={activeGroup?.id ?? null}
-                                              userColor={mainColor}
-                                            />}
+      {activeTab === "input" && (
+        <InputForm
+          categories={categories}
+          userId={activeUser?.id ?? null}
+          groupId={activeGroup?.id ?? null}
+          userColor={mainColor}
+          hoverColor={hoverColor}
+        />
+      )}
+      {activeTab === "monthly" && (
+        <MonthlyList
+          userId={activeUser?.id ?? null}
+          groupId={activeGroup?.id ?? null}
+          userColor={mainColor}
+        />
+      )}
+      {activeTab === "summary" && (
+        <BudgetSummary
+          userId={activeUser?.id ?? null}
+          groupId={activeGroup?.id ?? null}
+          userColor={mainColor}
+        />
+      )}
+      {activeTab === "total" && (
+        <TotalSummary
+          groupId={activeGroup?.id ?? null}
+          categories={categories}
+          userColor={mainColor}
+        />
+      )} {/* ✅ 새 탭 렌더링 */}
 
       {/* 설정 다이얼로그 */}
       <SettingsDialog

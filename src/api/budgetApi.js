@@ -107,21 +107,24 @@ export const addTransaction = async ({ category, amount, memo, date }, userId = 
   return { status: "success" };
 };
 
-export const updateTransaction = async (original, updated, userId) => {
+export const updateTransaction = async (original, updated, userId = null, groupId = null) => {
+  const matchConditions = {
+    date: original.date,
+    amount: original.amount,
+    category: original.category,
+    memo: original.memo,
+    ...(userId && { user_id: userId }),
+    ...(groupId && { shared_group_id: groupId }),
+  };
+
   const { error } = await supabase
     .from("transactions")
     .update({
       amount: updated.amount,
       memo: updated.memo,
-      category: updated.category, 
+      category: updated.category,
     })
-    .match({
-      date: original.date,
-      amount: original.amount,
-      category: original.category,
-      memo: original.memo,
-      user_id: userId,  // ✅ 사용자 조건 추가!
-    });
+    .match(matchConditions);
 
   if (error) throw error;
   return { status: "success" };

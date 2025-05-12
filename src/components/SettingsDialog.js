@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -7,6 +7,8 @@ import {
   Button,
   TextField,
   IconButton,
+  FormControlLabel,
+  Checkbox
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -44,14 +46,19 @@ function generateRandomCode() {
 }
 
 // 🔁 SortableItem (인라인 수정 지원)
-function SortableItem({ item, index, onDelete, onEditStart, onEditSave, onEditCancel, editing, editValue, setEditValue }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-  } = useSortable({ id: item.code });
+function SortableItem({
+  item,
+  index,
+  onDelete,
+  onEditStart,
+  onEditSave,
+  onEditCancel,
+  editing,
+  editValue,
+  setEditValue,
+}) {
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: item.code });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -67,8 +74,17 @@ function SortableItem({ item, index, onDelete, onEditStart, onEditSave, onEditCa
   };
 
   return (
-    <div className="sortable-item" ref={setNodeRef} style={style} {...attributes}>
-      <div className="drag-handle" {...listeners} style={{ cursor: "grab", paddingRight: "8px" }}>
+    <div
+      className="sortable-item"
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+    >
+      <div
+        className="drag-handle"
+        {...listeners}
+        style={{ cursor: "grab", paddingRight: "8px" }}
+      >
         ☰
       </div>
 
@@ -122,14 +138,12 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId, groupId }) {
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
-    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 0 } })
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 250, tolerance: 0 },
+    })
   );
 
-  useEffect(() => {
-    if (open && userId) loadCategories();
-  }, [open, userId]);
-
-  const loadCategories = async () => {
+  const loadCategories = useCallback(async () => {
     try {
       const data = await fetchCategories({
         userId: userId ?? null,
@@ -140,12 +154,21 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId, groupId }) {
     } catch (err) {
       console.error("카테고리 로딩 실패:", err);
     }
-  };
+  }, [userId, groupId]); // ✅ 의존성 포함
+
+  useEffect(() => {
+    if (open && (userId || groupId)) loadCategories();
+  }, [open, userId, groupId, loadCategories]); // ✅ 안전하게 추가됨
 
   const handleAdd = async () => {
     const code = generateRandomCode();
-    const maxSort = categories.length > 0 ? Math.max(...categories.map((c) => c.sort)) : 0;
-    await addCategory({ ...newCategory, code, sort: maxSort + 1 }, userId, groupId);
+    const maxSort =
+      categories.length > 0 ? Math.max(...categories.map((c) => c.sort)) : 0;
+    await addCategory(
+      { ...newCategory, code, sort: maxSort + 1 },
+      userId,
+      groupId
+    );
     setNewCategory({ code: "", description: "", sort: 0 });
     await loadCategories();
     if (onCategoryChange) onCategoryChange();
@@ -192,10 +215,12 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId, groupId }) {
     const oldIndex = categories.findIndex((c) => c.code === active.id);
     const newIndex = categories.findIndex((c) => c.code === over.id);
 
-    const newItems = arrayMove(categories, oldIndex, newIndex).map((item, idx) => ({
-      ...item,
-      sort: idx,
-    }));
+    const newItems = arrayMove(categories, oldIndex, newIndex).map(
+      (item, idx) => ({
+        ...item,
+        sort: idx,
+      })
+    );
 
     setCategories(newItems);
 
@@ -218,7 +243,10 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId, groupId }) {
           onDragStart={handleDragStart}
           onDragEnd={handleDragEnd}
         >
-          <SortableContext items={categories.map((c) => c.code)} strategy={verticalListSortingStrategy}>
+          <SortableContext
+            items={categories.map((c) => c.code)}
+            strategy={verticalListSortingStrategy}
+          >
             <div className="settings-list-wrapper">
               {categories.map((cat, index) => (
                 <SortableItem
@@ -242,7 +270,8 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId, groupId }) {
                 <div className="drag-handle">☰</div>
                 <div style={{ flexGrow: 1 }}>
                   <div className="item-text-primary">
-                    {categories.find((c) => c.code === activeId)?.description || ""}
+                    {categories.find((c) => c.code === activeId)?.description ||
+                      ""}
                   </div>
                 </div>
               </div>
@@ -255,9 +284,21 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId, groupId }) {
           className="settings-input"
           label="카테고리"
           value={newCategory.description}
-          onChange={(e) => setNewCategory({ ...newCategory, description: e.target.value })}
+          onChange={(e) =>
+            setNewCategory({ ...newCategory, description: e.target.value })
+          }
           fullWidth
           margin="dense"
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={newCategory.is_shared_total}
+              onChange={(e) => setNewCategory({ ...newCategory, is_shared_total: e.target.checked })}
+              color="primary"
+            />
+          }
+          label="공동 카테고리 누적 보기 포함"
         />
         <Button
           onClick={handleAdd}

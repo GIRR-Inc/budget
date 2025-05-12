@@ -51,16 +51,16 @@ const MonthlyList = ({ userId, groupId, userColor }) => {
 
   const handleEditSave = async (updated) => {
     try {
-      await updateTransaction(editItem, updated, userId);
+      await updateTransaction(editItem, updated, userId, groupId); // ✅ 수정된 호출부
       const updatedData = data.map((d) =>
         d === editItem
           ? {
-            ...editItem,
-            amount: updated.type === "expense" ? -Math.abs(updated.amount) : Math.abs(updated.amount),
-            memo: updated.memo,
-            category: updated.category,
-            category_name: categories.find((c) => c.code === updated.category)?.description || "카테고리 수정",
-          }
+              ...editItem,
+              amount: updated.type === "expense" ? -Math.abs(updated.amount) : Math.abs(updated.amount),
+              memo: updated.memo,
+              category: updated.category,
+              category_name: categories.find((c) => c.code === updated.category)?.description || "카테고리 수정",
+            }
           : d
       );
       setData(updatedData);
