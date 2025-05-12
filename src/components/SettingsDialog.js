@@ -298,7 +298,7 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId, groupId }) {
               color="primary"
             />
           }
-          label="공동 카테고리 누적 보기 포함"
+          label="누적보기"
         />
         <Button
           onClick={handleAdd}
