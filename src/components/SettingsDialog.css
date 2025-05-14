@@ -1,117 +1,120 @@
 @font-face {
-    font-family: 'S-CoreDream-3Light';
-    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-  }
-  
-  @font-face {
-    font-family: 'GmarketSansMedium';
-    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-  }
-  
-  .settings-dialog-content {
-    font-family: 'S-CoreDream-3Light';
-  }
-  
-  .settings-list-wrapper {
-    position: relative;
-    max-height: 300px;
-    overflow-y: auto;
-    touch-action: auto;
-    margin-bottom: 1rem;
-    border: 1px solid #eee;
-    border-radius: 8px;
-    background: #fdfdfd;
-    font-family: 'S-CoreDream-3Light';
-    font-size: 13px; /* 글씨 작게 */
-    -webkit-overflow-scrolling: touch;
-  }
+  font-family: 'S-CoreDream-3Light';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
 
-  .drag-preview {
-    opacity: 0.8;
-    background-color: #e8f0ff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  }
-  
-  .drag-handle {
-    touch-action: none;
-    user-select: none;
-    -webkit-user-select: none;
-    cursor: grab;
-    font-size: 16px;
-    color: #666;
-    margin-right: 8px;
-  }
-  
-  .settings-list-wrapper {
-    overflow-y: auto;
-    max-height: 300px;
-    touch-action: auto; /* 또는 manipulation */
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  .settings-input {
-    margin-top: 8px;
-  }
-  
-  .settings-button {
-    margin-top: 1rem;
-    background-color: #f4a8a8;
-    color: white;
-    border: none;
-    padding: 12px;
-    border-radius: 8px;
-    font-family: 'S-CoreDream-3Light';
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.2s ease;
-  }
-  
-  .settings-button:hover {
-    background-color: #f19191;
-  }
-  
-  .settings-list-wrapper .MuiListItem-root {
-    padding-top: 4px;
-    padding-bottom: 4px;
-  }
+@font-face {
+  font-family: 'GmarketSansMedium';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
 
-  .sortable-item {
-    position: relative; /* ⭐ 필수! */
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 12px;
-    margin-bottom: 8px;
-    transition: box-shadow 0.2s ease;
-  }
-  
-  .sortable-item:hover {
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .item-text-primary {
-    font-size: 13px;
-    font-family: 'S-CoreDream-3Light';
-    color: #333;
-  }
-  
-  .item-text-secondary {
-    font-size: 12px;
-    font-family: 'S-CoreDream-3Light';
-    color: #777;
-  }
-  
-  /* 수정 중인 아이템 하이라이트 */
+.settings-dialog-content {
+  font-family: 'S-CoreDream-3Light';
+}
+
+.settings-list-wrapper {
+  position: relative;
+  max-height: 300px;
+  overflow-y: auto;
+  touch-action: auto;
+  margin-bottom: 1rem;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background: #fdfdfd;
+  font-family: 'S-CoreDream-3Light';
+  font-size: 13px;
+  /* 글씨 작게 */
+  -webkit-overflow-scrolling: touch;
+}
+
+.drag-preview {
+  opacity: 0.8;
+  background-color: #e8f0ff;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.drag-handle {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+  font-size: 16px;
+  color: #666;
+  margin-right: 8px;
+}
+
+.settings-list-wrapper {
+  overflow-y: auto;
+  max-height: 300px;
+  touch-action: auto;
+  /* 또는 manipulation */
+  -webkit-overflow-scrolling: touch;
+}
+
+.settings-input {
+  margin-top: 8px;
+}
+
+.settings-button {
+  margin-top: 1rem;
+  background-color: #f4a8a8;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-family: 'S-CoreDream-3Light';
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.settings-button:hover {
+  background-color: #f19191;
+}
+
+.settings-list-wrapper .MuiListItem-root {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.sortable-item {
+  position: relative;
+  /* ⭐ 필수! */
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+  transition: box-shadow 0.2s ease;
+}
+
+.sortable-item:hover {
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.item-text-primary {
+  font-size: 13px;
+  font-family: 'S-CoreDream-3Light';
+  color: #333;
+}
+
+.item-text-secondary {
+  font-size: 12px;
+  font-family: 'S-CoreDream-3Light';
+  color: #777;
+}
+
+/* 수정 중인 아이템 하이라이트 */
 .sortable-item.editing {
-  background-color: #fff7f0;
-  border-color: #f4a8a8;
+  background-color: #fffaf4;
+  border: 1px solid #f4a8a8;
 }
 
 /* 수정 영역 구분선 */
@@ -119,4 +122,22 @@
   margin-top: 20px;
   padding-top: 12px;
   border-top: 1px solid #eee;
+}
+
+.category-checkbox-label {
+  font-family: 'GmarketSansMedium' !important;
+  font-size: 13px;
+  white-space: nowrap;
+  margin: 0;
+}
+
+/* 수정 중 버튼 위치용 스타일 */
+.sortable-item .MuiIconButton-root {
+  width: 28px;
+  height: 28px;
+}
+
+.sortable-item.editing {
+  position: relative;
+  padding-right: 64px; /* 버튼 공간 확보 */
 }

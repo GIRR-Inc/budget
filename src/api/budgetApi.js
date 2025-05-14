@@ -10,6 +10,57 @@ export const fetchUsers = async () => {
   return data;
 };
 
+export const fetchSharedTotalSummary = async (groupId) => {
+  if (!groupId) throw new Error("groupId가 필요합니다.");
+
+  const { data, error } = await supabase
+    .from("transactions")
+    .select(`
+      category,
+      amount,
+      memo,
+      date,
+      categories (
+        code,
+        description,
+        is_shared_total,
+        is_deleted
+      )
+    `)
+    .eq("shared_group_id", groupId);
+
+  if (error) throw error;
+
+  const filtered = data.filter(
+    (row) =>
+      row.categories &&
+      row.categories.is_shared_total === true &&
+      row.categories.is_deleted === false
+  );
+
+  // 🧮 카테고리별로 묶기
+  const grouped = {};
+  for (const row of filtered) {
+    const code = row.category;
+    const name = row.categories.description;
+    const amt = Number(row.amount);
+
+    if (!grouped[code]) {
+      grouped[code] = { code, name, total: 0, transactions: [] };
+    }
+
+    grouped[code].total += amt;
+    grouped[code].transactions.push({
+      amount: amt,
+      memo: row.memo,
+      date: row.date,
+    });
+  }
+
+  return Object.values(grouped).sort((a, b) => b.total - a.total);
+};
+
+
 
 export const fetchBudgetData = async ({ userId = null, groupId = null }) => {
   const matchObj = {
@@ -198,33 +249,36 @@ export const fetchCategories = async ({ userId = null, groupId = null }) => {
 };
 
 // 카테고리 추가
-export const addCategory = async ({ code, description }, userId = null, groupId = null) => {
+export const addCategory = async (
+  { code, description, sort, is_shared_total = false },
+  userId = null,
+  groupId = null
+) => {
   const targetColumn = userId ? "user_id" : "shared_group_id";
   const targetValue = userId ?? groupId;
 
-  const { data: existing } = await supabase
-    .from("categories")
-    .select("sort")
-    .eq("is_deleted", false)
-    .eq(targetColumn, targetValue)
-    .order("sort", { ascending: false })
-    .limit(1);
-
-  const nextSort = existing?.[0]?.sort != null ? existing[0].sort + 1 : 0;
-
   const { data, error } = await supabase
     .from("categories")
-    .insert([{ code, description, sort: nextSort, [targetColumn]: targetValue }]);
+    .insert([
+      {
+        code,
+        description,
+        sort,
+        [targetColumn]: targetValue,
+        is_shared_total, // ✅ 누적보기 상태 저장
+      },
+    ]);
 
   if (error) throw error;
   return { status: "success", data };
 };
 
 // 카테고리 이름 수정
-export const updateCategoryName = async (code, newDescription, userId = null, groupId = null) => {
+// 기존 updateCategoryName 함수 대신:
+export const updateCategory = async (code, { description, is_shared_total }, userId, groupId) => {
   const { error } = await supabase
     .from("categories")
-    .update({ description: newDescription })
+    .update({ description, is_shared_total })
     .eq("code", code)
     .match({
       ...(userId && { user_id: userId }),
@@ -234,6 +288,7 @@ export const updateCategoryName = async (code, newDescription, userId = null, gr
   if (error) throw error;
   return { status: "success" };
 };
+
 
 export const softDeleteCategory = async (code, userId = null, groupId = null) => {
   const { error } = await supabase

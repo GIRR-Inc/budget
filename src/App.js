@@ -189,47 +189,38 @@ function App() {
       </h2>
 
       {/* 탭 버튼 */}
-      <div
+<div className="tab-bar">
+  {[
+    { label: "입력하기", key: "input" },
+    { label: "월별 보기", key: "monthly" },
+    { label: "월간 예산", key: "summary" },
+    ...(activeGroup
+      ? [{ label: "항목별 누적", key: "total" }]
+      : []),
+  ].map(({ label, key }) => {
+    const isActive = activeTab === key;
+    return (
+      <button
+        key={key}
+        onClick={() => setActiveTab(key)}
+        className="tab"
         style={{
-          display: "flex",
-          justifyContent: "center",
-          gap: "8px",
-          marginBottom: "1rem",
+          backgroundColor: isActive ? mainColor : "white",
+          color: isActive ? "white" : mainColor,
+          border: `2px solid ${mainColor}`,
+        }}
+        onMouseOver={(e) => {
+          e.target.style.backgroundColor = isActive ? hoverColor : "#f9f9f9";
+        }}
+        onMouseOut={(e) => {
+          e.target.style.backgroundColor = isActive ? mainColor : "white";
         }}
       >
-        {[
-          { label: "입력하기", key: "input" },
-          { label: "월별 보기", key: "monthly" },
-          { label: "월간 예산", key: "summary" },
-        ].map(({ label, key }) => (
-          <button
-            key={key}
-            onClick={() => setActiveTab(key)}
-            style={{
-              padding: "10px 10px",
-              borderRadius: "30px",
-              border: `1px solid ${mainColor}`,
-              fontFamily: "'GmarketSansMedium', sans-serif",
-              fontWeight: 600,
-              backgroundColor: activeTab === key ? mainColor : "white",
-              color: activeTab === key ? "white" : mainColor,
-              boxShadow: "0 2px 5px rgba(0, 0, 0, 0.1)",
-              cursor: "pointer",
-              transition: "all 0.2s ease-in-out",
-            }}
-            onMouseOver={(e) => {
-              e.target.style.backgroundColor =
-                activeTab === key ? hoverColor : "#f0f0f0";
-            }}
-            onMouseOut={(e) => {
-              e.target.style.backgroundColor =
-                activeTab === key ? mainColor : "white";
-            }}
-          >
-            {label}
-          </button>
-        ))}
-      </div>
+        {label}
+      </button>
+    );
+  })}
+</div>
 
       {/* 탭 콘텐츠 */}
       {activeTab === "input" && (

@@ -1,57 +1,58 @@
 import React, { useEffect, useState } from "react";
-import { fetchBudgetData } from "../api/budgetApi";
+import { fetchSharedTotalSummary } from "../api/budgetApi";
 import "./TotalSummary.css";
 
-const TotalSummary = ({ groupId, categories, userColor }) => {
+const TotalSummary = ({ groupId, userColor }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // ✅ 누적 보기 대상 카테고리만 필터
-  const sharedCategoryCodes = categories
-    .filter((c) => c.is_shared_total)
-    .map((c) => c.code);
+  const [openCategory, setOpenCategory] = useState(null);
 
   useEffect(() => {
     const load = async () => {
       try {
         setLoading(true);
-        const tx = await fetchBudgetData({ groupId });
-        const filtered = tx.filter((t) => sharedCategoryCodes.includes(t.category));
-        setData(filtered);
+        const summaryList = await fetchSharedTotalSummary(groupId);
+        setData(summaryList);
       } catch (err) {
-        console.error("누적 보기 로딩 실패:", err);
+        console.error("누적 합계 로딩 실패:", err);
       } finally {
         setLoading(false);
       }
     };
     if (groupId) load();
-  }, [groupId, categories]);
-
-  // ✅ 카테고리별 누적합
-  const totals = data.reduce((acc, cur) => {
-    const key = cur.category;
-    const amt = Number(cur.amount);
-    if (!acc[key]) acc[key] = { name: cur.category_name, total: 0 };
-    acc[key].total += amt;
-    return acc;
-  }, {});
-
-  const sortedTotals = Object.entries(totals).sort(([, a], [, b]) => b.total - a.total);
+  }, [groupId]);
 
   return (
     <div className="total-summary">
-      <h3 style={{ color: userColor }}>📊 전체 누적 보기 (공동 태그)</h3>
-
       {loading ? (
         <p>불러오는 중...</p>
-      ) : sortedTotals.length === 0 ? (
+      ) : data.length === 0 ? (
         <p>해당되는 내역이 없습니다.</p>
       ) : (
         <ul className="total-list">
-          {sortedTotals.map(([code, { name, total }]) => (
-            <li key={code} className="total-item">
-              <span className="cat-name">{name}</span>
-              <span className="cat-total">{total.toLocaleString()}원</span>
+          {data.map(({ code, name, total, transactions }) => (
+            <li key={code} className="total-item-wrapper">
+              <div
+                className="total-item"
+                onClick={() =>
+                  setOpenCategory(openCategory === code ? null : code)
+                }
+              >
+                <span className="cat-name">{name}</span>
+                <span className="cat-total">{total.toLocaleString()}원</span>
+              </div>
+
+              {openCategory === code && (
+                <ul className="transaction-sublist">
+                  {transactions.map((tx, idx) => (
+                    <li key={idx} className="transaction-item">
+                      <span>{tx.date}</span>
+                      <span>{tx.memo || "메모 없음"}</span>
+                      <span>{tx.amount.toLocaleString()}원</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </li>
           ))}
         </ul>

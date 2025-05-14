@@ -1,34 +1,62 @@
+@font-face {
+  font-family: 'S-CoreDream-3Light';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'GmarketSansMedium';
+  src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2001@1.1/GmarketSansMedium.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* ✅ 전체 컨테이너 */
 .total-summary {
   font-family: 'GmarketSansMedium', sans-serif;
   padding: 1rem;
   background-color: #fffef6;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  max-width: 420px;
+  margin: 0 auto; /* ✅ 중앙 정렬 */
 }
 
+/* ✅ 제목 */
 .total-summary h3 {
   text-align: center;
   margin-bottom: 1rem;
-  font-size: 1.25rem;
+  font-size: 1.2rem;
+  font-family: 'GmarketSansMedium';
 }
 
+/* ✅ 리스트 감싸는 ul */
 .total-list {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
+/* ✅ 각 카테고리 카드 전체 wrapper */
+.total-item-wrapper {
+  margin-bottom: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+/* ✅ 카테고리 줄 */
 .total-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 12px 16px;
-  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
   font-size: 1rem;
-  background-color: white;
-  border-radius: 8px;
-  margin-bottom: 8px;
-  transition: transform 0.2s ease;
+  font-family: 'GmarketSansMedium';
 }
 
 .total-item:hover {
@@ -36,13 +64,36 @@
   transform: translateY(-2px);
 }
 
+/* ✅ 카테고리명 */
 .cat-name {
   font-weight: 600;
   color: #333;
+  font-family: 'GmarketSansMedium';
 }
 
+/* ✅ 금액 */
 .cat-total {
   font-weight: 700;
   color: #555;
   white-space: nowrap;
+  font-family: 'GmarketSansMedium';
+}
+
+/* ✅ 펼쳐지는 거래 내역 리스트 */
+.transaction-sublist {
+  padding: 8px 16px 12px;
+  background: #fdfdfd;
+  font-size: 13px;
+  font-family: 'S-CoreDream-3Light';
+}
+
+/* ✅ 거래 항목 */
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px dashed #ccc;
+  gap: 8px;
+  color: #444;
+  font-size: 13px;
 }

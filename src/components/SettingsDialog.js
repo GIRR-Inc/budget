@@ -8,7 +8,7 @@ import {
   TextField,
   IconButton,
   FormControlLabel,
-  Checkbox
+  Checkbox,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -19,7 +19,7 @@ import {
   addCategory,
   softDeleteCategory,
   updateCategoriesSort,
-  updateCategoryName,
+  updateCategory,
 } from "../api/budgetApi";
 import {
   DndContext,
@@ -56,6 +56,8 @@ function SortableItem({
   editing,
   editValue,
   setEditValue,
+  editSharedTotal, // ✅ 추가
+  setEditSharedTotal, // ✅ 추가
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: item.code });
@@ -75,27 +77,70 @@ function SortableItem({
 
   return (
     <div
-      className="sortable-item"
+      className={`sortable-item ${editing ? "editing" : ""}`}
       ref={setNodeRef}
       style={style}
       {...attributes}
     >
-      <div
-        className="drag-handle"
-        {...listeners}
-        style={{ cursor: "grab", paddingRight: "8px" }}
-      >
+      <div className="drag-handle" {...listeners}>
         ☰
       </div>
 
-      <div style={{ flexGrow: 1 }}>
+      <div style={{ flexGrow: 1, display: "flex", flexDirection: "column" }}>
         {editing ? (
-          <TextField
-            value={editValue}
-            onChange={(e) => setEditValue(e.target.value)}
-            size="small"
-            fullWidth
-          />
+          <>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <TextField
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                size="small"
+                fullWidth
+                margin="dense"
+                InputProps={{
+                  style: { fontSize: 14 },
+                }}
+              />
+              <IconButton
+                onClick={() => onEditSave(item.code)}
+                size="small"
+                style={{ padding: 6 }}
+              >
+                <CheckIcon fontSize="small" />
+              </IconButton>
+              <IconButton
+                onClick={onEditCancel}
+                size="small"
+                style={{ padding: 6 }}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </div>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "flex-end",
+                alignItems: "center",
+                marginTop: 1,
+                gap: 4,
+              }}
+            >
+              <Checkbox
+                checked={editSharedTotal}
+                onChange={(e) => setEditSharedTotal(e.target.checked)}
+                size="small"
+                sx={{ padding: "4px" }} // ✅ MUI spacing 최소화
+              />
+              <span
+                style={{
+                  fontFamily: "GmarketSansMedium",
+                  fontSize: "13px",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                누적보기
+              </span>
+            </div>
+          </>
         ) : (
           <>
             <div className="item-text-primary">{item.description}</div>
@@ -104,25 +149,16 @@ function SortableItem({
         )}
       </div>
 
-      <div style={{ display: "flex", gap: "4px" }}>
-        {editing ? (
-          <>
-            <IconButton onClick={() => onEditSave(item.code)}>
-              <CheckIcon fontSize="small" />
-            </IconButton>
-            <IconButton onClick={onEditCancel}>
-              <CloseIcon fontSize="small" />
-            </IconButton>
-          </>
-        ) : (
-          <IconButton onClick={() => onEditStart(item)}>
+      {!editing && (
+        <div style={{ display: "flex", gap: "4px" }}>
+          <IconButton onClick={() => onEditStart(item)} size="small">
             <EditIcon fontSize="small" />
           </IconButton>
-        )}
-        <IconButton onClick={() => onDelete(item.code)}>
-          <DeleteIcon fontSize="small" />
-        </IconButton>
-      </div>
+          <IconButton onClick={() => onDelete(item.code)} size="small">
+            <DeleteIcon fontSize="small" />
+          </IconButton>
+        </div>
+      )}
     </div>
   );
 }
@@ -135,6 +171,7 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId, groupId }) {
 
   const [editingCode, setEditingCode] = useState(null);
   const [editValue, setEditValue] = useState("");
+  const [editSharedTotal, setEditSharedTotal] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -183,6 +220,7 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId, groupId }) {
   const handleEditStart = (item) => {
     setEditingCode(item.code);
     setEditValue(item.description);
+    setEditSharedTotal(!!item.is_shared_total); // ✅ 체크박스 초기값
   };
 
   const handleEditCancel = () => {
@@ -193,7 +231,15 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId, groupId }) {
   const handleEditSave = async (code) => {
     if (!editValue.trim()) return;
     try {
-      await updateCategoryName(code, editValue, userId, groupId);
+      await updateCategory(
+        code,
+        {
+          description: editValue,
+          is_shared_total: editSharedTotal,
+        },
+        userId,
+        groupId
+      );
       await loadCategories();
       setEditingCode(null);
       setEditValue("");
@@ -260,6 +306,8 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId, groupId }) {
                   editing={editingCode === cat.code}
                   editValue={editValue}
                   setEditValue={setEditValue}
+                  editSharedTotal={editSharedTotal} // ✅ 추가
+                  setEditSharedTotal={setEditSharedTotal} // ✅ 추가
                 />
               ))}
             </div>
@@ -280,26 +328,41 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId, groupId }) {
         </DndContext>
 
         {/* ✅ 새 카테고리 추가 */}
-        <TextField
-          className="settings-input"
-          label="카테고리"
-          value={newCategory.description}
-          onChange={(e) =>
-            setNewCategory({ ...newCategory, description: e.target.value })
-          }
-          fullWidth
-          margin="dense"
-        />
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={newCategory.is_shared_total}
-              onChange={(e) => setNewCategory({ ...newCategory, is_shared_total: e.target.checked })}
-              color="primary"
-            />
-          }
-          label="누적보기"
-        />
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "24px", // ✅ 간격 더 넓게
+            marginTop: "12px",
+          }}
+        >
+          <TextField
+            label="카테고리"
+            value={newCategory.description}
+            onChange={(e) =>
+              setNewCategory({ ...newCategory, description: e.target.value })
+            }
+            margin="dense"
+            style={{ flexGrow: 1 }}
+          />
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={newCategory.is_shared_total}
+                onChange={(e) =>
+                  setNewCategory({
+                    ...newCategory,
+                    is_shared_total: e.target.checked,
+                  })
+                }
+                color="primary"
+                size="small"
+              />
+            }
+            label="누적보기"
+            className="category-checkbox-label" // ✅ 클래스 추가
+          />
+        </div>
         <Button
           onClick={handleAdd}
           className="settings-button"

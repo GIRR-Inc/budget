@@ -11,3 +11,36 @@
     font-weight: normal;
     font-style: normal;
 }
+
+.tab-bar {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap; /* ✅ 줄바꿈 허용 */
+  gap: 12px;
+  margin-bottom: 1rem;
+  font-family: 'GmarketSansMedium', sans-serif;
+}
+
+.tab {
+  padding: 10px 16px;
+  border-radius: 30px;
+  border: 2px solid #ccc;
+  font-weight: 600;
+  background-color: white;
+  color: #666;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.tab:hover {
+  background-color: #f9f9f9;
+}
+
+.tab.active {
+  background-color: #ffd966; /* 예시: 우리집 색상 */
+  color: white;
+  border-color: #ffc933;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
