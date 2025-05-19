@@ -38,6 +38,12 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
     .filter((d) => d.date?.startsWith(selectedMonth))
     .filter((d) => (selectedCategory ? d.category === selectedCategory : true));
 
+  const totalIncome = filtered
+    .filter((item) => Number(item.amount) > 0)
+    .reduce((sum, item) => sum + Number(item.amount), 0);
+
+  const netIncome = totalIncome - summary.spent;
+
   const visibleItems = filtered.slice(0, visibleCount);
 
   const handleDelete = async (item) => {
@@ -185,10 +191,31 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
         </div>
         <div className="summary-row">
           <span className="label">지출</span>
-          <span className={`value ${summary.spent > summary.budget ? "over" : ""}`}>
+          <span className={`value over`}>
             {summary.spent.toLocaleString()}원
           </span>
         </div>
+{groupId && (
+  <>
+    <div className="summary-row">
+      <span className="label">수입</span>
+      <span className="value income">
+        {filtered
+          .filter((item) => Number(item.amount) > 0)
+          .reduce((sum, item) => sum + Number(item.amount), 0)
+          .toLocaleString()}원
+      </span>
+    </div>
+    <div className="summary-info">
+      <span className="label">월 순이익</span>
+      <span
+        className={`value net-positive`}
+      >
+        {netIncome.toLocaleString()}원
+      </span>
+    </div>
+  </>
+)}
 
         <div className="toggle-button-wrapper">
           <button onClick={() => setShowDetail((prev) => !prev)}>

@@ -118,6 +118,16 @@
     justify-content: space-between;
     margin-bottom: 2px;
   }
+
+  .summary-info {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    padding-top: 4px;
+    border-top: 4px dashed #ddd;
+  }
+
   
   .summary-bar .label {
     color: #666;
@@ -133,6 +143,13 @@
   .summary-bar .value.over {
     color: crimson;
   }
+
+  .summary-bar .value.income {
+  color: royalblue;
+}
+.value.net-positive {
+  color: #2e7d32; /* 진한 초록 */
+}
   
   .item {
     position: relative;
