@@ -32,7 +32,9 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
   const [showDetail, setShowDetail] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
-  const months = [...new Set(data.map((d) => d.date?.slice(0, 7)))].sort().reverse();
+  const months = [...new Set(data.map((d) => d.date?.slice(0, 7)))]
+    .sort()
+    .reverse();
 
   const filtered = data
     .filter((d) => d.date?.startsWith(selectedMonth))
@@ -74,8 +76,8 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
               memo: updated.memo,
               category: updated.category,
               category_name:
-                categories.find((c) => c.code === updated.category)?.description ||
-                "카테고리 수정",
+                categories.find((c) => c.code === updated.category)
+                  ?.description || "카테고리 수정",
             }
           : d
       );
@@ -92,7 +94,9 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
 
     fetchBudgetData({ userId, groupId }).then((res) => {
       setData(res);
-      const months = [...new Set(res.map((d) => d.date?.slice(0, 7)))].sort().reverse();
+      const months = [...new Set(res.map((d) => d.date?.slice(0, 7)))]
+        .sort()
+        .reverse();
       if (months.length > 0) setSelectedMonth(months[0]);
     });
 
@@ -117,7 +121,8 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
 
   useEffect(() => {
     const handleScroll = () => {
-      const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
+      const nearBottom =
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
       if (nearBottom) {
         setVisibleCount((prev) => Math.min(prev + 15, filtered.length));
       }
@@ -167,7 +172,8 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
               setSelectedCategory(null);
             }}
             style={{
-              backgroundColor: month === selectedMonth ? userColor : "transparent",
+              backgroundColor:
+                month === selectedMonth ? userColor : "transparent",
               color: month === selectedMonth ? "white" : "black",
               border: `1px solid ${userColor || "#f4a8a8"}`,
             }}
@@ -189,33 +195,36 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
           <span className="label">예산</span>
           <span className="value">{summary.budget.toLocaleString()}원</span>
         </div>
+        {groupId && (
+          <>
+            <div className="summary-row">
+              <span className="label">수입</span>
+              <span className="value income">
+                {filtered
+                  .filter((item) => Number(item.amount) > 0)
+                  .reduce((sum, item) => sum + Number(item.amount), 0)
+                  .toLocaleString()}
+                원
+              </span>
+            </div>
+          </>
+        )}
         <div className="summary-row">
           <span className="label">지출</span>
           <span className={`value over`}>
             {summary.spent.toLocaleString()}원
           </span>
         </div>
-{groupId && (
-  <>
-    <div className="summary-row">
-      <span className="label">수입</span>
-      <span className="value income">
-        {filtered
-          .filter((item) => Number(item.amount) > 0)
-          .reduce((sum, item) => sum + Number(item.amount), 0)
-          .toLocaleString()}원
-      </span>
-    </div>
-    <div className="summary-info">
-      <span className="label">월 순이익</span>
-      <span
-        className={`value net-positive`}
-      >
-        {netIncome.toLocaleString()}원
-      </span>
-    </div>
-  </>
-)}
+        {groupId && (
+          <>
+            <div className="summary-info">
+              <span className="label">월 순이익</span>
+              <span className={`value net-positive`}>
+                {netIncome.toLocaleString()}원
+              </span>
+            </div>
+          </>
+        )}
 
         <div className="toggle-button-wrapper">
           <button onClick={() => setShowDetail((prev) => !prev)}>
@@ -234,13 +243,17 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
                   .sort((a, b) => b.total - a.total)
                   .map((cat, idx) => {
                     const percent =
-                      summary.spent > 0 ? Math.round((cat.total / summary.spent) * 100) : 0;
+                      summary.spent > 0
+                        ? Math.round((cat.total / summary.spent) * 100)
+                        : 0;
                     const isSelected = selectedCategory === cat.category;
 
                     return (
                       <li
                         key={idx}
-                        className={`category-item ${isSelected ? "clicked" : ""}`}
+                        className={`category-item ${
+                          isSelected ? "clicked" : ""
+                        }`}
                         onClick={() => {
                           if (isSelected) {
                             setSelectedCategory(null);
@@ -251,7 +264,9 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
                         }}
                         style={{
                           cursor: "pointer",
-                          backgroundColor: isSelected ? userColor || "#d1e7ff" : "transparent",
+                          backgroundColor: isSelected
+                            ? userColor || "#d1e7ff"
+                            : "transparent",
                         }}
                       >
                         <span className="category-name">{cat.name}</span>
@@ -296,7 +311,10 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
                 className="item"
                 style={isNewDay ? { borderTop: "3px solid #ddd" } : {}}
               >
-                <button className="delete-btn" onClick={() => handleDelete(item)}>
+                <button
+                  className="delete-btn"
+                  onClick={() => handleDelete(item)}
+                >
                   <CloseIcon fontSize="small" />
                 </button>
                 <button
@@ -331,7 +349,9 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
                       </div>
                     )}
                   </div>
-                  <span className={`amount ${isExpense ? "expense" : "income"}`}>
+                  <span
+                    className={`amount ${isExpense ? "expense" : "income"}`}
+                  >
                     {isExpense ? "-" : "+"}
                     {formatted}원
                   </span>
