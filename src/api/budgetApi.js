@@ -16,6 +16,7 @@ export const fetchSharedTotalSummary = async (groupId) => {
   const { data, error } = await supabase
     .from("transactions")
     .select(`
+      id,
       category,
       amount,
       memo,
@@ -51,6 +52,7 @@ export const fetchSharedTotalSummary = async (groupId) => {
 
     grouped[code].total += amt;
     grouped[code].transactions.push({
+      id: row.id,
       amount: amt,
       memo: row.memo,
       date: row.date,

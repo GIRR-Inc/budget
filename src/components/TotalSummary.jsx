@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { fetchSharedTotalSummary } from "../api/budgetApi";
 import "./TotalSummary.css";
 
-const TotalSummary = ({ groupId, userColor }) => {
+const TotalSummary = ({ groupId, userColor, onTxClick }) => {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openCategory, setOpenCategory] = useState(null);
@@ -45,8 +45,13 @@ const TotalSummary = ({ groupId, userColor }) => {
               {openCategory === code && (
                 <ul className="transaction-sublist">
                   {transactions.map((tx, idx) => (
-                    <li key={idx} className="transaction-item">
-                      <span>{tx.date}</span>
+                    <li
+                      key={idx}
+                      className="transaction-item"
+                      onClick={() => onTxClick?.(tx)} // ⬅️ 월별 리스트로 이동 요청
+                      style={{ cursor: "pointer" }}
+                    >
+                      <span>{tx.date?.slice(2).replace(/-/g, ".")}</span>
                       <span>{tx.memo || "메모 없음"}</span>
                       <span>{tx.amount.toLocaleString()}원</span>
                     </li>

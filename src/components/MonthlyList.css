@@ -363,3 +363,20 @@
   font-family: 'S-CoreDream-3Light';
   font-size: 12px; /* ✅ 퍼센트는 약간 더 작게 */
 }
+
+.date-label-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin : 0
+}
+
+@keyframes blink-highlight {
+  0%   { background-color: #fff3cd; }
+  50%  { background-color: #ffe8a1; }
+  100% { background-color: #fff3cd; }
+}
+
+.item.highlight {
+  animation: blink-highlight 1.2s ease-in-out 4;
+}

@@ -1,4 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  useEffect,
+  useState,
+  useImperativeHandle,
+  forwardRef,
+} from "react";
 import {
   fetchBudgetData,
   fetchMonthlySummary,
@@ -15,7 +20,7 @@ import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import EditDialog from "./EditDialog";
 import { getMatchedIcon } from "../util/iconMap";
 
-const MonthlyList = ({ userId, groupId, userColor }) => {
+const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
   const [data, setData] = useState([]);
   const [selectedMonth, setSelectedMonth] = useState("");
   const [summary, setSummary] = useState({ budget: 0, spent: 0 });
@@ -25,13 +30,13 @@ const MonthlyList = ({ userId, groupId, userColor }) => {
   const [categories, setCategories] = useState([]);
   const [categorySummary, setCategorySummary] = useState([]);
   const [showDetail, setShowDetail] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(null); // ✅ 추가
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   const months = [...new Set(data.map((d) => d.date?.slice(0, 7)))].sort().reverse();
 
   const filtered = data
     .filter((d) => d.date?.startsWith(selectedMonth))
-    .filter((d) => (selectedCategory ? d.category === selectedCategory : true)); // ✅ 카테고리 필터
+    .filter((d) => (selectedCategory ? d.category === selectedCategory : true));
 
   const visibleItems = filtered.slice(0, visibleCount);
 
@@ -51,15 +56,20 @@ const MonthlyList = ({ userId, groupId, userColor }) => {
 
   const handleEditSave = async (updated) => {
     try {
-      await updateTransaction(editItem, updated, userId, groupId); // ✅ 수정된 호출부
+      await updateTransaction(editItem, updated, userId, groupId);
       const updatedData = data.map((d) =>
         d === editItem
           ? {
               ...editItem,
-              amount: updated.type === "expense" ? -Math.abs(updated.amount) : Math.abs(updated.amount),
+              amount:
+                updated.type === "expense"
+                  ? -Math.abs(updated.amount)
+                  : Math.abs(updated.amount),
               memo: updated.memo,
               category: updated.category,
-              category_name: categories.find((c) => c.code === updated.category)?.description || "카테고리 수정",
+              category_name:
+                categories.find((c) => c.code === updated.category)?.description ||
+                "카테고리 수정",
             }
           : d
       );
@@ -113,30 +123,53 @@ const MonthlyList = ({ userId, groupId, userColor }) => {
 
   useEffect(() => {
     setVisibleCount(15);
-  }, [selectedMonth, selectedCategory]); // ✅ 카테고리 바뀔 때도 초기화
+  }, [selectedMonth, selectedCategory]);
+
+  const scrollToTx = (id) => {
+    const el = document.getElementById(`tx-${id}`);
+
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      el.classList.add("highlight");
+      setTimeout(() => el.classList.remove("highlight"), 1500);
+    } else {
+      console.warn("❌ 스크롤 대상 요소가 아직 DOM에 없음:", id);
+    }
+  };
+
+  useImperativeHandle(ref, () => ({
+    scrollToTransactionById: (id, dateStr) => {
+      const txMonth = dateStr?.slice(0, 7);
+      if (txMonth !== selectedMonth) {
+        setSelectedMonth(txMonth);
+        setTimeout(() => scrollToTx(id), 300); // 월 변경 후 스크롤
+      } else {
+        scrollToTx(id);
+      }
+    },
+  }));
 
   return (
     <div className="monthly-container">
-<div className="tab-bar">
-  {months.map((month) => (
-    <button
-      key={month}
-      className={`tab ${month === selectedMonth ? "active" : ""}`}
-      onClick={() => {
-        setSelectedMonth(month);
-        setSelectedCategory(null); // ✅ 월 변경 시 카테고리 초기화
-      }}
-      style={{
-        backgroundColor: month === selectedMonth ? userColor : "transparent",
-        color: month === selectedMonth ? "white" : "black", // 선택된 경우 글자색도 조정 (선택 사항)
-        border: `1px solid ${userColor || "#f4a8a8"}`,
-      }}
-    >
-      {month}
-    </button>
-  ))}
-</div>
-
+      <div className="tab-bar">
+        {months.map((month) => (
+          <button
+            key={month}
+            className={`tab ${month === selectedMonth ? "active" : ""}`}
+            onClick={() => {
+              setSelectedMonth(month);
+              setSelectedCategory(null);
+            }}
+            style={{
+              backgroundColor: month === selectedMonth ? userColor : "transparent",
+              color: month === selectedMonth ? "white" : "black",
+              border: `1px solid ${userColor || "#f4a8a8"}`,
+            }}
+          >
+            {month}
+          </button>
+        ))}
+      </div>
 
       <div
         className="summary-bar"
@@ -170,10 +203,11 @@ const MonthlyList = ({ userId, groupId, userColor }) => {
             ) : (
               <ul className="category-list">
                 {categorySummary
-                  .slice() // 원본 배열을 복사 (state 불변성 유지)
-                  .sort((a, b) => b.total - a.total) // 🔥 총합(total)이 높은 순으로 정렬
+                  .slice()
+                  .sort((a, b) => b.total - a.total)
                   .map((cat, idx) => {
-                    const percent = summary.spent > 0 ? Math.round((cat.total / summary.spent) * 100) : 0;
+                    const percent =
+                      summary.spent > 0 ? Math.round((cat.total / summary.spent) * 100) : 0;
                     const isSelected = selectedCategory === cat.category;
 
                     return (
@@ -190,7 +224,7 @@ const MonthlyList = ({ userId, groupId, userColor }) => {
                         }}
                         style={{
                           cursor: "pointer",
-                          backgroundColor: isSelected ? (userColor || "#d1e7ff") : "transparent",
+                          backgroundColor: isSelected ? userColor || "#d1e7ff" : "transparent",
                         }}
                       >
                         <span className="category-name">{cat.name}</span>
@@ -201,7 +235,6 @@ const MonthlyList = ({ userId, groupId, userColor }) => {
                       </li>
                     );
                   })}
-
               </ul>
             )}
           </div>
@@ -219,15 +252,26 @@ const MonthlyList = ({ userId, groupId, userColor }) => {
 
           return (
             <React.Fragment key={idx}>
-              {isNewDay && <div className="date-label">{day}일</div>}
+              {isNewDay && (
+                <div className="date-label-wrapper">
+                  <div className="date-label">{day}일</div>
+                  <div className="day-total">
+                    {filtered
+                      .filter((d) => d.date?.slice(8, 10) === day)
+                      .reduce((sum, d) => sum + Number(d.amount), 0)
+                      .toLocaleString()}
+                    원
+                  </div>
+                </div>
+              )}
               <li
+                id={`tx-${item.id}`}
                 className="item"
                 style={isNewDay ? { borderTop: "3px solid #ddd" } : {}}
               >
                 <button className="delete-btn" onClick={() => handleDelete(item)}>
                   <CloseIcon fontSize="small" />
                 </button>
-
                 <button
                   className="edit-btn"
                   onClick={() => {
@@ -237,7 +281,6 @@ const MonthlyList = ({ userId, groupId, userColor }) => {
                 >
                   <EditIcon fontSize="small" />
                 </button>
-
                 <div className="desc">
                   <div className="left-block">
                     <div className="category">
@@ -248,7 +291,6 @@ const MonthlyList = ({ userId, groupId, userColor }) => {
                         <span className="badge-deleted">삭제된 카테고리</span>
                       )}
                     </div>
-
                     {item.memo && (
                       <div className="memo">
                         {getMatchedIcon(item.memo) && (
@@ -262,7 +304,6 @@ const MonthlyList = ({ userId, groupId, userColor }) => {
                       </div>
                     )}
                   </div>
-
                   <span className={`amount ${isExpense ? "expense" : "income"}`}>
                     {isExpense ? "-" : "+"}
                     {formatted}원
@@ -284,6 +325,6 @@ const MonthlyList = ({ userId, groupId, userColor }) => {
       />
     </div>
   );
-};
+});
 
 export default MonthlyList;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import InputForm from "./components/InputForm";
 import MonthlyList from "./components/MonthlyList";
 import BudgetSummary from "./components/BudgetSummary";
@@ -17,6 +17,22 @@ function App() {
   const [activeUser, setActiveUser] = useState(null);
   const [sharedGroups, setSharedGroups] = useState([]);  // ✅ 추가
   const [activeGroup, setActiveGroup] = useState(null);   // ✅ 추가
+
+  const monthlyRef = useRef();
+
+const handleTransactionClick = (tx) => {
+  setActiveTab("monthly");
+
+  setTimeout(() => {
+    if (monthlyRef.current) {
+      monthlyRef.current.scrollToTransactionById(tx.id, tx.date);
+    } else {
+      console.warn("monthlyRef is still null");
+    }
+  }, 150); // 100~200ms 정도가 적당합니다
+};
+
+
   // 사용자 목록 불러오기
   const loadUsers = async () => {
     try {
@@ -70,6 +86,13 @@ function App() {
   useEffect(() => {
     loadUsers();
   }, []);
+
+  // "항목별 누적" 탭에서 개인 사용자로 전환하면 "입력하기" 탭으로 이동
+  useEffect(() => {
+    if (!activeGroup && activeTab === "total") {
+      setActiveTab("input");
+    }
+  }, [activeGroup, activeTab]);
 
   useEffect(() => {
     if (activeGroup) {
@@ -234,6 +257,7 @@ function App() {
       )}
       {activeTab === "monthly" && (
         <MonthlyList
+          ref={monthlyRef} // ✅ ref 연결
           userId={activeUser?.id ?? null}
           groupId={activeGroup?.id ?? null}
           userColor={mainColor}
@@ -251,6 +275,7 @@ function App() {
           groupId={activeGroup?.id ?? null}
           categories={categories}
           userColor={mainColor}
+          onTxClick={handleTransactionClick} // ✅ 전달
         />
       )} {/* ✅ 새 탭 렌더링 */}
 
