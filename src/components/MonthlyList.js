@@ -61,7 +61,9 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
   }, 0);
 
   // ✅ 최종 지출 및 순이익 계산
-  const adjustedSpent = summary.spent + includedPersonalExpense;
+  const adjustedSpent = groupId
+    ? summary.spent + includedPersonalExpense
+    : summary.spent;
   const netIncome = totalIncomeThisMonth - adjustedSpent;
 
   const visibleItems = filtered.slice(0, visibleCount);
@@ -107,35 +109,34 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
     }
   };
 
-useEffect(() => {
-  const loadGroupDetails = async () => {
-    if (!groupId || !selectedMonth) return;
+  useEffect(() => {
+    const loadGroupDetails = async () => {
+      if (!groupId || !selectedMonth) return;
 
-    try {
-      const members = await fetchGroupMembers(groupId);
-      const memberIds = members.map((m) => m.id);
-      const expenses = await fetchPersonalExpensesForGroupMembers(
-        selectedMonth,
-        memberIds
-      );
+      try {
+        const members = await fetchGroupMembers(groupId);
+        const memberIds = members.map((m) => m.id);
+        const expenses = await fetchPersonalExpensesForGroupMembers(
+          selectedMonth,
+          memberIds
+        );
 
-      setGroupMembers(members);
-      setIndividualExpenses(expenses);
+        setGroupMembers(members);
+        setIndividualExpenses(expenses);
 
-      // 초기 체크 상태 모두 true로 설정
-      const initialChecked = {};
-      members.forEach((m) => {
-        initialChecked[m.id] = true;
-      });
-      setIncludedUsers(initialChecked);
-    } catch (err) {
-      // 로딩 실패 시 무시 (에러 로깅 제거됨)
-    }
-  };
+        // 초기 체크 상태 모두 true로 설정
+        const initialChecked = {};
+        members.forEach((m) => {
+          initialChecked[m.id] = true;
+        });
+        setIncludedUsers(initialChecked);
+      } catch (err) {
+        // 로딩 실패 시 무시 (에러 로깅 제거됨)
+      }
+    };
 
-  loadGroupDetails();
-}, [groupId, selectedMonth]);
-
+    loadGroupDetails();
+  }, [groupId, selectedMonth]);
 
   useEffect(() => {
     if (!userId && !groupId) return;
@@ -265,39 +266,38 @@ useEffect(() => {
             <span className="label">지출</span>
             <span className="amount">-{adjustedSpent.toLocaleString()}원</span>
           </div>
-{groupId && groupMembers.length > 0 && (
-  <div className="sub-expense-inline-checkbox">
-    <span className="prefix">(</span>
-    {groupMembers.map((user, idx) => {
-      const amt = individualExpenses[user.id] || 0;
-      const checked = includedUsers[user.id] ?? true;
-      const amountText = amt.toLocaleString() + "원";
+          {groupId && groupMembers.length > 0 && (
+            <div className="sub-expense-inline-checkbox">
+              <span className="prefix">(</span>
+              {groupMembers.map((user, idx) => {
+                const amt = individualExpenses[user.id] || 0;
+                const checked = includedUsers[user.id] ?? true;
+                const amountText = amt.toLocaleString() + "원";
 
-      return (
-        <div key={user.id} className="expense-checkbox-item">
-          <input
-            type="checkbox"
-            checked={checked}
-            onChange={(e) =>
-              setIncludedUsers((prev) => ({
-                ...prev,
-                [user.id]: e.target.checked,
-              }))
-            }
-          />
-          <span className="expense-text">
-            {user.username} {amountText}
-          </span>
-          {idx !== groupMembers.length - 1 && (
-            <span className="divider">/</span>
+                return (
+                  <div key={user.id} className="expense-checkbox-item">
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={(e) =>
+                        setIncludedUsers((prev) => ({
+                          ...prev,
+                          [user.id]: e.target.checked,
+                        }))
+                      }
+                    />
+                    <span className="expense-text">
+                      {user.username} {amountText}
+                    </span>
+                    {idx !== groupMembers.length - 1 && (
+                      <span className="divider">/</span>
+                    )}
+                  </div>
+                );
+              })}
+              <span className="suffix">)</span>
+            </div>
           )}
-        </div>
-      );
-    })}
-    <span className="suffix">)</span>
-  </div>
-)}
-
 
           {groupId && (
             <div className="summary-item net">
