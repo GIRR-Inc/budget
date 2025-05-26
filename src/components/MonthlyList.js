@@ -11,6 +11,8 @@ import {
   updateTransaction,
   fetchCategorySummary,
   fetchCategories,
+  fetchGroupMembers,
+  fetchPersonalExpensesForGroupMembers,
 } from "../api/budgetApi";
 import "./MonthlyList.css";
 import CloseIcon from "@mui/icons-material/Close";
@@ -31,6 +33,9 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
   const [categorySummary, setCategorySummary] = useState([]);
   const [showDetail, setShowDetail] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [individualExpenses, setIndividualExpenses] = useState({});
+  const [groupMembers, setGroupMembers] = useState([]);
+  const [includedUsers, setIncludedUsers] = useState({});
 
   const months = [...new Set(data.map((d) => d.date?.slice(0, 7)))]
     .sort()
@@ -40,11 +45,24 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
     .filter((d) => d.date?.startsWith(selectedMonth))
     .filter((d) => (selectedCategory ? d.category === selectedCategory : true));
 
-  const totalIncome = filtered
+  // 월 전체 기준 수입 데이터 (카테고리 무관)
+  const allThisMonth = data.filter((item) =>
+    item.date?.startsWith(selectedMonth)
+  );
+  const totalIncomeThisMonth = allThisMonth
     .filter((item) => Number(item.amount) > 0)
     .reduce((sum, item) => sum + Number(item.amount), 0);
 
-  const netIncome = totalIncome - summary.spent;
+  // ✅ 선택된 개인지출 합계 계산
+  const includedPersonalExpense = groupMembers.reduce((sum, user) => {
+    return includedUsers[user.id]
+      ? sum + (individualExpenses[user.id] || 0)
+      : sum;
+  }, 0);
+
+  // ✅ 최종 지출 및 순이익 계산
+  const adjustedSpent = summary.spent + includedPersonalExpense;
+  const netIncome = totalIncomeThisMonth - adjustedSpent;
 
   const visibleItems = filtered.slice(0, visibleCount);
 
@@ -88,6 +106,36 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
       alert("수정 중 오류가 발생했습니다.");
     }
   };
+
+  useEffect(() => {
+    const loadGroupDetails = async () => {
+      if (!groupId || !selectedMonth) return;
+
+      try {
+        const members = await fetchGroupMembers(groupId);
+        const memberIds = members.map((m) => m.id);
+
+        const expenses = await fetchPersonalExpensesForGroupMembers(
+          selectedMonth,
+          memberIds
+        );
+
+        setGroupMembers(members);
+        setIndividualExpenses(expenses);
+
+        // ✅ 여기에서 초기 체크 상태를 true로 초기화
+        const initialChecked = {};
+        members.forEach((m) => {
+          initialChecked[m.id] = true;
+        });
+        setIncludedUsers(initialChecked);
+      } catch (err) {
+        console.error("❌ 개인 지출 정보 로딩 실패:", err);
+      }
+    };
+
+    loadGroupDetails();
+  }, [groupId, selectedMonth]);
 
   useEffect(() => {
     if (!userId && !groupId) return;
@@ -191,40 +239,73 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
         }}
       >
         <h3>{selectedMonth} 예산 요약</h3>
-        <div className="summary-row">
-          <span className="label">예산</span>
-          <span className="value">{summary.budget.toLocaleString()}원</span>
-        </div>
-        {groupId && (
-          <>
-            <div className="summary-row">
+
+        <div className="summary-section">
+          <div className="summary-item budget">
+            <span className="label">예산</span>
+            <span className="amount">{summary.budget.toLocaleString()}원</span>
+          </div>
+
+          {groupId && (
+            <div className="summary-item income">
               <span className="label">수입</span>
-              <span className="value income">
-                {filtered
+              <span className="amount">
+                +
+                {data
+                  .filter((item) => item.date?.startsWith(selectedMonth))
                   .filter((item) => Number(item.amount) > 0)
                   .reduce((sum, item) => sum + Number(item.amount), 0)
                   .toLocaleString()}
                 원
               </span>
             </div>
-          </>
-        )}
-        <div className="summary-row">
-          <span className="label">지출</span>
-          <span className={`value over`}>
-            {summary.spent.toLocaleString()}원
-          </span>
-        </div>
-        {groupId && (
-          <>
-            <div className="summary-info">
-              <span className="label">월 순이익</span>
-              <span className={`value net-positive`}>
-                {netIncome.toLocaleString()}원
+          )}
+
+          <div className="summary-item expense">
+            <span className="label">지출</span>
+            <span className="amount">-{adjustedSpent.toLocaleString()}원</span>
+          </div>
+          <div className="sub-expense-inline-checkbox">
+            <span className="prefix">(</span>
+            {groupMembers.map((user, idx) => {
+              const amt = individualExpenses[user.id] || 0;
+              const checked = includedUsers[user.id] ?? true;
+              const amountText = amt.toLocaleString() + "원";
+
+              return (
+                <div key={user.id} className="expense-checkbox-item">
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={(e) =>
+                      setIncludedUsers((prev) => ({
+                        ...prev,
+                        [user.id]: e.target.checked,
+                      }))
+                    }
+                  />
+                  <span className="expense-text">
+                    {user.username} {amountText}
+                  </span>
+                  {idx !== groupMembers.length - 1 && (
+                    <span className="divider">/</span>
+                  )}
+                </div>
+              );
+            })}
+            <span className="suffix">)</span>
+          </div>
+
+          {groupId && (
+            <div className="summary-item net">
+              <span className="label">순이익</span>
+              <span className="amount">
+                {netIncome >= 0 ? "+" : "-"}
+                {Math.abs(netIncome).toLocaleString()}원
               </span>
             </div>
-          </>
-        )}
+          )}
+        </div>
 
         <div className="toggle-button-wrapper">
           <button onClick={() => setShowDetail((prev) => !prev)}>
@@ -255,11 +336,7 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
                           isSelected ? "clicked" : ""
                         }`}
                         onClick={() => {
-                          if (isSelected) {
-                            setSelectedCategory(null);
-                          } else {
-                            setSelectedCategory(cat.category);
-                          }
+                          setSelectedCategory(isSelected ? null : cat.category);
                           window.scrollTo({ top: 0, behavior: "smooth" });
                         }}
                         style={{

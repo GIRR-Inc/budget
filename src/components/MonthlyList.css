@@ -14,177 +14,174 @@
 }
 
 .monthly-container {
-    padding: 1rem;
-    max-width: 600px;
-    margin: auto;
-  }
-  
-  .tab-bar {
-    display: flex;
-    overflow-x: auto;
-    gap: 8px;
-    margin-bottom: 1rem;
-  }
-  
-  .tab {
-    flex-shrink: 0;
-    padding: 6px 12px;
-    border: 1px solid #ccc;
-    border-radius: 16px;
-    background: #f8f8f8;
-    font-size: 14px;
-    font-family: 'S-CoreDream-3Light';
-    cursor: pointer;
-    white-space: nowrap;
-  }
-  
-  .tab.active {
-    background: #f4a8a8;
-    color: white;
-    font-family: 'S-CoreDream-3Light';
-    border-color: #f4a8a8;
-  }
-  
-  .list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-  }
+  padding: 1rem;
+  max-width: 600px;
+  margin: auto;
+}
 
-  .date {
-    font-size: 13px;
-    color: #888;
-    font-family: 'S-CoreDream-3Light';
-  }
-  
-  .desc {
-    display: flex;
-    justify-content: space-between;
-    align-items: center; /* ⭐ 중앙 정렬 */
-    padding-right: 4px;
-  }
+.tab-bar {
+  display: flex;
+  overflow-x: auto;
+  gap: 8px;
+  margin-bottom: 1rem;
+}
 
-  .left-block {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-  
-  .amount {
-    font-weight: bold;
-    white-space: nowrap;
-  }
-  
-  .amount.expense {
-    color: crimson;
-  }
-  
-  .amount.income {
-    color: royalblue;
-  }
-  
-  
-  .memo {
-    font-size: 15px;
-    color: #444;
-    margin-top: 2px;
-    font-family: 'S-CoreDream-3Light';
-  }
-  
-  .empty {
-    color: #999;
-    text-align: center;
-    margin-top: 20px;
-  }
-  
-  .summary-bar {
-    padding: 1px 1.2rem;
-    background-color: #fff7f7;
-    border: 1px solid #f4a8a8;
-    border-radius: 12px;
-    margin-bottom: 1.5rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    font-family: 'GmarketSansMedium';
-  }
-  
-  .summary-bar h3 {
-    font-size: 18px;
-    margin-bottom: 0.75rem;
-    color: #444;
-  }
-  
-  .summary-bar .summary-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 2px;
-  }
+.tab {
+  flex-shrink: 0;
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-radius: 16px;
+  background: #f8f8f8;
+  font-size: 14px;
+  font-family: 'S-CoreDream-3Light';
+  cursor: pointer;
+  white-space: nowrap;
+}
 
-  .summary-info {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 2px;
-    margin-bottom: 2px;
-    padding-top: 4px;
-    border-top: 4px dashed #ddd;
-  }
+.tab.active {
+  background: #f4a8a8;
+  color: white;
+  font-family: 'S-CoreDream-3Light';
+  border-color: #f4a8a8;
+}
 
-  
-  .summary-bar .label {
-    color: #666;
-    font-size: 15px;
-  }
-  
-  .summary-bar .value {
-    font-weight: bold;
-    font-size: 16px;
-    color: #333;
-  }
-  
-  .summary-bar .value.over {
-    color: crimson;
-  }
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
 
-  .summary-bar .value.income {
+.date {
+  font-size: 13px;
+  color: #888;
+  font-family: 'S-CoreDream-3Light';
+}
+
+.desc {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 4px;
+}
+
+.left-block {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.amount {
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.amount.expense {
+  color: crimson;
+}
+
+.amount.income {
   color: royalblue;
 }
-.value.net-positive {
-  color: #2e7d32; /* 진한 초록 */
+
+.memo {
+  font-size: 15px;
+  color: #444;
+  margin-top: 2px;
+  font-family: 'S-CoreDream-3Light';
 }
-  
-  .item {
-    position: relative;
-    padding: 15px 0;
-    border-bottom: 1px solid #eee;
-    font-family: 'S-CoreDream-3Light';
-  }
-  
-  .item-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 4px;
-  }
-  
-  .delete-btn {
-    position: absolute;
-    top: 6px;
-    right: 0px;
-    background: none;
-    border: none;
-    color: #e74c3c;
-    font-size: 16px;
-    cursor: pointer;
-    padding: 0;
-    line-height: 1;
-    z-index: 1;
-  }
-  
-/* 아이콘 크기 줄이기 */
+
+.empty {
+  color: #999;
+  text-align: center;
+  margin-top: 20px;
+}
+
+.summary-bar {
+  padding: 1px 1.2rem;
+  background-color: #fff7f7;
+  border: 1px solid #f4a8a8;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  font-family: 'GmarketSansMedium';
+}
+
+.summary-bar h3 {
+  font-size: 18px;
+  margin-bottom: 0.75rem;
+  color: #444;
+}
+
+.summary-bar .summary-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.summary-info {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  padding-top: 4px;
+  border-top: 4px dashed #ddd;
+}
+
+.summary-bar .label {
+  color: #666;
+  font-size: 15px;
+}
+
+.summary-bar .value {
+  font-weight: bold;
+  font-size: 16px;
+  color: #333;
+}
+
+.summary-bar .value.over {
+  color: crimson;
+}
+
+.summary-bar .value.income {
+  color: royalblue;
+}
+
+.value.net-positive {
+  color: #2e7d32;
+}
+
+.item {
+  position: relative;
+  padding: 15px 0;
+  border-bottom: 1px solid #eee;
+  font-family: 'S-CoreDream-3Light';
+}
+
+.item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.delete-btn {
+  position: absolute;
+  top: 6px;
+  right: 0px;
+  background: none;
+  border: none;
+  color: #e74c3c;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  z-index: 1;
+}
+
 .delete-btn svg {
   font-size: 14px;
 }
 
-/* hover 효과 제거 */
 .delete-btn:hover {
   background: none;
   color: #e74c3c;
@@ -199,7 +196,7 @@
 
 .category {
   display: flex;
-  align-items: center; /* ← 세로 중앙 정렬 */
+  align-items: center;
   gap: 6px;
   font-size: 12px;
   font-family: 'GmarketSansMedium';
@@ -222,17 +219,16 @@
   color: #fff;
   background-color: crimson;
   border-radius: 8px;
-  line-height: 1; /* ← 높이 안정화 */
+  line-height: 1;
 }
-
 
 .edit-btn {
   position: absolute;
   top: 6px;
-  right: 18px; /* ← X 아이콘보다 왼쪽으로 살짝 떨어뜨리기 */
+  right: 18px;
   background: none;
   border: none;
-  color: #888; /* 또는 #555, 눈에 띄지 않게 */
+  color: #888;
   font-size: 16px;
   cursor: pointer;
   padding: 0;
@@ -240,12 +236,10 @@
   z-index: 1;
 }
 
-/* 아이콘 크기 동일하게 */
 .edit-btn svg {
   font-size: 14px;
 }
 
-/* hover 효과 제거 */
 .edit-btn:hover {
   background: none;
   color: #888;
@@ -272,12 +266,12 @@
 .memo-icon {
   width: 18px;
   height: 18px;
-  border-radius: 50%;          /* 원형 모양 */
-  object-fit: cover;           /* 이미지 비율 유지하며 자르기 */
+  border-radius: 50%;
+  object-fit: cover;
   margin-right: 6px;
-  vertical-align: middle;      /* 세로 정렬 */
-  display: inline-block;       /* inline 요소처럼 표시 */
-  transform: translateY(-1px); /* 미세한 수직 보정 */
+  vertical-align: middle;
+  display: inline-block;
+  transform: translateY(-1px);
 }
 
 .date-label {
@@ -298,7 +292,7 @@
 
 .toggle-button-wrapper {
   display: flex;
-  justify-content: center; /* 중앙 정렬 */
+  justify-content: center;
   margin: 8px 0;
 }
 
@@ -338,10 +332,10 @@
 .category-item {
   display: flex;
   justify-content: space-between;
-  align-items: center; /* 세로 정렬 추가 */
+  align-items: center;
   border-radius: 8px;
   transition: background-color 0.3s, color 0.3s;
-  padding: 6px 8px; /* 위아래 약간 키워서 더 안정감 */
+  padding: 6px 8px;
 }
 
 .category-item:hover {
@@ -356,7 +350,7 @@
   color: #333;
   font-weight: bold;
   font-family: 'S-CoreDream-3Light';
-  font-size: 13px; /* ✅ 폰트 크기 추가 */
+  font-size: 13px;
 }
 
 .category-amount {
@@ -369,7 +363,7 @@
   font-weight: bold;
   font-variant-numeric: tabular-nums;
   font-family: 'S-CoreDream-3Light';
-  font-size: 13px; /* ✅ 폰트 크기 추가 */
+  font-size: 13px;
 }
 
 .category-percent {
@@ -378,14 +372,14 @@
   text-align: right;
   color: #888;
   font-family: 'S-CoreDream-3Light';
-  font-size: 12px; /* ✅ 퍼센트는 약간 더 작게 */
+  font-size: 12px;
 }
 
 .date-label-wrapper {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
-  margin : 0
+  margin: 0;
 }
 
 @keyframes blink-highlight {
@@ -396,4 +390,129 @@
 
 .item.highlight {
   animation: blink-highlight 1.2s ease-in-out 4;
+}
+
+/* ✅ 개선된 수입/지출/예산/순이익 스타일 */
+.summary-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-family: 'GmarketSansMedium';
+  margin-top: 6px;
+  margin-bottom: 10px;
+  padding-top: 6px;
+  /* border-top: 1px dashed #ccc; ⛔ 제거 */
+  padding: 10px;
+  border-radius: 6px;
+  box-shadow: inset 0 1px 0 #eee;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 6px 0;
+  font-size: 15px;
+}
+
+.summary-item .label {
+  color: #666;
+  font-size: 15px;
+}
+
+.summary-item .amount {
+  font-weight: bold;
+  font-variant-numeric: tabular-nums;
+  font-size: 16px;
+}
+
+.summary-item.budget .amount {
+  color: #6c5ce7;
+}
+
+.summary-item.income .amount {
+  color: #0984e3;
+}
+
+.summary-item.expense .amount {
+  color: #d63031;
+}
+
+.summary-item.net {
+  position: relative;
+  padding-top: 12px;
+  margin-top: 10px;
+  border-top: 2px dashed #bbb;
+}
+
+.summary-item.net .label {
+  font-size: 15px;
+  font-weight: bold;
+  color: #222;
+}
+
+.summary-item.net .amount {
+  font-size: 17px;
+  font-weight: bold;
+  color: #00b894;
+  font-family: 'GmarketSansMedium';
+  letter-spacing: 0.5px;
+}
+
+.dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.budget-dot { background-color: #6c5ce7; }
+.income-dot { background-color: #0984e3; }
+.expense-dot { background-color: #d63031; }
+.net-dot { background-color: #00b894; }
+
+.sub-expense-inline-checkbox {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #666;
+  margin-top: -4px;
+  margin-bottom: 6px;
+  font-family: 'S-CoreDream-3Light';
+  white-space: nowrap;
+}
+
+.expense-checkbox-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.expense-checkbox-item input[type="checkbox"] {
+  transform: translateY(1px); /* ✅ 텍스트와 정렬 맞춤 */
+  vertical-align: middle;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  appearance: auto;
+}
+
+.expense-text {
+  vertical-align: middle;
+}
+
+.divider {
+  margin-left: 4px;
+  margin-right: 2px;
+  color: #999;
+}
+
+.prefix,
+.suffix {
+  font-size: 12px;
+  color: #888;
+  vertical-align: middle;
 }

@@ -101,6 +101,52 @@ export const fetchBudgetData = async ({ userId = null, groupId = null }) => {
   }));
 };
 
+export const fetchPersonalExpensesForGroupMembers = async (month, memberIds = []) => {
+
+  if (memberIds.length === 0) return {};
+
+  const { data, error } = await supabase
+    .from("transactions")
+    .select("amount, date, user_id")
+    .gte("date", `${month}-01`)
+    .lt("date", `${getNextMonth(month)}-01`)
+    .in("user_id", memberIds)
+    .is("shared_group_id", null); // ✅ 개인 지출만
+
+  if (error) {
+    throw error;
+  }
+
+  const summary = {};
+  for (const row of data) {
+    const amt = Number(row.amount);
+    if (amt < 0) {
+      summary[row.user_id] = (summary[row.user_id] || 0) + -amt;
+    }
+  }
+
+  return summary;
+};
+
+
+
+export const fetchGroupMembers = async (groupId) => {
+
+  const { data, error } = await supabase
+    .from("shared_group_members")
+    .select("user_id, users(username)")
+    .eq("shared_group_id", groupId);
+
+  if (error) {
+    throw error;
+  }
+
+  return data.map((m) => ({
+    id: m.user_id,
+    username: m.users.username,
+  }));
+};
+
 
 // 월별 예산 및 지출 요약
 export const fetchMonthlySummary = async (month, userId = null, groupId = null) => {
