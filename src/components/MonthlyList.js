@@ -107,35 +107,35 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
     }
   };
 
-  useEffect(() => {
-    const loadGroupDetails = async () => {
-      if (!groupId || !selectedMonth) return;
+useEffect(() => {
+  const loadGroupDetails = async () => {
+    if (!groupId || !selectedMonth) return;
 
-      try {
-        const members = await fetchGroupMembers(groupId);
-        const memberIds = members.map((m) => m.id);
+    try {
+      const members = await fetchGroupMembers(groupId);
+      const memberIds = members.map((m) => m.id);
+      const expenses = await fetchPersonalExpensesForGroupMembers(
+        selectedMonth,
+        memberIds
+      );
 
-        const expenses = await fetchPersonalExpensesForGroupMembers(
-          selectedMonth,
-          memberIds
-        );
+      setGroupMembers(members);
+      setIndividualExpenses(expenses);
 
-        setGroupMembers(members);
-        setIndividualExpenses(expenses);
+      // 초기 체크 상태 모두 true로 설정
+      const initialChecked = {};
+      members.forEach((m) => {
+        initialChecked[m.id] = true;
+      });
+      setIncludedUsers(initialChecked);
+    } catch (err) {
+      // 로딩 실패 시 무시 (에러 로깅 제거됨)
+    }
+  };
 
-        // ✅ 여기에서 초기 체크 상태를 true로 초기화
-        const initialChecked = {};
-        members.forEach((m) => {
-          initialChecked[m.id] = true;
-        });
-        setIncludedUsers(initialChecked);
-      } catch (err) {
-        console.error("❌ 개인 지출 정보 로딩 실패:", err);
-      }
-    };
+  loadGroupDetails();
+}, [groupId, selectedMonth]);
 
-    loadGroupDetails();
-  }, [groupId, selectedMonth]);
 
   useEffect(() => {
     if (!userId && !groupId) return;
@@ -265,36 +265,39 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
             <span className="label">지출</span>
             <span className="amount">-{adjustedSpent.toLocaleString()}원</span>
           </div>
-          <div className="sub-expense-inline-checkbox">
-            <span className="prefix">(</span>
-            {groupMembers.map((user, idx) => {
-              const amt = individualExpenses[user.id] || 0;
-              const checked = includedUsers[user.id] ?? true;
-              const amountText = amt.toLocaleString() + "원";
+{groupId && groupMembers.length > 0 && (
+  <div className="sub-expense-inline-checkbox">
+    <span className="prefix">(</span>
+    {groupMembers.map((user, idx) => {
+      const amt = individualExpenses[user.id] || 0;
+      const checked = includedUsers[user.id] ?? true;
+      const amountText = amt.toLocaleString() + "원";
 
-              return (
-                <div key={user.id} className="expense-checkbox-item">
-                  <input
-                    type="checkbox"
-                    checked={checked}
-                    onChange={(e) =>
-                      setIncludedUsers((prev) => ({
-                        ...prev,
-                        [user.id]: e.target.checked,
-                      }))
-                    }
-                  />
-                  <span className="expense-text">
-                    {user.username} {amountText}
-                  </span>
-                  {idx !== groupMembers.length - 1 && (
-                    <span className="divider">/</span>
-                  )}
-                </div>
-              );
-            })}
-            <span className="suffix">)</span>
-          </div>
+      return (
+        <div key={user.id} className="expense-checkbox-item">
+          <input
+            type="checkbox"
+            checked={checked}
+            onChange={(e) =>
+              setIncludedUsers((prev) => ({
+                ...prev,
+                [user.id]: e.target.checked,
+              }))
+            }
+          />
+          <span className="expense-text">
+            {user.username} {amountText}
+          </span>
+          {idx !== groupMembers.length - 1 && (
+            <span className="divider">/</span>
+          )}
+        </div>
+      );
+    })}
+    <span className="suffix">)</span>
+  </div>
+)}
+
 
           {groupId && (
             <div className="summary-item net">
