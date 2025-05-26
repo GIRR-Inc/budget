@@ -139,29 +139,47 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
     loadGroupDetails();
   }, [groupId, selectedMonth]);
 
-  useEffect(() => {
-    if (!userId && !groupId) return;
+useEffect(() => {
+  if (!userId && !groupId) return;
 
-    fetchBudgetData({ userId, groupId }).then((res) => {
-      setData(res);
-      const months = [...new Set(res.map((d) => d.date?.slice(0, 7)))]
-        .sort()
-        .reverse();
-      if (months.length > 0) setSelectedMonth(months[0]);
-    });
+  fetchBudgetData({ userId, groupId }).then((res) => {
+    setData(res);
 
-    fetchCategories({ userId, groupId }).then((res) => {
-      setCategories(res);
-    });
+    const months = [...new Set(res.map((d) => d.date?.slice(0, 7)))].sort().reverse();
 
-    setSelectedCategory(null);
-  }, [userId, groupId]);
+    if (months.length > 0) {
+      const today = new Date();
+      const currentMonth = today.toISOString().slice(0, 7); // 예: '2025-05'
+
+      // 1️⃣ 현재 달이 있으면 우선 선택
+      if (months.includes(currentMonth)) {
+        setSelectedMonth(currentMonth);
+      } else {
+        // 2️⃣ 없으면 최신 달로
+        setSelectedMonth(months[0]);
+      }
+    }
+  });
+
+  fetchCategories({ userId, groupId }).then((res) => {
+    setCategories(res);
+  });
+
+  setSelectedCategory(null);
+}, [userId, groupId]);
+
 
 useEffect(() => {
   const loadAllSummaryData = async () => {
     if (!selectedMonth || (!userId && !groupId)) return;
 
-    setLoadingSummary(true);
+    // 1️⃣ 상태 초기화 (스피너 돌리기 전, 먼저 초기 상태 적용)
+    setSummary({ budget: 0, spent: 0 });
+    setCategorySummary([]);
+    setGroupMembers([]);
+    setIndividualExpenses({});
+    setIncludedUsers({});
+    setLoadingSummary(true); // 로딩 표시
 
     try {
       const [summaryRes, categoryRes] = await Promise.all([
@@ -187,20 +205,17 @@ useEffect(() => {
           initialChecked[m.id] = true;
         });
         setIncludedUsers(initialChecked);
-      } else {
-        setGroupMembers([]);
-        setIndividualExpenses({});
-        setIncludedUsers({});
       }
     } catch (e) {
       console.error("로딩 실패", e);
     } finally {
-      setLoadingSummary(false); // 
+      setLoadingSummary(false);
     }
   };
 
   loadAllSummaryData();
 }, [selectedMonth, userId, groupId]);
+
 
 
   useEffect(() => {
