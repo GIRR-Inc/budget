@@ -36,6 +36,7 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
   const [individualExpenses, setIndividualExpenses] = useState({});
   const [groupMembers, setGroupMembers] = useState([]);
   const [includedUsers, setIncludedUsers] = useState({});
+  const [loadingSummary, setLoadingSummary] = useState(true);
 
   const months = [...new Set(data.map((d) => d.date?.slice(0, 7)))]
     .sort()
@@ -156,17 +157,51 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
     setSelectedCategory(null);
   }, [userId, groupId]);
 
-  useEffect(() => {
+useEffect(() => {
+  const loadAllSummaryData = async () => {
     if (!selectedMonth || (!userId && !groupId)) return;
 
-    fetchMonthlySummary(selectedMonth, userId, groupId).then((res) => {
-      setSummary({ budget: res.budget, spent: res.spent });
-    });
+    setLoadingSummary(true);
 
-    fetchCategorySummary(selectedMonth, userId, groupId).then((res) => {
-      setCategorySummary(res);
-    });
-  }, [selectedMonth, userId, groupId]);
+    try {
+      const [summaryRes, categoryRes] = await Promise.all([
+        fetchMonthlySummary(selectedMonth, userId, groupId),
+        fetchCategorySummary(selectedMonth, userId, groupId),
+      ]);
+      setSummary({ budget: summaryRes.budget, spent: summaryRes.spent });
+      setCategorySummary(categoryRes);
+
+      if (groupId) {
+        const members = await fetchGroupMembers(groupId);
+        const memberIds = members.map((m) => m.id);
+        const expenses = await fetchPersonalExpensesForGroupMembers(
+          selectedMonth,
+          memberIds
+        );
+
+        setGroupMembers(members);
+        setIndividualExpenses(expenses);
+
+        const initialChecked = {};
+        members.forEach((m) => {
+          initialChecked[m.id] = true;
+        });
+        setIncludedUsers(initialChecked);
+      } else {
+        setGroupMembers([]);
+        setIndividualExpenses({});
+        setIncludedUsers({});
+      }
+    } catch (e) {
+      console.error("로딩 실패", e);
+    } finally {
+      setLoadingSummary(false); // 
+    }
+  };
+
+  loadAllSummaryData();
+}, [selectedMonth, userId, groupId]);
+
 
   useEffect(() => {
     const handleScroll = () => {
@@ -232,136 +267,146 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
         ))}
       </div>
 
-      <div
-        className="summary-bar"
-        style={{
-          backgroundColor: userColor ? `${userColor}15` : "#fff7f7",
-          border: `1px solid ${userColor || "#f4a8a8"}`,
-        }}
-      >
-        <h3>{selectedMonth} 예산 요약</h3>
+<div
+  className="summary-bar"
+  style={{
+    backgroundColor: userColor ? `${userColor}15` : "#fff7f7",
+    border: `1px solid ${userColor || "#f4a8a8"}`,
+  }}
+>
+  <h3>{selectedMonth} 예산 요약</h3>
 
-        <div className="summary-section">
-          <div className="summary-item budget">
-            <span className="label">예산</span>
-            <span className="amount">{summary.budget.toLocaleString()}원</span>
-          </div>
-
-          {groupId && (
-            <div className="summary-item income">
-              <span className="label">수입</span>
-              <span className="amount">
-                +
-                {data
-                  .filter((item) => item.date?.startsWith(selectedMonth))
-                  .filter((item) => Number(item.amount) > 0)
-                  .reduce((sum, item) => sum + Number(item.amount), 0)
-                  .toLocaleString()}
-                원
-              </span>
-            </div>
-          )}
-
-          <div className="summary-item expense">
-            <span className="label">지출</span>
-            <span className="amount">-{adjustedSpent.toLocaleString()}원</span>
-          </div>
-          {groupId && groupMembers.length > 0 && (
-            <div className="sub-expense-inline-checkbox">
-              <span className="prefix">(</span>
-              {groupMembers.map((user, idx) => {
-                const amt = individualExpenses[user.id] || 0;
-                const checked = includedUsers[user.id] ?? true;
-                const amountText = amt.toLocaleString() + "원";
-
-                return (
-                  <div key={user.id} className="expense-checkbox-item">
-                    <input
-                      type="checkbox"
-                      checked={checked}
-                      onChange={(e) =>
-                        setIncludedUsers((prev) => ({
-                          ...prev,
-                          [user.id]: e.target.checked,
-                        }))
-                      }
-                    />
-                    <span className="expense-text">
-                      {user.username} {amountText}
-                    </span>
-                    {idx !== groupMembers.length - 1 && (
-                      <span className="divider">/</span>
-                    )}
-                  </div>
-                );
-              })}
-              <span className="suffix">)</span>
-            </div>
-          )}
-
-          {groupId && (
-            <div className="summary-item net">
-              <span className="label">순이익</span>
-              <span className="amount">
-                {netIncome >= 0 ? "+" : "-"}
-                {Math.abs(netIncome).toLocaleString()}원
-              </span>
-            </div>
-          )}
+  {loadingSummary ? (
+    <div style={{ textAlign: "center", padding: "20px 0" }}>
+      <div className="spinner" />
+    </div>
+  ) : (
+    <>
+      <div className="summary-section">
+        <div className="summary-item budget">
+          <span className="label">예산</span>
+          <span className="amount">{summary.budget.toLocaleString()}원</span>
         </div>
 
-        <div className="toggle-button-wrapper">
-          <button onClick={() => setShowDetail((prev) => !prev)}>
-            {showDetail ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-          </button>
+        {groupId && (
+          <div className="summary-item income">
+            <span className="label">수입</span>
+            <span className="amount">
+              +
+              {data
+                .filter((item) => item.date?.startsWith(selectedMonth))
+                .filter((item) => Number(item.amount) > 0)
+                .reduce((sum, item) => sum + Number(item.amount), 0)
+                .toLocaleString()}
+              원
+            </span>
+          </div>
+        )}
+
+        <div className="summary-item expense">
+          <span className="label">지출</span>
+          <span className="amount">-{adjustedSpent.toLocaleString()}원</span>
         </div>
 
-        {showDetail && (
-          <div className="category-summary">
-            {categorySummary.length === 0 ? (
-              <p className="empty">지출 내역이 없습니다.</p>
-            ) : (
-              <ul className="category-list">
-                {categorySummary
-                  .slice()
-                  .sort((a, b) => b.total - a.total)
-                  .map((cat, idx) => {
-                    const percent =
-                      summary.spent > 0
-                        ? Math.round((cat.total / summary.spent) * 100)
-                        : 0;
-                    const isSelected = selectedCategory === cat.category;
+        {groupId && groupMembers.length > 0 && !loadingSummary && (
+          <div className="sub-expense-inline-checkbox">
+            <span className="prefix">(</span>
+            {groupMembers.map((user, idx) => {
+              const amt = individualExpenses[user.id] || 0;
+              const checked = includedUsers[user.id] ?? true;
+              const amountText = amt.toLocaleString() + "원";
 
-                    return (
-                      <li
-                        key={idx}
-                        className={`category-item ${
-                          isSelected ? "clicked" : ""
-                        }`}
-                        onClick={() => {
-                          setSelectedCategory(isSelected ? null : cat.category);
-                          window.scrollTo({ top: 0, behavior: "smooth" });
-                        }}
-                        style={{
-                          cursor: "pointer",
-                          backgroundColor: isSelected
-                            ? userColor || "#d1e7ff"
-                            : "transparent",
-                        }}
-                      >
-                        <span className="category-name">{cat.name}</span>
-                        <span className="category-amount">
-                          {cat.total.toLocaleString()}원{" "}
-                          <span className="category-percent">({percent}%)</span>
-                        </span>
-                      </li>
-                    );
-                  })}
-              </ul>
-            )}
+              return (
+                <div key={user.id} className="expense-checkbox-item">
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={(e) =>
+                      setIncludedUsers((prev) => ({
+                        ...prev,
+                        [user.id]: e.target.checked,
+                      }))
+                    }
+                  />
+                  <span className="expense-text">
+                    {user.username} {amountText}
+                  </span>
+                  {idx !== groupMembers.length - 1 && (
+                    <span className="divider">/</span>
+                  )}
+                </div>
+              );
+            })}
+            <span className="suffix">)</span>
+          </div>
+        )}
+
+        {groupId && !loadingSummary &&(
+          <div className="summary-item net">
+            <span className="label">순이익</span>
+            <span className="amount">
+              {netIncome >= 0 ? "+" : "-"}
+              {Math.abs(netIncome).toLocaleString()}원
+            </span>
           </div>
         )}
       </div>
+
+      <div className="toggle-button-wrapper">
+        <button onClick={() => setShowDetail((prev) => !prev)}>
+          {showDetail ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+        </button>
+      </div>
+
+      {showDetail && (
+        <div className="category-summary">
+          {categorySummary.length === 0 ? (
+            <p className="empty">지출 내역이 없습니다.</p>
+          ) : (
+            <ul className="category-list">
+              {categorySummary
+                .slice()
+                .sort((a, b) => b.total - a.total)
+                .map((cat, idx) => {
+                  const percent =
+                    summary.spent > 0
+                      ? Math.round((cat.total / summary.spent) * 100)
+                      : 0;
+                  const isSelected = selectedCategory === cat.category;
+
+                  return (
+                    <li
+                      key={idx}
+                      className={`category-item ${
+                        isSelected ? "clicked" : ""
+                      }`}
+                      onClick={() => {
+                        setSelectedCategory(isSelected ? null : cat.category);
+                        window.scrollTo({ top: 0, behavior: "smooth" });
+                      }}
+                      style={{
+                        cursor: "pointer",
+                        backgroundColor: isSelected
+                          ? userColor || "#d1e7ff"
+                          : "transparent",
+                      }}
+                    >
+                      <span className="category-name">{cat.name}</span>
+                      <span className="category-amount">
+                        {cat.total.toLocaleString()}원{" "}
+                        <span className="category-percent">({percent}%)</span>
+                      </span>
+                    </li>
+                  );
+                })}
+            </ul>
+          )}
+        </div>
+      )}
+    </>
+  )}
+</div>
+
 
       <ul className="list">
         {visibleItems.map((item, idx) => {
