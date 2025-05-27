@@ -326,7 +326,7 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
                 </span>
               </div>
 
-              {(groupId || userId) && !loadingSummary && (
+              {(groupId) && !loadingSummary && (
                 <div className="sub-expense-inline-checkbox">
                   <div
                     className="expense-checkbox-item"
