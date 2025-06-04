@@ -59,6 +59,10 @@ export const fetchSharedTotalSummary = async (groupId) => {
     });
   }
 
+  for (const key in grouped) {
+    grouped[key].transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+  }
+
   return Object.values(grouped).sort((a, b) => b.total - a.total);
 };
 
