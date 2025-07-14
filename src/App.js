@@ -12,8 +12,27 @@ import {
   fetchSharedGroups,
   createSharedGroup,
   addUsersToSharedGroup,
+  addTransaction,
 } from "./api/budgetApi"; // ✅ fetchUsers 추가
+import { fetchFixedCosts, fetchBudgetData } from "./api/budgetApi";
 import "./App.css";
+
+// 1. 고정비용 목록 (코드에 직접 작성)
+const FIXED_COSTS = [
+  {
+    category: "월세", // 카테고리 코드 또는 이름
+    amount: 500000,
+    memo: "집 월세",
+    day: 1, // 매월 1일
+  },
+  {
+    category: "넷플릭스",
+    amount: 17000,
+    memo: "넷플릭스 구독",
+    day: 10,
+  },
+  // ...필요한 만큼 추가
+];
 
 function App() {
   const [activeTab, setActiveTab] = useState("input");
@@ -106,6 +125,47 @@ function App() {
     } else if (activeUser) {
       loadCategories(activeUser.id, null);
     }
+  }, [activeUser, activeGroup]);
+
+  // 고정비용 자동 입력: 오늘이 고정일 이상이면 이번 달, 오늘이 고정일 전이면 지난달 고정비용 누락 시 자동 입력
+  useEffect(() => {
+    const autoInputFixedCosts = async () => {
+      if (!activeUser && !activeGroup) return;
+      const fixedCosts = await fetchFixedCosts(activeUser?.id, activeGroup?.id);
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = today.getMonth() + 1;
+      const todayDay = today.getDate();
+      // 이번 달 트랜잭션 모두 조회
+      const txs = await fetchBudgetData({ userId: activeUser?.id, groupId: activeGroup?.id });
+      for (const fixed of fixedCosts) {
+        if (!fixed.active) continue;
+        // 이번 달 고정일자
+        const thisMonth = String(month).padStart(2, '0');
+        const fixedDateThisMonth = `${year}-${thisMonth}-${String(fixed.day).padStart(2, '0')}`;
+        // 지난달 고정일자
+        let prevYear = year, prevMonth = month - 1;
+        if (prevMonth === 0) { prevMonth = 12; prevYear -= 1; }
+        const prevMonthStr = String(prevMonth).padStart(2, '0');
+        const fixedDatePrevMonth = `${prevYear}-${prevMonthStr}-${String(fixed.day).padStart(2, '0')}`;
+        // 이번 달 고정비용 입력 여부
+        const alreadyThisMonth = txs.some(tx => tx.category === fixed.category && Math.abs(Number(tx.amount)) === Math.abs(Number(fixed.amount)) && tx.memo === fixed.memo && tx.date === fixedDateThisMonth);
+        // 지난달 고정비용 입력 여부
+        const alreadyPrevMonth = txs.some(tx => tx.category === fixed.category && Math.abs(Number(tx.amount)) === Math.abs(Number(fixed.amount)) && tx.memo === fixed.memo && tx.date === fixedDatePrevMonth);
+        if (todayDay < fixed.day) {
+          // 오늘이 고정일 전이면, 지난달 고정비용 누락 시 자동 입력
+          if (!alreadyPrevMonth) {
+            await addTransaction({ category: fixed.category, amount: -fixed.amount, memo: fixed.memo, date: fixedDatePrevMonth }, activeUser?.id, activeGroup?.id);
+          }
+        } else {
+          // 오늘이 고정일 이상이면, 이번 달 고정비용 누락 시 자동 입력
+          if (!alreadyThisMonth) {
+            await addTransaction({ category: fixed.category, amount: -fixed.amount, memo: fixed.memo, date: fixedDateThisMonth }, activeUser?.id, activeGroup?.id);
+          }
+        }
+      }
+    };
+    autoInputFixedCosts();
   }, [activeUser, activeGroup]);
 
   const mainColor = activeGroup

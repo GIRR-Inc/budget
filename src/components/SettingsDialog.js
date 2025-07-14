@@ -9,6 +9,8 @@ import {
   IconButton,
   FormControlLabel,
   Checkbox,
+  Tabs,
+  Tab,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
@@ -20,6 +22,10 @@ import {
   softDeleteCategory,
   updateCategoriesSort,
   updateCategory,
+  fetchFixedCosts,
+  addFixedCost,
+  updateFixedCost,
+  deleteFixedCost,
 } from "../api/budgetApi";
 import {
   DndContext,
@@ -181,6 +187,12 @@ function SettingsDialog({
   const [editValue, setEditValue] = useState("");
   const [editSharedTotal, setEditSharedTotal] = useState(false);
 
+  // 고정비용 관리 상태
+  const [fixedCosts, setFixedCosts] = useState([]);
+  const [newFixed, setNewFixed] = useState({ category: "", amount: "", memo: "", day: 1 });
+  const [editingFixedId, setEditingFixedId] = useState(null);
+  const [editFixed, setEditFixed] = useState({ category: "", amount: "", memo: "", day: 1, active: true });
+
   // CSS 변수 설정
   useEffect(() => {
     document.documentElement.style.setProperty("--main-color", userColor);
@@ -211,6 +223,20 @@ function SettingsDialog({
   useEffect(() => {
     if (open && (userId || groupId)) loadCategories();
   }, [open, userId, groupId, loadCategories]); // ✅ 안전하게 추가됨
+
+  // 고정비용 목록 불러오기
+  const loadFixedCosts = useCallback(async () => {
+    try {
+      const data = await fetchFixedCosts(userId, groupId);
+      setFixedCosts(data);
+    } catch (err) {
+      console.error("고정비용 로딩 실패:", err);
+    }
+  }, [userId, groupId]);
+
+  useEffect(() => {
+    if (open && (userId || groupId)) loadFixedCosts();
+  }, [open, userId, groupId, loadFixedCosts]);
 
   const handleAdd = async () => {
     const code = generateRandomCode();
@@ -293,102 +319,299 @@ function SettingsDialog({
     }
   };
 
+  // 고정비용 추가
+  const handleAddFixed = async () => {
+    if (!newFixed.category || !newFixed.amount || !newFixed.day) return;
+    await addFixedCost({
+      ...newFixed,
+      amount: parseInt(newFixed.amount, 10),
+      userId,
+      groupId,
+    });
+    setNewFixed({ category: "", amount: "", memo: "", day: 1 });
+    await loadFixedCosts();
+  };
+  // 고정비용 수정 시작
+  const handleEditFixedStart = (item) => {
+    setEditingFixedId(item.id);
+    setEditFixed({
+      category: item.category,
+      amount: item.amount.toString(),
+      memo: item.memo || "",
+      day: item.day,
+      active: item.active,
+    });
+  };
+  // 고정비용 수정 취소
+  const handleEditFixedCancel = () => {
+    setEditingFixedId(null);
+    setEditFixed({ category: "", amount: "", memo: "", day: 1, active: true });
+  };
+  // 고정비용 저장
+  const handleEditFixedSave = async (id) => {
+    await updateFixedCost(id, {
+      ...editFixed,
+      amount: parseInt(editFixed.amount, 10),
+    });
+    setEditingFixedId(null);
+    await loadFixedCosts();
+  };
+  // 고정비용 삭제
+  const handleDeleteFixed = async (id) => {
+    await deleteFixedCost(id);
+    await loadFixedCosts();
+  };
+
+  const [activeTab, setActiveTab] = useState(0); // 0: 카테고리, 1: 고정비용
+
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>환경 설정 - 카테고리 관리</DialogTitle>
-      <DialogContent dividers className="settings-dialog-content">
-        {/* ✅ DND 시작 */}
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragStart={handleDragStart}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={categories.map((c) => c.code)}
-            strategy={verticalListSortingStrategy}
-          >
-            <div className="settings-list-wrapper">
-              {categories.map((cat, index) => (
-                <SortableItem
-                  key={cat.code}
-                  item={cat}
-                  index={index}
-                  onDelete={handleDelete}
-                  onEditStart={handleEditStart}
-                  onEditSave={handleEditSave}
-                  onEditCancel={handleEditCancel}
-                  editing={editingCode === cat.code}
-                  editValue={editValue}
-                  setEditValue={setEditValue}
-                  editSharedTotal={editSharedTotal} // ✅ 추가
-                  setEditSharedTotal={setEditSharedTotal} // ✅ 추가
-                />
-              ))}
+      <DialogTitle>환경 설정</DialogTitle>
+      <Tabs value={activeTab} onChange={(_, v) => setActiveTab(v)} variant="fullWidth" sx={{ borderBottom: '1.5px solid #eee', mb: 1 }}>
+        <Tab label="카테고리 관리" sx={{ fontWeight: 700, fontFamily: 'GmarketSansMedium', fontSize: 16, color: userColor }} />
+        <Tab label="고정비용 관리" sx={{ fontWeight: 700, fontFamily: 'GmarketSansMedium', fontSize: 16, color: userColor }} />
+      </Tabs>
+      <DialogContent className="settings-dialog-content">
+        {activeTab === 0 && (
+          <>
+            {/* ✅ DND 시작 */}
+            <DndContext
+              sensors={sensors}
+              collisionDetection={closestCenter}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+            >
+              <SortableContext
+                items={categories.map((c) => c.code)}
+                strategy={verticalListSortingStrategy}
+              >
+                <div className="settings-list-wrapper">
+                  {categories.map((cat, index) => (
+                    <SortableItem
+                      key={cat.code}
+                      item={cat}
+                      index={index}
+                      onDelete={handleDelete}
+                      onEditStart={handleEditStart}
+                      onEditSave={handleEditSave}
+                      onEditCancel={handleEditCancel}
+                      editing={editingCode === cat.code}
+                      editValue={editValue}
+                      setEditValue={setEditValue}
+                      editSharedTotal={editSharedTotal}
+                      setEditSharedTotal={setEditSharedTotal}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+              <DragOverlay>
+                {activeId ? (
+                  <div className="sortable-item drag-preview">
+                    <div className="drag-handle">☰</div>
+                    <div style={{ flexGrow: 1 }}>
+                      <div className="item-text-primary">
+                        {categories.find((c) => c.code === activeId)?.description || ""}
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
+              </DragOverlay>
+            </DndContext>
+            {/* ✅ 새 카테고리 추가 */}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "24px",
+                marginTop: "12px",
+              }}
+            >
+              <TextField
+                label="카테고리"
+                value={newCategory.description}
+                onChange={(e) =>
+                  setNewCategory({ ...newCategory, description: e.target.value })
+                }
+                margin="dense"
+                style={{ flexGrow: 1 }}
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={newCategory.is_shared_total}
+                    onChange={(e) =>
+                      setNewCategory({
+                        ...newCategory,
+                        is_shared_total: e.target.checked,
+                      })
+                    }
+                    color="primary"
+                    size="small"
+                  />
+                }
+                label="누적보기"
+                className="category-checkbox-label"
+              />
             </div>
-          </SortableContext>
-          <DragOverlay>
-            {activeId ? (
-              <div className="sortable-item drag-preview">
-                <div className="drag-handle">☰</div>
-                <div style={{ flexGrow: 1 }}>
-                  <div className="item-text-primary">
-                    {categories.find((c) => c.code === activeId)?.description ||
-                      ""}
+            <Button
+              onClick={handleAdd}
+              className="settings-button"
+              variant="contained"
+              style={{
+                marginTop: 12,
+                background: `linear-gradient(135deg, ${userColor} 0%, ${hoverColor} 100%)`,
+              }}
+            >
+              카테고리 추가
+            </Button>
+          </>
+        )}
+        {activeTab === 1 && (
+          <>
+            {/* 고정비용 관리 UI (위에서 구현한 심플 테이블 스타일) */}
+            <div className="fixed-cost-inputs">
+              <select
+                value={newFixed.category}
+                onChange={e => setNewFixed(f => ({ ...f, category: e.target.value }))}
+                style={{ minWidth: 120, padding: 8, borderRadius: 8, border: '1.5px solid #eee', fontFamily: 'S-CoreDream-3Light', fontSize: 15 }}
+              >
+                <option value="">카테고리 선택</option>
+                {categories.map(cat => (
+                  <option key={cat.code} value={cat.code}>{cat.description}</option>
+                ))}
+              </select>
+              <input
+                type="number"
+                placeholder="금액"
+                value={newFixed.amount}
+                onChange={e => setNewFixed(f => ({ ...f, amount: e.target.value.replace(/\D/g, "") }))}
+                style={{ width: 90, padding: 8, borderRadius: 8, border: '1.5px solid #eee', fontFamily: 'S-CoreDream-3Light', fontSize: 15 }}
+              />
+              <input
+                type="text"
+                placeholder="메모"
+                value={newFixed.memo}
+                onChange={e => setNewFixed(f => ({ ...f, memo: e.target.value }))}
+                style={{ width: 120, padding: 8, borderRadius: 8, border: '1.5px solid #eee', fontFamily: 'S-CoreDream-3Light', fontSize: 15 }}
+              />
+              <input
+                type="number"
+                min={1}
+                max={28}
+                placeholder="일"
+                value={newFixed.day}
+                onChange={e => setNewFixed(f => ({ ...f, day: e.target.value.replace(/\D/g, "") }))}
+                style={{ width: 60, padding: 8, borderRadius: 8, border: '1.5px solid #eee', fontFamily: 'S-CoreDream-3Light', fontSize: 15 }}
+              />
+              <Button variant="contained" onClick={handleAddFixed} style={{ minWidth: 70, borderRadius: 8, fontWeight: 600, fontFamily: 'S-CoreDream-3Light', background: `linear-gradient(135deg, ${userColor} 0%, ${hoverColor} 100%)` }}>추가</Button>
+            </div>
+            {/* 심플한 행(테이블) 스타일로 고정비용 리스트 */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 0, maxHeight: 260, overflowY: 'auto', background: '#fff', borderRadius: 10, padding: 0, border: '1.5px solid #f4a8a855' }}>
+              {/* 헤더 */}
+              <div className="fixed-cost-header" style={{ display: 'flex', alignItems: 'center', fontWeight: 700, fontSize: 14, color: userColor, background: '#fafafa', borderBottom: '1px solid #eee', padding: '8px 0 8px 8px' }}>
+                <div style={{ flex: 2, minWidth: 80 }}>카테고리</div>
+                <div style={{ flex: 1, minWidth: 60 }}>금액</div>
+                <div style={{ flex: 2, minWidth: 80 }}>메모</div>
+                <div style={{ flex: 1, minWidth: 40 }}>일자</div>
+                <div style={{ flex: 1, minWidth: 40 }}>활성</div>
+                <div style={{ flex: 2, minWidth: 100, textAlign: 'right', paddingRight: 8 }}>관리</div>
+              </div>
+              {fixedCosts.map(item => (
+                <div key={item.id} className={`fixed-cost-row`} style={{
+                  display: 'flex', alignItems: 'center', borderBottom: '1px solid #f4f4f4', padding: '8px 0 8px 8px', background: editingFixedId === item.id ? '#fffaf4' : '#fff',
+                }}>
+                  {/* 카테고리 */}
+                  <div className="fixed-cost-label" style={{ flex: 2, minWidth: 80 }}>
+                    {editingFixedId === item.id ? (
+                      <select
+                        value={editFixed.category}
+                        onChange={e => setEditFixed(f => ({ ...f, category: e.target.value }))}
+                        style={{ minWidth: 80, padding: 6, borderRadius: 6, border: '1.5px solid #eee', fontFamily: 'S-CoreDream-3Light', fontSize: 15 }}
+                      >
+                        <option value="">카테고리 선택</option>
+                        {categories.map(cat => (
+                          <option key={cat.code} value={cat.code}>{cat.description}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <span style={{ color: item.active ? userColor : '#bbb', fontWeight: 600 }}>
+                        {categories.find(c => c.code === item.category)?.description || item.category}
+                      </span>
+                    )}
+                  </div>
+                  {/* 금액 */}
+                  <div className="fixed-cost-label" style={{ flex: 1, minWidth: 60 }}>
+                    {editingFixedId === item.id ? (
+                      <input
+                        type="number"
+                        value={editFixed.amount}
+                        onChange={e => setEditFixed(f => ({ ...f, amount: e.target.value.replace(/\D/g, "") }))}
+                        style={{ width: 60, padding: 6, borderRadius: 6, border: '1.5px solid #eee', fontFamily: 'S-CoreDream-3Light', fontSize: 15 }}
+                      />
+                    ) : (
+                      <span>{item.amount.toLocaleString()}원</span>
+                    )}
+                  </div>
+                  {/* 메모 */}
+                  <div className="fixed-cost-label" style={{ flex: 2, minWidth: 80 }}>
+                    {editingFixedId === item.id ? (
+                      <input
+                        type="text"
+                        value={editFixed.memo}
+                        onChange={e => setEditFixed(f => ({ ...f, memo: e.target.value }))}
+                        style={{ width: 80, padding: 6, borderRadius: 6, border: '1.5px solid #eee', fontFamily: 'S-CoreDream-3Light', fontSize: 15 }}
+                      />
+                    ) : (
+                      <span style={{ color: '#555' }}>{item.memo}</span>
+                    )}
+                  </div>
+                  {/* 일자 */}
+                  <div className="fixed-cost-label" style={{ flex: 1, minWidth: 40 }}>
+                    {editingFixedId === item.id ? (
+                      <input
+                        type="number"
+                        min={1}
+                        max={28}
+                        value={editFixed.day}
+                        onChange={e => setEditFixed(f => ({ ...f, day: e.target.value.replace(/\D/g, "") }))}
+                        style={{ width: 36, padding: 6, borderRadius: 6, border: '1.5px solid #eee', fontFamily: 'S-CoreDream-3Light', fontSize: 15 }}
+                      />
+                    ) : (
+                      <span>{item.day}일</span>
+                    )}
+                  </div>
+                  {/* 활성화 */}
+                  <div className="fixed-cost-label" style={{ flex: 1, minWidth: 40 }}>
+                    {editingFixedId === item.id ? (
+                      <Checkbox
+                        checked={editFixed.active}
+                        onChange={e => setEditFixed(f => ({ ...f, active: e.target.checked }))}
+                        size="small"
+                        style={{ color: userColor }}
+                      />
+                    ) : (
+                      <Checkbox checked={item.active} disabled size="small" style={{ color: userColor }} />
+                    )}
+                  </div>
+                  {/* 관리 버튼 */}
+                  <div className="fixed-cost-actions" style={{ flex: 2, minWidth: 100, textAlign: 'right', paddingRight: 8 }}>
+                    {editingFixedId === item.id ? (
+                      <>
+                        <Button size="small" onClick={() => handleEditFixedSave(item.id)} style={{ borderRadius: 8, fontWeight: 600, fontFamily: 'S-CoreDream-3Light', background: userColor, color: 'white', marginLeft: 4 }}>저장</Button>
+                        <Button size="small" onClick={handleEditFixedCancel} style={{ borderRadius: 8, fontWeight: 600, fontFamily: 'S-CoreDream-3Light', background: '#eee', color: '#888', marginLeft: 4 }}>취소</Button>
+                      </>
+                    ) : (
+                      <>
+                        <Button size="small" onClick={() => handleEditFixedStart(item)} style={{ borderRadius: 8, fontWeight: 600, fontFamily: 'S-CoreDream-3Light', background: hoverColor, color: 'white', marginLeft: 4 }}>수정</Button>
+                        <Button size="small" onClick={() => handleDeleteFixed(item.id)} style={{ borderRadius: 8, fontWeight: 600, fontFamily: 'S-CoreDream-3Light', background: '#eee', color: '#888', marginLeft: 4 }}>삭제</Button>
+                      </>
+                    )}
                   </div>
                 </div>
-              </div>
-            ) : null}
-          </DragOverlay>
-        </DndContext>
-
-        {/* ✅ 새 카테고리 추가 */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "24px", // ✅ 간격 더 넓게
-            marginTop: "12px",
-          }}
-        >
-          <TextField
-            label="카테고리"
-            value={newCategory.description}
-            onChange={(e) =>
-              setNewCategory({ ...newCategory, description: e.target.value })
-            }
-            margin="dense"
-            style={{ flexGrow: 1 }}
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={newCategory.is_shared_total}
-                onChange={(e) =>
-                  setNewCategory({
-                    ...newCategory,
-                    is_shared_total: e.target.checked,
-                  })
-                }
-                color="primary"
-                size="small"
-              />
-            }
-            label="누적보기"
-            className="category-checkbox-label" // ✅ 클래스 추가
-          />
-        </div>
-        <Button
-          onClick={handleAdd}
-          className="settings-button"
-          variant="contained"
-          style={{
-            marginTop: 12,
-            background: `linear-gradient(135deg, ${userColor} 0%, ${hoverColor} 100%)`,
-          }}
-        >
-          카테고리 추가
-        </Button>
+              ))}
+            </div>
+          </>
+        )}
       </DialogContent>
 
       <DialogActions>

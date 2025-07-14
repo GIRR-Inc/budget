@@ -167,3 +167,128 @@
   position: relative;
   padding-right: 64px; /* 버튼 공간 확보 */
 }
+
+/* 고정비용 입력란/버튼 영역 스타일 */
+.fixed-cost-inputs {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  width: 100%;
+  min-width: 0;
+}
+
+.fixed-cost-inputs > * {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.fixed-cost-row {
+  display: flex !important;
+  align-items: center !important;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #f4a8a822;
+  border: 1.5px solid #f4a8a855;
+  margin-bottom: 16px;
+  padding: 16px 14px 12px 14px !important;
+  min-width: 0;
+  width: 100%;
+  gap: 12px !important;
+  overflow-x: auto;
+  transition: box-shadow 0.2s;
+}
+
+.fixed-cost-row:hover {
+  box-shadow: 0 4px 16px #f4a8a844;
+}
+
+.fixed-cost-label {
+  flex: 1 1 0;
+  min-width: 0;
+  font-weight: 600;
+  color: var(--main-color, #f4a8a8);
+  margin-right: 8px;
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: none;
+  border: none;
+}
+
+.fixed-cost-actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.fixed-cost-row input,
+.fixed-cost-row select {
+  width: 100% !important;
+  min-width: 0 !important;
+  font-size: 15px;
+  margin-bottom: 0;
+  box-sizing: border-box;
+  border-radius: 6px;
+  border: 1.5px solid #eee;
+  background: #fafafa;
+  padding: 6px 8px;
+}
+
+/* 반응형: 고정비용 관리 테이블(행) 모바일 카드형 전환 */
+@media (max-width: 600px) {
+  .fixed-cost-inputs {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    margin-bottom: 14px !important;
+  }
+  .fixed-cost-inputs > * {
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: 15px;
+  }
+  .fixed-cost-header {
+    display: none !important;
+  }
+  .fixed-cost-row {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    padding: 14px 10px 10px 10px !important;
+  }
+  .fixed-cost-row-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+    font-size: 15px;
+    width: 100%;
+  }
+  .fixed-cost-row-bottom {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    width: 100%;
+  }
+  .fixed-cost-label {
+    font-size: 15px;
+    margin-right: 0;
+  }
+  .fixed-cost-actions {
+    margin-left: auto;
+    display: flex;
+    gap: 6px;
+  }
+  .fixed-cost-row input,
+  .fixed-cost-row select {
+    width: 100% !important;
+    min-width: 0 !important;
+    font-size: 15px;
+    margin-bottom: 0;
+  }
+}

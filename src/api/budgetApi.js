@@ -733,3 +733,53 @@ export const fetchMemoSuggestions = async (userId = null, groupId = null) => {
   // 최근 사용된 순서로 정렬 (이미 created_at desc로 정렬되어 있음)
   return uniqueMemos.slice(0, 20); // 최대 20개까지만 반환
 };
+
+// 고정비용 목록 불러오기
+export const fetchFixedCosts = async (userId = null, groupId = null) => {
+  const query = supabase
+    .from("fixed_costs")
+    .select("*")
+    .eq("active", true)
+    .order("day", { ascending: true });
+  if (userId) query.eq("user_id", userId);
+  else if (groupId) query.eq("shared_group_id", groupId);
+  else throw new Error("userId 또는 groupId 중 하나는 반드시 필요합니다.");
+  const { data, error } = await query;
+  if (error) throw error;
+  return data;
+};
+
+// 고정비용 추가
+export const addFixedCost = async ({ category, amount, memo, day, userId = null, groupId = null }) => {
+  const payload = {
+    category,
+    amount,
+    memo,
+    day,
+    user_id: userId,
+    shared_group_id: groupId,
+  };
+  const { data, error } = await supabase.from("fixed_costs").insert([payload]);
+  if (error) throw error;
+  return data;
+};
+
+// 고정비용 수정
+export const updateFixedCost = async (id, { category, amount, memo, day, active }) => {
+  const { data, error } = await supabase
+    .from("fixed_costs")
+    .update({ category, amount, memo, day, active })
+    .eq("id", id);
+  if (error) throw error;
+  return data;
+};
+
+// 고정비용 삭제(soft delete)
+export const deleteFixedCost = async (id) => {
+  const { data, error } = await supabase
+    .from("fixed_costs")
+    .update({ active: false })
+    .eq("id", id);
+  if (error) throw error;
+  return data;
+};
