@@ -705,3 +705,31 @@ export const fetchCategoryMonthlyData = async (
 
   return { data: result, categoryInfo };
 };
+
+// 기존 거래 내역에서 memo 값들을 가져와서 자동완성용으로 사용
+export const fetchMemoSuggestions = async (userId = null, groupId = null) => {
+  const matchObj = {
+    ...(userId && { user_id: userId }),
+    ...(groupId && { shared_group_id: groupId }),
+  };
+
+  const { data, error } = await supabase
+    .from("transactions")
+    .select("memo")
+    .match(matchObj)
+    .not("memo", "is", null)
+    .not("memo", "eq", "")
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+
+  // 중복 제거하고 빈 값 필터링
+  const uniqueMemos = [
+    ...new Set(
+      data.map((row) => row.memo).filter((memo) => memo && memo.trim())
+    ),
+  ];
+
+  // 최근 사용된 순서로 정렬 (이미 created_at desc로 정렬되어 있음)
+  return uniqueMemos.slice(0, 20); // 최대 20개까지만 반환
+};

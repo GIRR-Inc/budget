@@ -19,13 +19,71 @@
   margin: auto;
 }
 
-.tab-bar {
+/* 월별 버튼 전용 스크롤바 */
+.month-scroll-bar {
   display: flex;
   overflow-x: auto;
   gap: 8px;
   margin-bottom: 1rem;
+  height: 44px;
+  align-items: center;
+  padding: 0 4px;
+  scrollbar-width: thin;
+  scrollbar-color: #f4a8a8 #fff7f7;
+  background: transparent;
+}
+.month-scroll-bar::-webkit-scrollbar {
+  height: 5px;
+}
+.month-scroll-bar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.month-scroll-bar::-webkit-scrollbar-thumb {
+  background: #f4a8a8;
+  border-radius: 3px;
+}
+.month-scroll-bar::-webkit-scrollbar-thumb:hover {
+  background: #e57373;
 }
 
+.month-tab {
+  flex-shrink: 0;
+  padding: 7px 18px;
+  border: 1.5px solid #f4a8a8;
+  border-radius: 22px;
+  background: linear-gradient(90deg, var(--inactive-color, #fff7f7) 60%, var(--inactive-color2, #ffeaea) 100%);
+  font-size: 15px;
+  font-family: 'GmarketSansMedium';
+  cursor: pointer;
+  white-space: nowrap;
+  min-width: 70px;
+  text-align: center;
+  color: #444;
+  box-shadow: 0 2px 8px rgba(244,168,168,0.08);
+  margin-bottom: 2px;
+  transition: all 0.18s cubic-bezier(.4,0,.2,1);
+  outline: none;
+}
+.month-tab:hover:not(.active) {
+  background: linear-gradient(90deg, var(--hover-color, #f19191) 60%, #fff7f7 100%);
+  color: #fff;
+  border-color: var(--hover-color, #f19191);
+  box-shadow: 0 4px 12px rgba(244,168,168,0.13);
+}
+.month-tab.active {
+  background: linear-gradient(90deg, var(--active-color, #f4a8a8) 60%, var(--active-color2, #f19191) 100%);
+  color: #fff;
+  border-color: var(--active-color2, #f19191);
+  font-weight: bold;
+  box-shadow: 0 4px 16px rgba(244,168,168,0.18);
+}
+
+/* 기존 .tab-bar, .tab 관련 스크롤 스타일 제거 (상위 탭 영향 방지) */
+.tab-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1rem;
+}
 .tab {
   flex-shrink: 0;
   padding: 6px 12px;
@@ -37,7 +95,6 @@
   cursor: pointer;
   white-space: nowrap;
 }
-
 .tab.active {
   background: #f4a8a8;
   color: white;
@@ -97,19 +154,46 @@
 }
 
 .summary-bar {
-  padding: 1px 1.2rem;
-  background-color: #fff7f7;
-  border: 1px solid #f4a8a8;
-  border-radius: 12px;
+  padding: 16px;
+  background: linear-gradient(135deg, var(--summary-bg, #fff7f7) 0%, var(--summary-bg2, #ffeaea) 100%);
+  border: 2px solid var(--summary-border, #f4a8a8);
+  border-radius: 16px;
   margin-bottom: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 20px rgba(244,168,168,0.08);
   font-family: 'GmarketSansMedium';
+  position: relative;
+  overflow: hidden;
+}
+
+.summary-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--summary-accent, #f4a8a8) 0%, var(--summary-accent2, #f19191) 100%);
 }
 
 .summary-bar h3 {
-  font-size: 18px;
+  font-size: 22px;
   margin-bottom: 0.75rem;
-  color: #444;
+  color: #333;
+  font-weight: bold;
+  text-align: center;
+  position: relative;
+}
+
+.summary-bar h3::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 2px;
+  background: var(--summary-accent, #f4a8a8);
+  border-radius: 1px;
 }
 
 .summary-bar .summary-row {
@@ -293,27 +377,37 @@
 .toggle-button-wrapper {
   display: flex;
   justify-content: center;
-  margin: 8px 0;
+  margin: 12px 0;
 }
 
 .toggle-button-wrapper button {
   background: none;
   border: none;
   cursor: pointer;
-  padding: 4px;
-  color: #888;
+  padding: 8px;
+  color: var(--toggle-color, #888);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: color 0.2s;
+  transition: all 0.3s ease;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
 }
 
 .toggle-button-wrapper button:hover {
-  color: #f19191;
+  background: rgba(244, 168, 168, 0.1);
+  color: var(--toggle-hover-color, #f19191);
+  transform: scale(1.1);
 }
 
 .toggle-button-wrapper svg {
   font-size: 24px;
+  transition: transform 0.3s ease;
+}
+
+.toggle-button-wrapper button:hover svg {
+  transform: scale(1.1);
 }
 
 .category-summary {
@@ -396,68 +490,92 @@
 .summary-section {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 10px;
   font-family: 'GmarketSansMedium';
-  margin-top: 6px;
-  margin-bottom: 10px;
-  padding-top: 6px;
-  /* border-top: 1px dashed #ccc; ⛔ 제거 */
-  padding: 10px;
-  border-radius: 6px;
-  box-shadow: inset 0 1px 0 #eee;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 .summary-item {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
-  padding: 6px 0;
-  font-size: 15px;
+  align-items: center;
+  padding: 10px 14px;
+  font-size: 17px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px solid rgba(244, 168, 168, 0.1);
+  transition: all 0.2s ease;
+}
+
+.summary-item:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(244, 168, 168, 0.1);
 }
 
 .summary-item .label {
-  color: #666;
-  font-size: 15px;
+  color: #555;
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.summary-item .label::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--item-color, #666);
 }
 
 .summary-item .amount {
   font-weight: bold;
   font-variant-numeric: tabular-nums;
-  font-size: 16px;
+  font-size: 18px;
+  font-family: 'GmarketSansMedium';
 }
 
-.summary-item.budget .amount {
-  color: #6c5ce7;
-}
+.summary-item.budget .label::before { background: #6c5ce7; }
+.summary-item.budget .amount { color: #6c5ce7; }
 
-.summary-item.income .amount {
-  color: #0984e3;
-}
+.summary-item.income .label::before { background: #0984e3; }
+.summary-item.income .amount { color: #0984e3; }
 
-.summary-item.expense .amount {
-  color: #d63031;
-}
+.summary-item.expense .label::before { background: #d63031; }
+.summary-item.expense .amount { color: #d63031; }
 
 .summary-item.net {
   position: relative;
-  padding-top: 12px;
-  margin-top: 10px;
-  border-top: 2px dashed #bbb;
+  padding: 14px;
+  margin-top: 12px;
+  border-top: 2px dashed rgba(187, 187, 187, 0.3);
+  background: linear-gradient(135deg, rgba(0, 184, 148, 0.1) 0%, rgba(0, 184, 148, 0.05) 100%);
+  border: 1px solid rgba(0, 184, 148, 0.2);
 }
 
 .summary-item.net .label {
-  font-size: 15px;
+  font-size: 17px;
   font-weight: bold;
   color: #222;
 }
 
 .summary-item.net .amount {
-  font-size: 17px;
+  font-size: 19px;
   font-weight: bold;
   color: #00b894;
   font-family: 'GmarketSansMedium';
   letter-spacing: 0.5px;
 }
+
+.summary-item.net .label::before { background: #00b894; }
 
 .dot {
   display: inline-block;
@@ -477,31 +595,73 @@
   justify-content: flex-end;
   align-items: center;
   gap: 4px;
-  font-size: 12px;
-  color: #666;
-  margin-top: -4px;
-  margin-bottom: 6px;
+  font-size: 11px;
+  color: #555;
+  margin: 0;
   font-family: 'S-CoreDream-3Light';
   white-space: nowrap;
+  padding: 2px 4px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 4px;
+  border: 1px solid rgba(244, 168, 168, 0.15);
 }
 
 .expense-checkbox-item {
   display: inline-flex;
   align-items: center;
   gap: 3px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: rgba(244, 168, 168, 0.03);
+  border: 1px solid rgba(244, 168, 168, 0.08);
+  transition: all 0.2s ease;
+}
+
+.expense-checkbox-item:hover {
+  background: rgba(244, 168, 168, 0.08);
+  border-color: rgba(244, 168, 168, 0.2);
 }
 
 .expense-checkbox-item input[type="checkbox"] {
-  transform: translateY(1px); /* ✅ 텍스트와 정렬 맞춤 */
+  transform: translateY(1px);
   vertical-align: middle;
   cursor: pointer;
   margin: 0;
   padding: 0;
-  appearance: auto;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border: 1.5px solid #ccc;
+  border-radius: 2px;
+  background: white;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.expense-checkbox-item input[type="checkbox"]:checked {
+  background: var(--checkbox-color, #f4a8a8);
+  border-color: var(--checkbox-color, #f4a8a8);
+}
+
+.expense-checkbox-item input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: -1px;
+  left: 0px;
+  color: white;
+  font-size: 9px;
+  font-weight: bold;
+}
+
+.expense-checkbox-item input[type="checkbox"]:hover {
+  border-color: var(--checkbox-hover-color, #f19191);
 }
 
 .expense-text {
   vertical-align: middle;
+  font-weight: 500;
+  color: #444;
+  font-size: 10px;
 }
 
 .divider {
@@ -530,5 +690,23 @@
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 600px) {
+  .month-scroll-bar {
+    height: 36px;
+    gap: 4px;
+    padding: 0 2px;
+  }
+  .month-tab {
+    padding: 4px 10px;
+    font-size: 12px;
+    min-width: 48px;
+    border-radius: 15px;
+    margin-bottom: 1px;
+  }
+  .month-scroll-bar::-webkit-scrollbar {
+    height: 3px;
+  }
 }
 

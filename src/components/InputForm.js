@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { addTransaction } from "../api/budgetApi";
+import React, { useState, useRef, useEffect } from "react";
+import { addTransaction, fetchMemoSuggestions } from "../api/budgetApi";
 import "./InputForm.css";
 
 const InputForm = ({
@@ -24,10 +24,42 @@ const InputForm = ({
   });
 
   const [fixDate, setFixDate] = useState(false);
-
   const [type, setType] = useState("expense");
-
   const [showPopup, setShowPopup] = useState(false);
+  const [recentCategories, setRecentCategories] = useState([]); // 최근 사용 카테고리
+  const [memoSuggestions, setMemoSuggestions] = useState([]); // 메모 자동완성 제안
+  const [showMemoSuggestions, setShowMemoSuggestions] = useState(false); // 메모 제안 표시 여부
+  const [filteredMemoSuggestions, setFilteredMemoSuggestions] = useState([]); // 필터링된 메모 제안
+  const amountInputRef = useRef(null);
+  const memoInputRef = useRef(null);
+
+  // 컴포넌트 마운트 시 메모 제안 가져오기
+  useEffect(() => {
+    const loadMemoSuggestions = async () => {
+      try {
+        const suggestions = await fetchMemoSuggestions(userId, groupId);
+        setMemoSuggestions(suggestions);
+      } catch (error) {
+        console.error("메모 제안 로드 실패:", error);
+      }
+    };
+
+    loadMemoSuggestions();
+  }, [userId, groupId]);
+
+  // 메모 입력 시 필터링 (2글자 이상일 때만)
+  useEffect(() => {
+    if (form.memo.trim().length < 2) {
+      setFilteredMemoSuggestions([]); // 2글자 미만이면 제안 표시 안함
+    } else {
+      const filtered = memoSuggestions
+        .filter((suggestion) =>
+          suggestion.toLowerCase().includes(form.memo.toLowerCase())
+        )
+        .slice(0, 5);
+      setFilteredMemoSuggestions(filtered);
+    }
+  }, [form.memo, memoSuggestions]);
 
   const formatWithComma = (value) => {
     const num = value.replace(/,/g, "");
@@ -42,8 +74,38 @@ const InputForm = ({
     if (name === "amount") {
       const raw = value.replace(/,/g, "").replace(/\D/g, "");
       setForm({ ...form, [name]: raw });
+    } else if (name === "category") {
+      setForm({ ...form, [name]: value });
+      // 최근 카테고리 갱신
+      if (value) {
+        setRecentCategories((prev) => {
+          const filtered = prev.filter((c) => c !== value);
+          return [value, ...filtered].slice(0, 3);
+        });
+      }
+    } else if (name === "memo") {
+      setForm({ ...form, [name]: value });
     } else {
       setForm({ ...form, [name]: value });
+    }
+  };
+
+  const handleCategoryQuickSelect = (code) => {
+    setForm((prev) => ({ ...prev, category: code }));
+    setRecentCategories((prev) => {
+      const filtered = prev.filter((c) => c !== code);
+      return [code, ...filtered].slice(0, 3);
+    });
+  };
+
+  const handleAmountPreset = (amount) => {
+    setForm((prev) => {
+      const prevAmount = Number(prev.amount.replace(/,/g, "")) || 0;
+      const newAmount = prevAmount + amount;
+      return { ...prev, amount: newAmount.toString() };
+    });
+    if (amountInputRef.current) {
+      amountInputRef.current.focus();
     }
   };
 
@@ -76,11 +138,43 @@ const InputForm = ({
     }
   };
 
+  // 최근 사용 카테고리 객체 정보
+  const recentCategoryObjs = recentCategories
+    .map((code) => categories.find((cat) => cat.code === code))
+    .filter(Boolean);
+
   return (
     <div>
       <form className="form-container" onSubmit={handleSubmit}>
         <label>
           대분류코드
+          {/* 최근 사용 카테고리 빠른 선택 */}
+          {recentCategoryObjs.length > 0 && (
+            <div style={{ display: "flex", gap: "6px", margin: "6px 0" }}>
+              {recentCategoryObjs.map((cat) => (
+                <button
+                  key={cat.code}
+                  type="button"
+                  style={{
+                    backgroundColor:
+                      form.category === cat.code ? userColor : "#f0f0f0",
+                    color: form.category === cat.code ? "white" : "#333",
+                    border: `1px solid ${
+                      form.category === cat.code ? userColor : "#ccc"
+                    }`,
+                    borderRadius: "6px",
+                    padding: "6px 12px",
+                    fontSize: "13px",
+                    cursor: "pointer",
+                    fontFamily: "'S-CoreDream-3Light'",
+                  }}
+                  onClick={() => handleCategoryQuickSelect(cat.code)}
+                >
+                  {cat.description}
+                </button>
+              ))}
+            </div>
+          )}
           <select
             name="category"
             value={form.category}
@@ -103,9 +197,13 @@ const InputForm = ({
               name="amount"
               type="text"
               inputMode="numeric"
+              pattern="[0-9]*"
+              autoFocus
+              ref={amountInputRef}
               value={formatWithComma(form.amount)}
               onChange={handleChange}
               required
+              autoComplete="off"
             />
             <div className="type-tabs">
               {["expense", "income"].map((t) => (
@@ -132,11 +230,110 @@ const InputForm = ({
               ))}
             </div>
           </div>
+          {/* 금액 프리셋 버튼 */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              gap: "6px",
+              marginTop: "8px",
+            }}
+          >
+            {[100, 1000, 10000, 100000].map((preset) => (
+              <button
+                key={preset}
+                type="button"
+                style={{
+                  backgroundColor: "#f0f0f0",
+                  color: "#333",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                  fontSize: "12px",
+                  padding: "3px 8px",
+                  minWidth: "unset",
+                  cursor: "pointer",
+                  fontFamily: "'S-CoreDream-3Light'",
+                  lineHeight: 1.1,
+                  margin: "2px 0",
+                }}
+                onClick={() => handleAmountPreset(preset)}
+              >
+                +
+                {preset === 100
+                  ? "1백"
+                  : preset === 1000
+                  ? "1천"
+                  : preset === 10000
+                  ? "1만"
+                  : "10만"}
+                원
+              </button>
+            ))}
+          </div>
         </label>
 
         <label>
           세부설명
-          <input name="memo" value={form.memo} onChange={handleChange} />
+          <div style={{ position: "relative" }}>
+            <input
+              name="memo"
+              value={form.memo}
+              onChange={handleChange}
+              ref={memoInputRef}
+              onFocus={() => setShowMemoSuggestions(true)}
+              onBlur={() => {
+                // 약간의 지연을 두어 클릭 이벤트가 처리되도록 함
+                setTimeout(() => setShowMemoSuggestions(false), 150);
+              }}
+              autoComplete="off"
+            />
+            {showMemoSuggestions && filteredMemoSuggestions.length > 0 && (
+              <div
+                style={{
+                  position: "absolute",
+                  top: "100%",
+                  left: 0,
+                  right: 0,
+                  backgroundColor: "white",
+                  border: "1px solid #ccc",
+                  borderRadius: "6px",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+                  zIndex: 1000,
+                  maxHeight: "200px",
+                  overflowY: "auto",
+                }}
+              >
+                {filteredMemoSuggestions.map((suggestion, index) => (
+                  <div
+                    key={index}
+                    style={{
+                      padding: "8px 12px",
+                      cursor: "pointer",
+                      borderBottom: "1px solid #f0f0f0",
+                      fontSize: "14px",
+                      fontFamily: "'S-CoreDream-3Light'",
+                    }}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      setForm((prev) => ({ ...prev, memo: suggestion }));
+                      setShowMemoSuggestions(false);
+                      if (memoInputRef.current) {
+                        memoInputRef.current.focus();
+                      }
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = "#f5f5f5";
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = "white";
+                    }}
+                  >
+                    {suggestion}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </label>
         <div style={{ marginBottom: "8px" }}>
           {/* 일자 + 날짜 고정 */}
@@ -225,8 +422,8 @@ const InputForm = ({
             className="popup-content"
             style={{
               backgroundColor: "white",
-              width: "80%",           // ✅ 화면 너비의 90% 사용
-              maxWidth: "360px",      // ✅ 데스크탑에서는 최대 360px 제한
+              width: "80%", // ✅ 화면 너비의 90% 사용
+              maxWidth: "360px", // ✅ 데스크탑에서는 최대 360px 제한
               padding: "20px",
               borderRadius: "12px",
               boxShadow: "0 4px 10px rgba(0, 0, 0, 0.2)",

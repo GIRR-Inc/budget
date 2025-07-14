@@ -270,6 +270,7 @@ function App() {
           userId={activeUser?.id ?? null}
           groupId={activeGroup?.id ?? null}
           userColor={mainColor}
+          hoverColor={hoverColor}
         />
       )}
       {activeTab === "summary" && (
