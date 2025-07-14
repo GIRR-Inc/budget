@@ -35,7 +35,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #f4a8a8, #f19191, #e87a7a);
+  background: linear-gradient(90deg, var(--main-color, #f4a8a8), var(--hover-color, #f19191), var(--active-color, #e87a7a));
   border-radius: 20px 20px 0 0;
 }
 
@@ -65,7 +65,7 @@ input {
 
 input:focus {
   outline: none;
-  border-color: #f4a8a8;
+  border-color: var(--main-color, #f4a8a8);
   box-shadow: 0 0 0 3px rgba(244, 168, 168, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05);
   transform: translateY(-1px);
 }
@@ -73,7 +73,7 @@ input:focus {
 button {
   padding: 14px 20px;
   font-size: 16px;
-  background: linear-gradient(135deg, #f4a8a8 0%, #f19191 100%);
+  background: linear-gradient(135deg, var(--main-color, #f4a8a8) 0%, var(--hover-color, #f19191) 100%);
   font-family: 'S-CoreDream-3Light';
   color: white;
   border: none;
@@ -102,13 +102,13 @@ button:hover::before {
 }
 
 button:hover {
-  background: linear-gradient(135deg, #f19191 0%, #e87a7a 100%);
+  background: linear-gradient(135deg, var(--hover-color, #f19191) 0%, var(--hover-color, #f19191) 100%);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(244, 168, 168, 0.4);
 }
 
 button:active {
-  background: linear-gradient(135deg, #e87a7a 0%, #d65a5a 100%);
+  background: linear-gradient(135deg, var(--active-color, #e87a7a) 0%, var(--active-color, #e87a7a) 100%);
   transform: translateY(0);
   box-shadow: 0 2px 10px rgba(244, 168, 168, 0.3);
 }
@@ -197,28 +197,7 @@ button:focus {
   overflow-x: hidden;
 }
 
-.dropdown-search {
-  padding: 12px 16px;
-  border-bottom: 1px solid #f8f9fa;
-}
 
-.search-input {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #e9ecef;
-  border-radius: 8px;
-  font-size: 14px;
-  font-family: 'S-CoreDream-3Light';
-  background: #f8f9fa;
-  transition: all 0.2s ease;
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: var(--main-color, #f4a8a8);
-  background: #ffffff;
-  box-shadow: 0 0 0 2px rgba(244, 168, 168, 0.1);
-}
 
 .dropdown-options {
   max-height: 120px;
@@ -249,12 +228,12 @@ button:focus {
 }
 
 .dropdown-option.selected {
-  background: linear-gradient(135deg, var(--main-color, #f4a8a8) 0%, var(--hover-color, #f19191) 100%);
+  background: linear-gradient(135deg, var(--main-color, #f4a8a8) 0%, var(--main-color, #f4a8a8) 100%);
   color: white;
 }
 
 .dropdown-option.selected:hover {
-  background: linear-gradient(135deg, var(--hover-color, #f19191) 0%, var(--active-color, #e87a7a) 100%);
+  background: linear-gradient(135deg, var(--hover-color, #f19191) 0%, var(--hover-color, #f19191) 100%);
   transform: translateX(4px);
   overflow: hidden;
 }
@@ -303,13 +282,13 @@ button:focus {
   color: white;
   border-color: var(--main-color, #f4a8a8);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px rgba(244, 168, 168, 0.3);
+  box-shadow: 0 2px 8px var(--main-color, #f4a8a8);
 }
 
 .amount-preset-btn:active {
   background: var(--hover-color, #f19191);
   transform: translateY(0);
-  box-shadow: 0 1px 4px rgba(244, 168, 168, 0.2);
+  box-shadow: 0 1px 4px var(--hover-color, #f19191);
 }
 
 /* 드롭다운 스크롤바 스타일링 */
@@ -361,17 +340,17 @@ button:focus {
 }
 
 .type-tabs button:hover {
-  border-color: #f4a8a8;
-  color: #f4a8a8;
+  border-color: var(--main-color, #f4a8a8);
+  color: var(--main-color, #f4a8a8);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(244, 168, 168, 0.15);
+  box-shadow: 0 4px 12px var(--main-color, #f4a8a8);
 }
 
 .type-tabs button.active {
-  background: linear-gradient(135deg, #f4a8a8 0%, #f19191 100%);
+  background: linear-gradient(135deg, var(--main-color, #f4a8a8) 0%, var(--hover-color, #f19191) 100%);
   color: white;
-  border-color: #f4a8a8;
-  box-shadow: 0 4px 15px rgba(244, 168, 168, 0.3);
+  border-color: var(--main-color, #f4a8a8);
+  box-shadow: 0 4px 15px var(--main-color, #f4a8a8);
 }
 
 /* 공통 텍스트 레이블 스타일 */
@@ -428,7 +407,7 @@ button:focus {
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #f4a8a8, #f19191, #e87a7a);
+  background: linear-gradient(90deg, var(--main-color, #f4a8a8), var(--hover-color, #f19191), var(--active-color, #e87a7a));
   border-radius: 20px 20px 0 0;
 }
 

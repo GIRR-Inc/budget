@@ -31,7 +31,6 @@ const InputForm = ({
   const [showMemoSuggestions, setShowMemoSuggestions] = useState(false); // 메모 제안 표시 여부
   const [filteredMemoSuggestions, setFilteredMemoSuggestions] = useState([]); // 필터링된 메모 제안
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false); // 카테고리 드롭다운 표시 여부
-  const [categorySearchTerm, setCategorySearchTerm] = useState(""); // 카테고리 검색어
   const amountInputRef = useRef(null);
   const memoInputRef = useRef(null);
   const categoryDropdownRef = useRef(null);
@@ -118,22 +117,12 @@ const InputForm = ({
   const handleCategorySelect = (code) => {
     setForm((prev) => ({ ...prev, category: code }));
     setShowCategoryDropdown(false);
-    setCategorySearchTerm(""); // 검색어 초기화
     // 최근 카테고리 갱신
     setRecentCategories((prev) => {
       const filtered = prev.filter((c) => c !== code);
       return [code, ...filtered].slice(0, 3);
     });
   };
-
-  const handleCategorySearch = (e) => {
-    setCategorySearchTerm(e.target.value);
-  };
-
-  // 검색어에 따른 필터링된 카테고리
-  const filteredCategories = categories.filter((cat) =>
-    cat.description.toLowerCase().includes(categorySearchTerm.toLowerCase())
-  );
 
   const handleCategoryQuickSelect = (code) => {
     setForm((prev) => ({ ...prev, category: code }));
@@ -236,9 +225,6 @@ const InputForm = ({
               className={`custom-select ${showCategoryDropdown ? "open" : ""}`}
               onClick={() => {
                 setShowCategoryDropdown(!showCategoryDropdown);
-                if (!showCategoryDropdown) {
-                  setCategorySearchTerm(""); // 드롭다운 열릴 때 검색어 초기화
-                }
               }}
             >
               <div className="custom-select__selected">
@@ -265,18 +251,8 @@ const InputForm = ({
 
             {showCategoryDropdown && (
               <div className="custom-select__dropdown">
-                <div className="dropdown-search">
-                  <input
-                    type="text"
-                    placeholder="카테고리 검색..."
-                    className="search-input"
-                    value={categorySearchTerm}
-                    onChange={handleCategorySearch}
-                    autoFocus
-                  />
-                </div>
                 <div className="dropdown-options">
-                  {filteredCategories.map((cat) => (
+                  {categories.map((cat) => (
                     <div
                       key={cat.code}
                       className={`dropdown-option ${
