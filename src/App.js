@@ -120,6 +120,12 @@ function App() {
     ? "#f19191"
     : "#619ee8";
 
+  // CSS 변수 설정
+  useEffect(() => {
+    document.documentElement.style.setProperty("--main-color", mainColor);
+    document.documentElement.style.setProperty("--hover-color", hoverColor);
+  }, [mainColor, hoverColor]);
+
   return (
     <div
       style={{
@@ -143,6 +149,8 @@ function App() {
             borderRadius: "30px",
             overflow: "hidden",
             border: `2px solid ${mainColor}`,
+            boxShadow: `0 4px 15px ${mainColor}30`,
+            background: "white",
           }}
         >
           {users.map((user, index) => (
@@ -153,17 +161,34 @@ function App() {
                 setActiveGroup(null); // 개인 보기
               }}
               style={{
-                padding: "8px 24px",
+                padding: "10px 28px",
                 border: "none",
-                backgroundColor:
-                  activeUser?.id === user.id ? mainColor : "white",
+                background:
+                  activeUser?.id === user.id
+                    ? `linear-gradient(135deg, ${mainColor} 0%, ${hoverColor} 100%)`
+                    : "white",
                 color: activeUser?.id === user.id ? "white" : mainColor,
                 fontWeight: 600,
                 fontFamily: "'GmarketSansMedium', sans-serif",
                 cursor: "pointer",
                 outline: "none",
-                borderRight: index === 0 ? `1px solid ${mainColor}` : "none",
-                transition: "all 0.2s",
+                borderRight: index === 0 ? `1px solid ${mainColor}40` : "none",
+                transition: "all 0.3s ease",
+                fontSize: "14px",
+                position: "relative",
+                overflow: "hidden",
+              }}
+              onMouseOver={(e) => {
+                if (activeUser?.id !== user.id) {
+                  e.target.style.background = `linear-gradient(135deg, ${mainColor}20 0%, ${hoverColor}20 100%)`;
+                  e.target.style.transform = "translateY(-1px)";
+                }
+              }}
+              onMouseOut={(e) => {
+                if (activeUser?.id !== user.id) {
+                  e.target.style.background = "white";
+                  e.target.style.transform = "translateY(0)";
+                }
               }}
             >
               {user.username}
@@ -177,17 +202,34 @@ function App() {
                 setActiveGroup(group);
               }}
               style={{
-                padding: "8px 24px",
+                padding: "10px 28px",
                 border: "none",
-                backgroundColor:
-                  activeGroup?.id === group.id ? mainColor : "white",
+                background:
+                  activeGroup?.id === group.id
+                    ? `linear-gradient(135deg, ${mainColor} 0%, ${hoverColor} 100%)`
+                    : "white",
                 color: activeGroup?.id === group.id ? "white" : mainColor,
                 fontWeight: 600,
                 fontFamily: "'GmarketSansMedium', sans-serif",
                 cursor: "pointer",
                 outline: "none",
-                borderLeft: `1px solid ${mainColor}`, // 구분선 추가
-                transition: "all 0.2s",
+                borderLeft: `1px solid ${mainColor}40`,
+                transition: "all 0.3s ease",
+                fontSize: "14px",
+                position: "relative",
+                overflow: "hidden",
+              }}
+              onMouseOver={(e) => {
+                if (activeGroup?.id !== group.id) {
+                  e.target.style.background = `linear-gradient(135deg, ${mainColor}20 0%, ${hoverColor}20 100%)`;
+                  e.target.style.transform = "translateY(-1px)";
+                }
+              }}
+              onMouseOut={(e) => {
+                if (activeGroup?.id !== group.id) {
+                  e.target.style.background = "white";
+                  e.target.style.transform = "translateY(0)";
+                }
               }}
             >
               {group.name}
@@ -204,11 +246,21 @@ function App() {
           zIndex: 1000,
           backgroundColor: "white",
           borderRadius: "50%",
-          boxShadow: "0 4px 10px rgba(0, 0, 0, 0.15)",
+          boxShadow: `0 4px 10px rgba(0, 0, 0, 0.15), 0 2px 8px ${mainColor}20`,
+          border: `2px solid ${mainColor}`,
         }}
       >
-        <IconButton onClick={() => setSettingsOpen(true)} size="large">
-          <SettingsIcon style={{ color: mainColor }} />
+        <IconButton
+          onClick={() => setSettingsOpen(true)}
+          size="large"
+          className="settings-icon-button"
+          style={{
+            color: mainColor,
+            backgroundColor: "transparent",
+            background: "transparent",
+          }}
+        >
+          <SettingsIcon />
         </IconButton>
       </div>
       <h2
@@ -297,6 +349,8 @@ function App() {
         }
         userId={activeUser?.id ?? null}
         groupId={activeGroup?.id ?? null}
+        userColor={mainColor}
+        hoverColor={hoverColor}
       />
     </div>
   );

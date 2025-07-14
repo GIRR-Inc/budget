@@ -44,3 +44,44 @@
   border-color: #ffc933;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
+
+/* 설정 버튼 스타일 오버라이드 */
+.settings-icon-button {
+  background-color: transparent !important;
+  color: var(--main-color, #f4a8a8) !important;
+  transition: all 0.3s ease !important;
+}
+
+.settings-icon-button:hover {
+  background-color: transparent !important;
+  color: var(--hover-color, #f19191) !important;
+  transform: scale(1.1) !important;
+}
+
+.settings-icon-button .MuiIconButton-root {
+  background-color: transparent !important;
+}
+
+.settings-icon-button .MuiIconButton-root:hover {
+  background-color: transparent !important;
+}
+
+/* Material-UI IconButton 기본 스타일 완전 오버라이드 */
+.MuiIconButton-root.settings-icon-button {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+.MuiIconButton-root.settings-icon-button:hover {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* 추가적인 Material-UI 스타일 오버라이드 */
+.MuiIconButton-root.settings-icon-button .MuiTouchRipple-root {
+  background-color: transparent !important;
+}
+
+.MuiIconButton-root.settings-icon-button:hover .MuiTouchRipple-root {
+  background-color: transparent !important;
+}

@@ -164,7 +164,15 @@ function SortableItem({
 }
 
 // ⚙ SettingsDialog 메인
-function SettingsDialog({ open, onClose, onCategoryChange, userId, groupId }) {
+function SettingsDialog({
+  open,
+  onClose,
+  onCategoryChange,
+  userId,
+  groupId,
+  userColor = "#f4a8a8",
+  hoverColor = "#f19191",
+}) {
   const [categories, setCategories] = useState([]);
   const [newCategory, setNewCategory] = useState({ description: "", sort: 0 });
   const [activeId, setActiveId] = useState(null);
@@ -172,6 +180,13 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId, groupId }) {
   const [editingCode, setEditingCode] = useState(null);
   const [editValue, setEditValue] = useState("");
   const [editSharedTotal, setEditSharedTotal] = useState(false);
+
+  // CSS 변수 설정
+  useEffect(() => {
+    document.documentElement.style.setProperty("--main-color", userColor);
+    document.documentElement.style.setProperty("--hover-color", hoverColor);
+    document.documentElement.style.setProperty("--active-color", "#e87a7a");
+  }, [userColor, hoverColor]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -367,14 +382,25 @@ function SettingsDialog({ open, onClose, onCategoryChange, userId, groupId }) {
           onClick={handleAdd}
           className="settings-button"
           variant="contained"
-          style={{ marginTop: 12 }}
+          style={{
+            marginTop: 12,
+            background: `linear-gradient(135deg, ${userColor} 0%, ${hoverColor} 100%)`,
+          }}
         >
           카테고리 추가
         </Button>
       </DialogContent>
 
       <DialogActions>
-        <Button onClick={onClose}>닫기</Button>
+        <Button
+          onClick={onClose}
+          style={{
+            background: `linear-gradient(135deg, ${userColor} 0%, ${hoverColor} 100%)`,
+            color: "white",
+          }}
+        >
+          닫기
+        </Button>
       </DialogActions>
     </Dialog>
   );

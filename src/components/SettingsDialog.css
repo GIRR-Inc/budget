@@ -61,7 +61,7 @@
 
 .settings-button {
   margin-top: 1rem;
-  background-color: #f4a8a8;
+  background: linear-gradient(135deg, var(--main-color, #f4a8a8) 0%, var(--hover-color, #f19191) 100%);
   color: white;
   border: none;
   padding: 12px;
@@ -69,11 +69,14 @@
   font-family: 'S-CoreDream-3Light';
   font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(244, 168, 168, 0.2);
 }
 
 .settings-button:hover {
-  background-color: #f19191;
+  background: linear-gradient(135deg, var(--hover-color, #f19191) 0%, var(--active-color, #e87a7a) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(244, 168, 168, 0.3);
 }
 
 .settings-list-wrapper .MuiListItem-root {
@@ -114,7 +117,8 @@
 /* 수정 중인 아이템 하이라이트 */
 .sortable-item.editing {
   background-color: #fffaf4;
-  border: 1px solid #f4a8a8;
+  border: 2px solid var(--main-color, #f4a8a8);
+  box-shadow: 0 0 0 3px rgba(244, 168, 168, 0.1);
 }
 
 /* 수정 영역 구분선 */
