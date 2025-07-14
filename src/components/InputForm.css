@@ -35,7 +35,7 @@
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, var(--main-color, #f4a8a8), var(--hover-color, #f19191), var(--active-color, #e87a7a));
+  background: var(--main-color, #ffffff);
   border-radius: 20px 20px 0 0;
 }
 
@@ -65,7 +65,7 @@ input {
 
 input:focus {
   outline: none;
-  border-color: var(--main-color, #f4a8a8);
+  border-color: var(--hover-color);
   box-shadow: 0 0 0 3px rgba(244, 168, 168, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05);
   transform: translateY(-1px);
 }
@@ -73,13 +73,13 @@ input:focus {
 button {
   padding: 14px 20px;
   font-size: 16px;
-  background: linear-gradient(135deg, var(--main-color, #f4a8a8) 0%, var(--hover-color, #f19191) 100%);
+  background: var(--main-color);
   font-family: 'S-CoreDream-3Light';
   color: white;
   border: none;
   border-radius: 12px;
   cursor: pointer;
-  box-shadow: 0 4px 15px rgba(244, 168, 168, 0.3);
+  box-shadow: var(--hover-color);
   transition: all 0.3s ease;
   font-weight: 600;
   position: relative;
@@ -102,13 +102,13 @@ button:hover::before {
 }
 
 button:hover {
-  background: linear-gradient(135deg, var(--hover-color, #f19191) 0%, var(--hover-color, #f19191) 100%);
+  background: var(--hover-color);
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(244, 168, 168, 0.4);
 }
 
 button:active {
-  background: linear-gradient(135deg, var(--active-color, #e87a7a) 0%, var(--active-color, #e87a7a) 100%);
+  background: var(--active-color);
   transform: translateY(0);
   box-shadow: 0 2px 10px rgba(244, 168, 168, 0.3);
 }
@@ -142,12 +142,12 @@ button:focus {
 }
 
 .custom-select:hover {
-  border-color: var(--main-color, #f4a8a8);
+  border-color: var(--hover-color);
   box-shadow: 0 4px 12px rgba(244, 168, 168, 0.1);
 }
 
 .custom-select.open {
-  border-color: var(--main-color, #f4a8a8);
+  border-color: var(--active-color);
   box-shadow: 0 0 0 3px rgba(244, 168, 168, 0.1), 0 4px 12px rgba(0, 0, 0, 0.05);
   transform: translateY(-1px);
 }
@@ -186,7 +186,7 @@ button:focus {
   left: 0;
   right: 0;
   background: #ffffff;
-  border: 2px solid var(--main-color, #f4a8a8);
+  border: 2px solid var(--hover-color);
   border-radius: 12px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(244, 168, 168, 0.15);
   z-index: 1000;
@@ -200,7 +200,7 @@ button:focus {
 
 
 .dropdown-options {
-  max-height: 120px;
+  max-height: 230px;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -222,18 +222,18 @@ button:focus {
 
 .dropdown-option:hover {
   background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f4 100%);
-  color: var(--main-color, #f4a8a8);
+  color: var(--main-color);
   transform: translateX(4px);
   overflow: hidden;
 }
 
 .dropdown-option.selected {
-  background: linear-gradient(135deg, var(--main-color, #f4a8a8) 0%, var(--main-color, #f4a8a8) 100%);
+  background: linear-gradient(135deg, var(--main-color) 0%, var(--hover-color) 50%, var(--active-color) 100%);
   color: white;
 }
 
 .dropdown-option.selected:hover {
-  background: linear-gradient(135deg, var(--hover-color, #f19191) 0%, var(--hover-color, #f19191) 100%);
+  background: linear-gradient(135deg, var(--hover-color) 0%, var(--active-color) 50%, #ffffff 100%);
   transform: translateX(4px);
   overflow: hidden;
 }
@@ -278,17 +278,15 @@ button:focus {
 }
 
 .amount-preset-btn:hover {
-  background: var(--main-color, #f4a8a8);
+  background: var(--main-color);
   color: white;
-  border-color: var(--main-color, #f4a8a8);
+  border-color: var(--main-color);
   transform: translateY(-1px);
-  box-shadow: 0 2px 8px var(--main-color, #f4a8a8);
 }
 
 .amount-preset-btn:active {
-  background: var(--hover-color, #f19191);
+  background: var(--hover-color);
   transform: translateY(0);
-  box-shadow: 0 1px 4px var(--hover-color, #f19191);
 }
 
 /* 드롭다운 스크롤바 스타일링 */
@@ -302,12 +300,12 @@ button:focus {
 }
 
 .dropdown-options::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, var(--main-color, #f4a8a8) 0%, var(--hover-color, #f19191) 100%);
+  background: var(--main-color);
   border-radius: 3px;
 }
 
 .dropdown-options::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, var(--hover-color, #f19191) 0%, var(--active-color, #e87a7a) 100%);
+  background: linear-gradient(135deg, var(--hover-color) 0%, var(--active-color) 50%, #ffffff 100%);
 }
 
 .amount-row {
@@ -340,17 +338,17 @@ button:focus {
 }
 
 .type-tabs button:hover {
-  border-color: var(--main-color, #f4a8a8);
-  color: var(--main-color, #f4a8a8);
+  border-color: var(--hover-color);
+  color: var(--hover-color);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px var(--main-color, #f4a8a8);
+  box-shadow: 0 4px 12px var(--hover-color);
 }
 
 .type-tabs button.active {
-  background: linear-gradient(135deg, var(--main-color, #f4a8a8) 0%, var(--hover-color, #f19191) 100%);
+  background: var(--main-color);
   color: white;
-  border-color: var(--main-color, #f4a8a8);
-  box-shadow: 0 4px 15px var(--main-color, #f4a8a8);
+  border-color: var(--active-color);
+  box-shadow: 0 4px 15px var(--active-color);
 }
 
 /* 공통 텍스트 레이블 스타일 */
@@ -407,7 +405,7 @@ button:focus {
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, var(--main-color, #f4a8a8), var(--hover-color, #f19191), var(--active-color, #e87a7a));
+  background: var(--main-color);
   border-radius: 20px 20px 0 0;
 }
 
@@ -453,7 +451,7 @@ button:focus {
   left: 0;
   right: 0;
   background: #ffffff;
-  border: 2px solid #f4a8a8;
+  border: 2px solid var(--hover-color);
   border-radius: 12px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12), 0 4px 12px rgba(244, 168, 168, 0.15);
   z-index: 1000;
@@ -478,7 +476,7 @@ button:focus {
 
 .memo-suggestion-item:hover {
   background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f4 100%);
-  color: #f4a8a8;
+  color: var(--hover-color);
   transform: translateX(4px);
 }
 
@@ -498,12 +496,12 @@ button:focus {
 }
 
 .memo-suggestions::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #f4a8a8 0%, #f19191 100%);
+  background: linear-gradient(135deg, #f4a8a8 0%, #f19191 50%, #e87a7a 100%);
   border-radius: 3px;
 }
 
 .memo-suggestions::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #f19191 0%, #e87a7a 100%);
+  background: linear-gradient(135deg, #f19191 0%, #e87a7a 50%, #d86b6b 100%);
 }
 
 @keyframes slideDown {

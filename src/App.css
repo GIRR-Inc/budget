@@ -48,7 +48,7 @@
 /* 설정 버튼 스타일 오버라이드 */
 .settings-icon-button {
   background-color: transparent !important;
-  color: var(--main-color, #f4a8a8) !important;
+  color: var(--main-color);
   transition: all 0.3s ease !important;
 }
 
