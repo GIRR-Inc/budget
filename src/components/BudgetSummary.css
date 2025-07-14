@@ -14,115 +14,192 @@
 }
 
 .budget-container {
-    padding: 1rem;
-    background: #fefefe;
-    border-radius: 12px;
-    box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
-  }
-  
-  .budget-form {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-  }
-  
-  .budget-form input,
-  .budget-form button {
-    padding: 8px 12px;
-    font-size: 16px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-  }
-  
-  .budget-form button {
-    background: #f4a8a8;
-    color: white;
-    cursor: pointer;
-    width: 100%;
-    font-family: 'S-CoreDream-3Light';
-    border: 2px solid #d88c8c; /* 테두리 색 추가 */
-    transition: background 0.3s, border-color 0.3s;
-  }
-  
-  .budget-form button:hover {
-    background: #f19191;
-    border-color: #c76060; /* hover 시 더 진한 테두리로 */
-  }
-  
-  .progress-wrapper {
-    display: flex;
+  padding: 1rem;
+  background: #fefefe;
+  border-radius: 12px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
+}
+
+.progress-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+.progress-section {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  background: #fffef6;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.progress-chart {
+  flex-shrink: 0;
+}
+
+.progress-circle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.progress-text {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.percent-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  font-family: 'GmarketSansMedium';
+  color: #333;
+  line-height: 1;
+}
+
+.percent-label {
+  font-size: 0.8rem;
+  font-family: 'S-CoreDream-3Light';
+  color: #666;
+  margin-top: 2px;
+}
+
+.budget-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.budget-form-compact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.month-selector input {
+  padding: 6px 8px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-family: 'S-CoreDream-3Light';
+  width: 100%;
+}
+
+.budget-input-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.budget-input-group input {
+  flex: 1;
+  padding: 6px 8px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  font-family: 'S-CoreDream-3Light';
+}
+
+.budget-input-group button {
+  padding: 6px 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-family: 'S-CoreDream-3Light';
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.budget-input-group button:hover {
+  opacity: 0.8;
+}
+
+.budget-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+
+.summary-item .label {
+  font-size: 0.9rem;
+  font-family: 'S-CoreDream-3Light';
+  color: #666;
+}
+
+.summary-item .amount {
+  font-size: 0.9rem;
+  font-family: 'GmarketSansMedium';
+  font-weight: 600;
+}
+
+.summary-item .amount.spent {
+  color: #e74c3c;
+}
+
+.summary-item .amount.budget {
+  color: #2ecc71;
+}
+
+.summary-item .amount.remaining {
+  color: #3498db;
+}
+
+.budget-warning {
+  color: #e74c3c;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-align: center;
+  font-family: 'S-CoreDream-3Light';
+  background: #fdf2f2;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #fecaca;
+}
+
+/* 반응형 디자인 */
+@media (max-width: 480px) {
+  .progress-section {
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin-top: 24px;
+    gap: 1rem;
+    padding: 1rem;
   }
   
-  .progress-bar {
+  .progress-circle svg {
     width: 100px;
-    height: 200px;
-    background: #eee;
-    border-radius: 16px;
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.1);
+    height: 100px;
   }
   
+  .percent-number {
+    font-size: 1.2rem;
+  }
   
-  .fill {
-    background: #f4a8a8;
+  .budget-input-group {
+    flex-direction: column;
+  }
+  
+  .budget-input-group button {
     width: 100%;
-    position: absolute;
-    bottom: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
-    font-size: 20px;
-    transition: height 0.5s ease;
   }
-  
-  .summary-text {
-    margin-top: 12px;
-    font-size: 14px;
-    text-align: center;
-    font-family: 'S-CoreDream-3Light';
-  }
-  
-  .progress-bar {
-    width: 60px;
-    height: 150px;
-    background: #eee;
-    border-radius: 12px;
-    overflow: hidden;
-    position: relative;
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
-  }
-  
-  
-  .percent-label {
-    font-family: 'S-CoreDream-3Light';
-    position: relative;
-    z-index: 1;
-  }
-  
-  .progress-bar .fill.over {
-    background-color: crimson;
-    font-family: 'S-CoreDream-3Light';
-  }
-  
-  .budget-warning {
-    color: crimson;
-    font-weight: bold;
-    margin-top: 0.5rem;
-    font-family: 'S-CoreDream-3Light';
-  }
+}
   
   /* BudgetSummary.css */
 .remaining-text {
@@ -138,4 +215,27 @@
   font-weight: 700;
   color: #333;
   margin-bottom: 10px;
+}
+
+.selected-category-info {
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.selected-category-info h4 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-family: 'GmarketSansMedium';
+  font-size: 1rem;
+}
+
+.selected-category-info p {
+  margin: 0;
+  color: #666;
+  font-family: 'S-CoreDream-3Light';
+  font-size: 0.9rem;
 }

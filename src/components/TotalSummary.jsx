@@ -11,8 +11,12 @@ const TotalSummary = ({ groupId, userColor, onTxClick }) => {
     const load = async () => {
       try {
         setLoading(true);
-        const summaryList = await fetchSharedTotalSummary(groupId);
-        setData(summaryList);
+        if (groupId) {
+          const summaryList = await fetchSharedTotalSummary(groupId);
+          setData(summaryList);
+        } else {
+          setData([]); // 개인 사용자일 때는 빈 배열
+        }
       } catch (err) {
         console.error("누적 합계 로딩 실패:", err);
       } finally {
@@ -24,7 +28,9 @@ const TotalSummary = ({ groupId, userColor, onTxClick }) => {
 
   return (
     <div className="total-summary">
-      {loading ? (
+      {!groupId ? (
+        <p>그룹에서만 사용할 수 있는 기능입니다.</p>
+      ) : loading ? (
         <p>불러오는 중...</p>
       ) : data.length === 0 ? (
         <p>해당되는 내역이 없습니다.</p>

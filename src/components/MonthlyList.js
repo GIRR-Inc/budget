@@ -96,6 +96,7 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
                   : Math.abs(updated.amount),
               memo: updated.memo,
               category: updated.category,
+              date: updated.date, // ✅ 날짜 정보 추가
               category_name:
                 categories.find((c) => c.code === updated.category)
                   ?.description || "카테고리 수정",
@@ -104,6 +105,16 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
       );
       setData(updatedData);
       setEditDialogOpen(false);
+
+      // ✅ Summary 데이터도 새로고침
+      if (selectedMonth) {
+        const [summaryRes, categoryRes] = await Promise.all([
+          fetchMonthlySummary(selectedMonth, userId, groupId),
+          fetchCategorySummary(selectedMonth, userId, groupId),
+        ]);
+        setSummary({ budget: summaryRes.budget, spent: summaryRes.spent });
+        setCategorySummary(categoryRes);
+      }
     } catch (err) {
       console.error("수정 실패:", err);
       alert("수정 중 오류가 발생했습니다.");
@@ -326,7 +337,7 @@ const MonthlyList = forwardRef(({ userId, groupId, userColor }, ref) => {
                 </span>
               </div>
 
-              {(groupId) && !loadingSummary && (
+              {groupId && !loadingSummary && (
                 <div className="sub-expense-inline-checkbox">
                   <div
                     className="expense-checkbox-item"

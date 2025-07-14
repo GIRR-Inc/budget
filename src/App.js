@@ -6,7 +6,13 @@ import SettingsDialog from "./components/SettingsDialog";
 import TotalSummary from "./components/TotalSummary";
 import SettingsIcon from "@mui/icons-material/Settings";
 import IconButton from "@mui/material/IconButton";
-import { fetchUsers, fetchCategories, fetchSharedGroups, createSharedGroup, addUsersToSharedGroup } from "./api/budgetApi"; // ✅ fetchUsers 추가
+import {
+  fetchUsers,
+  fetchCategories,
+  fetchSharedGroups,
+  createSharedGroup,
+  addUsersToSharedGroup,
+} from "./api/budgetApi"; // ✅ fetchUsers 추가
 import "./App.css";
 
 function App() {
@@ -15,23 +21,22 @@ function App() {
   const [categories, setCategories] = useState([]);
   const [users, setUsers] = useState([]);
   const [activeUser, setActiveUser] = useState(null);
-  const [sharedGroups, setSharedGroups] = useState([]);  // ✅ 추가
-  const [activeGroup, setActiveGroup] = useState(null);   // ✅ 추가
+  const [sharedGroups, setSharedGroups] = useState([]); // ✅ 추가
+  const [activeGroup, setActiveGroup] = useState(null); // ✅ 추가
 
   const monthlyRef = useRef();
 
-const handleTransactionClick = (tx) => {
-  setActiveTab("monthly");
+  const handleTransactionClick = (tx) => {
+    setActiveTab("monthly");
 
-  setTimeout(() => {
-    if (monthlyRef.current) {
-      monthlyRef.current.scrollToTransactionById(tx.id, tx.date);
-    } else {
-      console.warn("monthlyRef is still null");
-    }
-  }, 150); // 100~200ms 정도가 적당합니다
-};
-
+    setTimeout(() => {
+      if (monthlyRef.current) {
+        monthlyRef.current.scrollToTransactionById(tx.id, tx.date);
+      } else {
+        console.warn("monthlyRef is still null");
+      }
+    }, 150); // 100~200ms 정도가 적당합니다
+  };
 
   // 사용자 목록 불러오기
   const loadUsers = async () => {
@@ -55,10 +60,11 @@ const handleTransactionClick = (tx) => {
     try {
       // 사용자 불러오기 (보경과 다른 사용자)
       const users = await fetchUsers();
-      const bokyung = users.find(u => u.username === "보경");
-      const other = users.find(u => u.username !== "보경");
+      const bokyung = users.find((u) => u.username === "보경");
+      const other = users.find((u) => u.username !== "보경");
 
-      if (!bokyung || !other) throw new Error("두 명의 사용자 정보가 필요합니다");
+      if (!bokyung || !other)
+        throw new Error("두 명의 사용자 정보가 필요합니다");
 
       // 그룹 생성
       const group = await createSharedGroup("우리집");
@@ -149,7 +155,8 @@ const handleTransactionClick = (tx) => {
               style={{
                 padding: "8px 24px",
                 border: "none",
-                backgroundColor: activeUser?.id === user.id ? mainColor : "white",
+                backgroundColor:
+                  activeUser?.id === user.id ? mainColor : "white",
                 color: activeUser?.id === user.id ? "white" : mainColor,
                 fontWeight: 600,
                 fontFamily: "'GmarketSansMedium', sans-serif",
@@ -172,7 +179,8 @@ const handleTransactionClick = (tx) => {
               style={{
                 padding: "8px 24px",
                 border: "none",
-                backgroundColor: activeGroup?.id === group.id ? mainColor : "white",
+                backgroundColor:
+                  activeGroup?.id === group.id ? mainColor : "white",
                 color: activeGroup?.id === group.id ? "white" : mainColor,
                 fontWeight: 600,
                 fontFamily: "'GmarketSansMedium', sans-serif",
@@ -187,7 +195,6 @@ const handleTransactionClick = (tx) => {
           ))}
         </div>
       </div>
-
       {/* 톱니바퀴 버튼 */}
       <div
         style={{
@@ -204,47 +211,49 @@ const handleTransactionClick = (tx) => {
           <SettingsIcon style={{ color: mainColor }} />
         </IconButton>
       </div>
-
-      <h2 style={{ textAlign: "center", fontFamily: "'GmarketSansMedium', sans-serif" }}>
+      <h2
+        style={{
+          textAlign: "center",
+          fontFamily: "'GmarketSansMedium', sans-serif",
+        }}
+      >
         {activeGroup
           ? `우리집 공동 가계부`
           : `우리 ${activeUser?.username}이의 부자 가계부`}
       </h2>
-
       {/* 탭 버튼 */}
-<div className="tab-bar">
-  {[
-    { label: "입력하기", key: "input" },
-    { label: "월별 보기", key: "monthly" },
-    { label: "월간 예산", key: "summary" },
-    ...(activeGroup
-      ? [{ label: "항목별 누적", key: "total" }]
-      : []),
-  ].map(({ label, key }) => {
-    const isActive = activeTab === key;
-    return (
-      <button
-        key={key}
-        onClick={() => setActiveTab(key)}
-        className="tab"
-        style={{
-          backgroundColor: isActive ? mainColor : "white",
-          color: isActive ? "white" : mainColor,
-          border: `2px solid ${mainColor}`,
-        }}
-        onMouseOver={(e) => {
-          e.target.style.backgroundColor = isActive ? hoverColor : "#f9f9f9";
-        }}
-        onMouseOut={(e) => {
-          e.target.style.backgroundColor = isActive ? mainColor : "white";
-        }}
-      >
-        {label}
-      </button>
-    );
-  })}
-</div>
-
+      <div className="tab-bar">
+        {[
+          { label: "입력하기", key: "input" },
+          { label: "월별 보기", key: "monthly" },
+          { label: "예산 통계", key: "summary" },
+          ...(activeGroup ? [{ label: "항목별 누적", key: "total" }] : []),
+        ].map(({ label, key }) => {
+          const isActive = activeTab === key;
+          return (
+            <button
+              key={key}
+              onClick={() => setActiveTab(key)}
+              className="tab"
+              style={{
+                backgroundColor: isActive ? mainColor : "white",
+                color: isActive ? "white" : mainColor,
+                border: `2px solid ${mainColor}`,
+              }}
+              onMouseOver={(e) => {
+                e.target.style.backgroundColor = isActive
+                  ? hoverColor
+                  : "#f9f9f9";
+              }}
+              onMouseOut={(e) => {
+                e.target.style.backgroundColor = isActive ? mainColor : "white";
+              }}
+            >
+              {label}
+            </button>
+          );
+        })}
+      </div>
       {/* 탭 콘텐츠 */}
       {activeTab === "input" && (
         <InputForm
@@ -273,17 +282,18 @@ const handleTransactionClick = (tx) => {
       {activeTab === "total" && (
         <TotalSummary
           groupId={activeGroup?.id ?? null}
-          categories={categories}
           userColor={mainColor}
           onTxClick={handleTransactionClick} // ✅ 전달
         />
-      )} {/* ✅ 새 탭 렌더링 */}
-
+      )}{" "}
+      {/* ✅ 새 탭 렌더링 */}
       {/* 설정 다이얼로그 */}
       <SettingsDialog
         open={settingsOpen}
         onClose={() => setSettingsOpen(false)}
-        onCategoryChange={() => loadCategories(activeUser?.id ?? null, activeGroup?.id ?? null)}
+        onCategoryChange={() =>
+          loadCategories(activeUser?.id ?? null, activeGroup?.id ?? null)
+        }
         userId={activeUser?.id ?? null}
         groupId={activeGroup?.id ?? null}
       />

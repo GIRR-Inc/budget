@@ -15,6 +15,7 @@ const EditDialog = ({ open, onClose, item, onSave, userId, categories }) => {
   const [memo, setMemo] = useState("");
   const [type, setType] = useState("expense"); // expense | income
   const [category, setCategory] = useState("");
+  const [date, setDate] = useState("");
 
   useEffect(() => {
     if (item) {
@@ -23,6 +24,13 @@ const EditDialog = ({ open, onClose, item, onSave, userId, categories }) => {
       setMemo(item.memo || "");
       setType(item.amount < 0 ? "expense" : "income");
       setCategory(item.category); // 추가
+      // 날짜 설정 - item.date가 있으면 사용, 없으면 오늘 날짜
+      if (item.date) {
+        setDate(item.date);
+      } else {
+        const today = new Date().toISOString().split("T")[0];
+        setDate(today);
+      }
     }
   }, [item]);
 
@@ -37,14 +45,30 @@ const EditDialog = ({ open, onClose, item, onSave, userId, categories }) => {
   const handleSave = () => {
     const numeric = parseInt(unmask(amount), 10) || 0;
     const finalAmount = type === "expense" ? -numeric : numeric;
-  
-    onSave({ amount: finalAmount, memo, category, type, userId }); // ✅ category 추가
+
+    onSave({ amount: finalAmount, memo, category, type, userId, date }); // ✅ date 추가
   };
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
       <DialogTitle>항목 수정</DialogTitle>
       <DialogContent>
+        <label>
+          날짜
+          <input
+            name="date"
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
+            style={{
+              width: "100%",
+              padding: "8px",
+              marginTop: "4px",
+              fontFamily: "'S-CoreDream-3Light'",
+            }}
+          />
+        </label>
         <label>
           금액
           <div className="amount-row">
@@ -75,21 +99,28 @@ const EditDialog = ({ open, onClose, item, onSave, userId, categories }) => {
           </div>
         </label>
         <label>
-  카테고리
-  <select
-    value={category}
-    onChange={(e) => setCategory(e.target.value)}
-    required
-    style={{ width: "100%", padding: "8px", marginTop: "4px", fontFamily: "'S-CoreDream-3Light'" }}
-  >
-    <option value="" disabled>카테고리 선택</option>
-    {categories.map((c) => (
-      <option key={c.code} value={c.code}>
-        {c.description}
-      </option>
-    ))}
-  </select>
-</label>
+          카테고리
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value)}
+            required
+            style={{
+              width: "100%",
+              padding: "8px",
+              marginTop: "4px",
+              fontFamily: "'S-CoreDream-3Light'",
+            }}
+          >
+            <option value="" disabled>
+              카테고리 선택
+            </option>
+            {categories.map((c) => (
+              <option key={c.code} value={c.code}>
+                {c.description}
+              </option>
+            ))}
+          </select>
+        </label>
         <label>
           메모
           <input
@@ -116,7 +147,11 @@ const EditDialog = ({ open, onClose, item, onSave, userId, categories }) => {
         <Button
           onClick={handleSave}
           variant="contained"
-          style={{ backgroundColor: "#f19191", color: "#fff", fontFamily: "'S-CoreDream-3Light'",}}
+          style={{
+            backgroundColor: "#f19191",
+            color: "#fff",
+            fontFamily: "'S-CoreDream-3Light'",
+          }}
         >
           저장
         </Button>
