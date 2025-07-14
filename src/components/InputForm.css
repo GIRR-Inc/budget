@@ -192,7 +192,7 @@ button:focus {
   z-index: 1000;
   margin-top: 4px;
   animation: slideDown 0.2s ease;
-  max-height: 200px;
+  max-height: 400px;
   overflow: hidden;
   overflow-x: hidden;
 }
@@ -475,13 +475,13 @@ button:focus {
 }
 
 .memo-suggestion-item:hover {
-  background: linear-gradient(135deg, #f8f9fa 0%, #f1f3f4 100%);
+  background: var(--hover-color);
   color: var(--hover-color);
   transform: translateX(4px);
 }
 
 .memo-suggestion-item:active {
-  background: linear-gradient(135deg, #f4a8a8 0%, #f19191 100%);
+  background: var(--hover-color);
   color: white;
 }
 

@@ -2,6 +2,24 @@ import React, { useState, useRef, useEffect } from "react";
 import { addTransaction, fetchMemoSuggestions } from "../api/budgetApi";
 import "./InputForm.css";
 
+// 유틸: hex 색상을 더 어둡게
+function darkenColor(hex, amount = 20) {
+  let col = hex.replace("#", "");
+  if (col.length === 3)
+    col = col
+      .split("")
+      .map((x) => x + x)
+      .join("");
+  const num = parseInt(col, 16);
+  let r = (num >> 16) - amount;
+  let g = ((num >> 8) & 0x00ff) - amount;
+  let b = (num & 0x0000ff) - amount;
+  r = Math.max(0, r);
+  g = Math.max(0, g);
+  b = Math.max(0, b);
+  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
+}
+
 const InputForm = ({
   categories,
   userId,
@@ -184,7 +202,10 @@ const InputForm = ({
   useEffect(() => {
     document.documentElement.style.setProperty("--main-color", userColor);
     document.documentElement.style.setProperty("--hover-color", hoverColor);
-    document.documentElement.style.setProperty("--active-color", "#e87a7a");
+    document.documentElement.style.setProperty(
+      "--active-color",
+      darkenColor(userColor, 32)
+    );
   }, [userColor, hoverColor]);
 
   return (
@@ -192,33 +213,6 @@ const InputForm = ({
       <form className="form-container" onSubmit={handleSubmit}>
         <label>
           대분류코드
-          {/* 최근 사용 카테고리 빠른 선택 */}
-          {recentCategoryObjs.length > 0 && (
-            <div style={{ display: "flex", gap: "6px", margin: "6px 0" }}>
-              {recentCategoryObjs.map((cat) => (
-                <button
-                  key={cat.code}
-                  type="button"
-                  style={{
-                    backgroundColor:
-                      form.category === cat.code ? userColor : "#f0f0f0",
-                    color: form.category === cat.code ? "white" : "#333",
-                    border: `1px solid ${
-                      form.category === cat.code ? userColor : "#ccc"
-                    }`,
-                    borderRadius: "6px",
-                    padding: "6px 12px",
-                    fontSize: "13px",
-                    cursor: "pointer",
-                    fontFamily: "'S-CoreDream-3Light'",
-                  }}
-                  onClick={() => handleCategoryQuickSelect(cat.code)}
-                >
-                  {cat.description}
-                </button>
-              ))}
-            </div>
-          )}
           {/* 커스텀 카테고리 드롭다운 */}
           <div className="custom-select-container" ref={categoryDropdownRef}>
             <div

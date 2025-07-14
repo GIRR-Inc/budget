@@ -302,7 +302,7 @@ const MonthlyList = forwardRef(
         </div>
 
         <div
-          className="summary-bar"
+          className={`summary-bar${!showDetail ? " collapsed" : ""}`}
           style={{
             "--summary-bg": userColor ? `${userColor}15` : "#fff7f7",
             "--summary-bg2": userColor ? `${userColor}25` : "#ffeaea",
@@ -557,6 +557,8 @@ const MonthlyList = forwardRef(
           onSave={handleEditSave}
           userId={userId}
           categories={categories}
+          userColor={userColor}
+          hoverColor={hoverColor}
         />
       </div>
     );

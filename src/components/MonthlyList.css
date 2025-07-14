@@ -710,3 +710,36 @@
   }
 }
 
+.summary-bar.collapsed {
+  padding: 8px 16px 4px 16px;
+  min-height: 0;
+  margin-bottom: 0.5rem;
+  box-shadow: none;
+  border-radius: 16px;
+  transition: all 0.2s;
+  overflow: hidden;
+}
+
+.summary-bar.collapsed h3 {
+  font-size: 16px;
+  margin-bottom: 0.2rem;
+}
+
+.summary-bar.collapsed .toggle-button-wrapper {
+  margin: 0;
+  padding: 0;
+}
+
+.summary-bar.collapsed .summary-section {
+  display: flex !important;
+  gap: 8px;
+  flex-direction: column;
+  padding: 6px 0 0 0;
+  background: none;
+  box-shadow: none;
+}
+
+.summary-bar.collapsed .category-summary {
+  display: none !important;
+}
+

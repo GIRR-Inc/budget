@@ -14,6 +14,7 @@
 
 .settings-dialog-content {
   font-family: 'S-CoreDream-3Light';
+  padding-bottom: 0 !important;
 }
 
 .settings-list-wrapper {
@@ -21,7 +22,7 @@
   max-height: 300px;
   overflow-y: auto;
   touch-action: auto;
-  margin-bottom: 1rem;
+  margin-bottom: 1.2rem;
   border: 1px solid #eee;
   border-radius: 8px;
   background: #fdfdfd;
@@ -128,11 +129,32 @@
   border-top: 1px solid #eee;
 }
 
-.category-checkbox-label {
+.category-checkbox-label, .compact-checkbox-label {
   font-family: 'GmarketSansMedium' !important;
-  font-size: 13px;
-  white-space: nowrap;
+  font-size: 12px !important;
+  color: var(--main-color, #f4a8a8);
+  font-weight: 500;
+  letter-spacing: -0.5px;
   margin: 0;
+  line-height: 1.2;
+}
+
+.compact-checkbox-area {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 8px;
+  border-radius: 5px;
+  background: var(--summary-bg, #f9f9f9);
+  border: 1px solid var(--main-color, #f4a8a8);
+  width: fit-content;
+  font-size: 12px;
+  height: 28px;
+}
+
+.form-section-divider {
+  border-top: 1px solid #eee;
+  margin: 18px 0 10px 0;
 }
 
 /* 수정 중 버튼 위치용 스타일 */
