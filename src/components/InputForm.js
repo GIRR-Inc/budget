@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
 import { addTransaction, fetchMemoSuggestions } from "../api/budgetApi";
-import { fetchFixedCosts } from "../api/budgetApi";
 import { Dialog, Button } from "@mui/material";
 import "./InputForm.css";
 
@@ -25,7 +24,7 @@ function darkenColor(hex, amount = 20) {
 const InputForm = ({
   categories,
   userId,
-  groupId, // ✅ 추가
+  groupId,
   userColor = "#f4a8a8",
   hoverColor = "#f19191",
 }) => {
@@ -54,39 +53,6 @@ const InputForm = ({
   const amountInputRef = useRef(null);
   const memoInputRef = useRef(null);
   const categoryDropdownRef = useRef(null);
-
-  // 고정비용 선택 상태
-  const [fixedCosts, setFixedCosts] = useState([]);
-  const [fixedDialogOpen, setFixedDialogOpen] = useState(false);
-  useEffect(() => {
-    const loadFixed = async () => {
-      try {
-        const data = await fetchFixedCosts(userId, groupId);
-        setFixedCosts(data);
-      } catch (e) {
-        setFixedCosts([]);
-      }
-    };
-    if (userId || groupId) loadFixed();
-  }, [userId, groupId]);
-
-  // 고정비용 선택 시 입력폼 자동 채움 (카드형)
-  const handleFixedCardSelect = (item) => {
-    // 당월의 고정비용 일자로 세팅
-    const today = new Date();
-    const year = today.getFullYear();
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const day = String(item.day).padStart(2, '0');
-    const dateStr = `${year}-${month}-${day}`;
-    setForm(f => ({
-      ...f,
-      category: item.category,
-      amount: item.amount.toString(),
-      memo: item.memo || "",
-      date: dateStr,
-    }));
-    setFixedDialogOpen(false);
-  };
 
   // 컴포넌트 마운트 시 메모 제안 가져오기
   useEffect(() => {
@@ -207,14 +173,14 @@ const InputForm = ({
         { ...form, amount: finalAmount },
         userId,
         groupId
-      ); // ✅ userId 전달
+      );
       if (result.status === "success") {
         setShowPopup(true);
         setForm({
           category: "",
           amount: "",
           memo: "",
-          date: fixDate ? form.date : getToday(), // ✅ 날짜 유지 여부 결정
+          date: fixDate ? form.date : getToday(),
         });
         setType("expense");
       } else {
@@ -246,77 +212,10 @@ const InputForm = ({
 
   return (
     <div>
-      {/* 고정비용 빠른입력 버튼+팝오버 카드형 */}
-      {fixedCosts.length > 0 && (
-        <div style={{ marginBottom: 12 }}>
-          <Button
-            variant="contained"
-            style={{
-              background: `linear-gradient(135deg, ${userColor} 0%, ${hoverColor} 100%)`,
-              color: "white",
-              fontWeight: 600,
-              borderRadius: 10,
-              boxShadow: "0 2px 8px rgba(244,168,168,0.15)",
-              fontFamily: "'S-CoreDream-3Light'",
-              fontSize: 15,
-              padding: "10px 24px",
-            }}
-            onClick={() => setFixedDialogOpen(true)}
-          >
-            💸 고정비용 빠른입력
-          </Button>
-          <Dialog open={fixedDialogOpen} onClose={() => setFixedDialogOpen(false)} maxWidth="xs" fullWidth>
-            <div style={{ padding: 24, background: "#fff8f8" }}>
-              <h3 style={{ fontFamily: 'GmarketSansMedium', fontSize: 20, marginBottom: 18, color: userColor }}>고정비용 선택</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                {fixedCosts.map(item => (
-                  <div
-                    key={item.id}
-                    onClick={() => handleFixedCardSelect(item)}
-                    style={{
-                      borderRadius: 14,
-                      boxShadow: `0 2px 12px ${userColor}22`,
-                      background: `linear-gradient(135deg, #fff 60%, ${userColor}11 100%)`,
-                      padding: '18px 18px 14px 18px',
-                      cursor: 'pointer',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 16,
-                      border: `2px solid ${userColor}33`,
-                      transition: 'box-shadow 0.2s, border 0.2s',
-                    }}
-                    onMouseOver={e => e.currentTarget.style.boxShadow = `0 4px 18px ${hoverColor}55`}
-                    onMouseOut={e => e.currentTarget.style.boxShadow = `0 2px 12px ${userColor}22`}
-                  >
-                    <span style={{ fontSize: 28, marginRight: 6 }}>💸</span>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: 700, fontSize: 16, color: userColor, marginBottom: 2 }}>
-                        {categories.find(c => c.code === item.category)?.description || item.category}
-                      </div>
-                      <div style={{ fontSize: 15, color: '#2c3e50', fontWeight: 600 }}>
-                        {item.amount.toLocaleString()}원
-                        {item.memo && <span style={{ color: '#888', fontWeight: 400, marginLeft: 8 }}>({item.memo})</span>}
-                      </div>
-                      <div style={{ fontSize: 13, color: '#888', marginTop: 2 }}>매월 {item.day}일</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <Button
-                onClick={() => setFixedDialogOpen(false)}
-                style={{ marginTop: 24, width: '100%', background: userColor, color: 'white', borderRadius: 8 }}
-                variant="contained"
-              >
-                닫기
-              </Button>
-            </div>
-          </Dialog>
-        </div>
-      )}
+      {/* 일반 입력 폼 */}
       <form className="form-container" onSubmit={handleSubmit}>
         <label>
           대분류코드
-          {/* 커스텀 카테고리 드롭다운 */}
           <div className="custom-select-container" ref={categoryDropdownRef}>
             <div
               className={`custom-select ${showCategoryDropdown ? "open" : ""}`}
@@ -345,7 +244,6 @@ const InputForm = ({
                 </svg>
               </div>
             </div>
-
             {showCategoryDropdown && (
               <div className="custom-select__dropdown">
                 <div className="dropdown-options">
@@ -382,7 +280,6 @@ const InputForm = ({
             )}
           </div>
         </label>
-
         <label>
           금액
           <div className="amount-row">
@@ -422,29 +319,28 @@ const InputForm = ({
               ))}
             </div>
           </div>
-          {/* 금액 프리셋 버튼 */}
-          <div className="amount-preset-buttons">
-            {[100, 1000, 10000, 100000].map((preset) => (
-              <button
-                key={preset}
-                type="button"
-                className="amount-preset-btn"
-                onClick={() => handleAmountPreset(preset)}
-              >
-                +
-                {preset === 100
-                  ? "1백"
-                  : preset === 1000
-                  ? "1천"
-                  : preset === 10000
-                  ? "1만"
-                  : "10만"}
-                원
-              </button>
-            ))}
-          </div>
         </label>
-
+        {/* 금액 프리셋 버튼 */}
+        <div className="amount-preset-buttons">
+          {[100, 1000, 10000, 100000].map((preset) => (
+            <button
+              key={preset}
+              type="button"
+              className="amount-preset-btn"
+              onClick={() => handleAmountPreset(preset)}
+            >
+              +
+              {preset === 100
+                ? "1백"
+                : preset === 1000
+                ? "1천"
+                : preset === 10000
+                ? "1만"
+                : "10만"}
+              원
+            </button>
+          ))}
+        </div>
         <label>
           세부설명
           <div style={{ position: "relative" }}>
@@ -455,7 +351,6 @@ const InputForm = ({
               ref={memoInputRef}
               onFocus={() => setShowMemoSuggestions(true)}
               onBlur={() => {
-                // 약간의 지연을 두어 클릭 이벤트가 처리되도록 함
                 setTimeout(() => setShowMemoSuggestions(false), 150);
               }}
               autoComplete="off"
@@ -496,7 +391,7 @@ const InputForm = ({
               className="label-span"
               style={{
                 flexDirection: "row",
-                alignItems: "center", // ✅ 중요!
+                alignItems: "center",
                 gap: "4px",
                 whiteSpace: "nowrap",
               }}
@@ -505,15 +400,13 @@ const InputForm = ({
                 type="checkbox"
                 checked={fixDate}
                 onChange={(e) => setFixDate(e.target.checked)}
-                style={{ verticalAlign: "middle" }} // ✅ 체크박스 정렬 보정
+                style={{ verticalAlign: "middle" }}
               />
               <span className="label-small" style={{ lineHeight: "1" }}>
                 날짜 고정
               </span>
             </span>
           </div>
-
-          {/* 날짜 입력 필드 */}
           <input
             name="date"
             type="date"
@@ -523,7 +416,6 @@ const InputForm = ({
             style={{ width: "100%", marginTop: "6px" }}
           />
         </div>
-
         <button
           type="submit"
           style={{

@@ -444,6 +444,28 @@ button:focus {
   }
 }
 
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
 /* 자동완성 드롭다운 스타일 */
 .memo-suggestions {
   position: absolute;
@@ -504,14 +526,34 @@ button:focus {
   background: linear-gradient(135deg, #f19191 0%, #e87a7a 50%, #d86b6b 100%);
 }
 
-@keyframes slideDown {
+.fixed-cost-notification {
+  animation: slideDown 0.3s ease-out;
+}
+
+.fixed-cost-notification.hide {
+  animation: slideUp 0.3s ease-out;
+}
+
+/* 고정비용 알림용 애니메이션 (가운데 정렬) */
+@keyframes notificationSlideDown {
   from {
     opacity: 0;
-    transform: translateY(-10px);
+    transform: translateX(-50%) translateY(-20px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes notificationSlideUp {
+  from {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
   }
 }
 
