@@ -61,15 +61,16 @@ function App() {
 
   // 고정비용 자동 입력 알림 표시 함수
   const showFixedCostNotification = (fixedCosts, categories) => {
-    // 알림 큐에 추가
-    const notifications = fixedCosts.map((fixed) => ({
-      message: `${
-        categories.find((c) => c.code === fixed.category)?.description ||
-        fixed.category
-      } ${fixed.amount.toLocaleString()}원`,
-      amount: fixed.amount,
-      category: fixed.category,
-    }));
+
+const truncateMemo = (memo) => memo.length > 10 ? memo.slice(0, 10) + '…' : memo;
+
+const notifications = fixedCosts.map((fixed) => ({
+  message: `📌 ${fixed.day}일에 '${categories.find((c) => c.code === fixed.category)?.description}' 항목${
+  fixed.memo ? ` (메모: ${truncateMemo(fixed.memo)})` : ''
+}을 등록했어요. 총 ${Number(fixed.amount).toLocaleString()}원이 입력되었어요.`,
+  amount: fixed.amount,
+  category: fixed.category,
+}));
 
     setNotificationQueue((prev) => [...prev, ...notifications]);
   };
@@ -147,13 +148,16 @@ function App() {
   };
 
   const loadCategories = async (userId = null, groupId = null) => {
-    if (!userId && !groupId) return;
+    if (!userId && !groupId) return [];
 
     try {
       const data = await fetchCategories({ userId, groupId });
+      console.log('data', data)
       setCategories(data);
+      return data; // 로드된 카테고리 데이터 반환
     } catch (error) {
       console.error("카테고리 로딩 실패:", error);
+      return [];
     }
   };
 
@@ -168,20 +172,22 @@ function App() {
     }
   }, [activeGroup, activeTab]);
 
+  // 사용자/그룹 변경 시 카테고리 로드 및 고정비용 자동 입력
   useEffect(() => {
-    if (activeGroup) {
-      loadCategories(null, activeGroup.id);
-    } else if (activeUser) {
-      loadCategories(activeUser.id, null);
-    }
-  }, [activeUser, activeGroup]);
-
-  // 고정비용 자동 입력: 오늘이 고정일 이상이면 이번 달, 오늘이 고정일 전이면 지난달 고정비용 누락 시 자동 입력
-  useEffect(() => {
-    const autoInputFixedCosts = async () => {
+    const handleUserGroupChange = async () => {
       if (!activeUser && !activeGroup) return;
 
       try {
+        // 먼저 카테고리 로드
+        let loadedCategories = [];
+        if (activeGroup) {
+          loadedCategories = await loadCategories(null, activeGroup.id);
+        } else if (activeUser) {
+          console.log('1111')
+          loadedCategories = await loadCategories(activeUser.id, null);
+        }
+
+        // 카테고리 로드 완료 후 고정비용 처리
         const fixedCosts = await fetchFixedCosts(
           activeUser?.id,
           activeGroup?.id
@@ -293,15 +299,15 @@ function App() {
 
         // 자동 입력된 고정비용이 있으면 알림 표시
         if (addedFixedCosts.length > 0) {
-          showFixedCostNotification(addedFixedCosts, categories);
+          showFixedCostNotification(addedFixedCosts, loadedCategories);
         }
       } catch (error) {
-        console.error("고정비용 자동 입력 실패:", error);
+        console.error("사용자/그룹 변경 처리 실패:", error);
       }
     };
 
-    autoInputFixedCosts();
-  }, [activeUser, activeGroup]); // categories 제거, hasAutoInputRun 플래그 제거
+    handleUserGroupChange();
+  }, [activeUser, activeGroup]);
 
   // 사용자/그룹 변경 시 자동 입력 플래그 리셋
   useEffect(() => {
@@ -340,25 +346,35 @@ function App() {
         <div
           style={{
             position: "fixed",
-            top: "20px",
+            top: "16px",
             left: "50%",
             transform: "translateX(-50%)",
             zIndex: 9999,
-            background: `linear-gradient(135deg, ${mainColor} 0%, ${hoverColor} 100%)`,
-            color: "white",
-            padding: "12px 24px",
-            borderRadius: "25px",
-            boxShadow: "0 4px 20px rgba(0, 0, 0, 0.15)",
-            fontFamily: "GmarketSansMedium",
+        
+            background: "#fff",
+            color: mainColor,
+            padding: "8px 20px",
+            borderRadius: "12px",
+            border: `1.5px solid ${mainColor}`,
+            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
+        
+            fontFamily: "'GmarketSansMedium', sans-serif",
             fontSize: "14px",
             fontWeight: 600,
+            letterSpacing: "0.2px",
+        
             animation: "notificationSlideDown 0.3s ease-out",
             display: "flex",
             alignItems: "center",
             gap: "8px",
+        
+            backdropFilter: "blur(1.5px)",
+            transition: "all 0.2s ease-in-out",
+            maxWidth: "90%",
+            wordBreak: "keep-all",
+            lineHeight: "1.4",
           }}
         >
-          <span style={{ fontSize: "16px" }}>💸</span>
           {fixedCostNotification.message}
         </div>
       )}

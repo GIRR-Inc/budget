@@ -135,6 +135,7 @@ const InputForm = ({
   };
 
   const handleCategorySelect = (code) => {
+    console.log("카테고리 선택:", code);
     setForm((prev) => ({ ...prev, category: code }));
     setShowCategoryDropdown(false);
     // 최근 카테고리 갱신
@@ -167,6 +168,21 @@ const InputForm = ({
     e.preventDefault();
     const rawAmount = parseInt(unmask(form.amount), 10);
     const finalAmount = type === "expense" ? rawAmount * -1 : rawAmount;
+
+    // 디버깅을 위한 로그 추가
+    console.log("제출 데이터:", {
+      form,
+      finalAmount,
+      userId,
+      groupId,
+      categories: categories.map(c => ({ code: c.code, description: c.description }))
+    });
+
+    // 카테고리가 선택되지 않은 경우 체크
+    if (!form.category) {
+      alert("카테고리를 선택해주세요.");
+      return;
+    }
 
     try {
       const result = await addTransaction(
