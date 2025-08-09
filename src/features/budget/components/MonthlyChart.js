@@ -9,7 +9,7 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
-import { fetchCategoryMonthlyData } from "../api/budgetApi";
+import { fetchCategoryMonthlyData } from "../../../api/budgetApi"
 import "./MonthlyChart.css";
 
 const MonthlyChart = ({ userId, groupId, userColor = "#f4a8a8" }) => {

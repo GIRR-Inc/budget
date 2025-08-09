@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { fetchSharedTotalSummary } from "../api/budgetApi";
+import { fetchSharedTotalSummary } from "../../../api/budgetApi";
 import "./TotalSummary.css";
 
 const TotalSummary = ({ groupId, userColor, onTxClick }) => {
@@ -7,7 +7,7 @@ const TotalSummary = ({ groupId, userColor, onTxClick }) => {
   const [loading, setLoading] = useState(true);
   const [openCategory, setOpenCategory] = useState(null);
 
-  useEffect(() => {
+  useEffect(() => { 
     const load = async () => {
       try {
         setLoading(true);

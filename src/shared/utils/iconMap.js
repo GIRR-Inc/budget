@@ -1,9 +1,9 @@
-import composeIcon from "../assets/icons/compose.png";
-import mcdonald from "../assets/icons/mcdonald.jpg";
-import megaCoffe from "../assets/icons/megaCoffe.png";
-import starbucks from "../assets/icons/starbucks.png";
-import theVenti from "../assets/icons/theVenti.png";
-import ediya from "../assets/icons/ediya.png";
+import composeIcon from "../../assets/icons/compose.png";
+import mcdonald from "../../assets/icons/mcdonald.jpg";
+import megaCoffe from "../../assets/icons/megaCoffe.png";
+import starbucks from "../../assets/icons/starbucks.png";
+import theVenti from "../../assets/icons/theVenti.png";
+import ediya from "../../assets/icons/ediya.png";
 
 export const keywordIconMap = {
   컴포즈: composeIcon,

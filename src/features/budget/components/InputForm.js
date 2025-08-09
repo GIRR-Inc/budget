@@ -1,25 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
-import { addTransaction, fetchMemoSuggestions } from "../api/budgetApi";
+import { addTransaction, fetchMemoSuggestions } from "../../../api/budgetApi";
 import { Dialog, Button } from "@mui/material";
 import "./InputForm.css";
-
-// 유틸: hex 색상을 더 어둡게
-function darkenColor(hex, amount = 20) {
-  let col = hex.replace("#", "");
-  if (col.length === 3)
-    col = col
-      .split("")
-      .map((x) => x + x)
-      .join("");
-  const num = parseInt(col, 16);
-  let r = (num >> 16) - amount;
-  let g = ((num >> 8) & 0x00ff) - amount;
-  let b = (num & 0x0000ff) - amount;
-  r = Math.max(0, r);
-  g = Math.max(0, g);
-  b = Math.max(0, b);
-  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
-}
+import { darkenColor } from "../../../shared/utils/color"
 
 const InputForm = ({
   categories,
@@ -139,14 +122,6 @@ const InputForm = ({
     setForm((prev) => ({ ...prev, category: code }));
     setShowCategoryDropdown(false);
     // 최근 카테고리 갱신
-    setRecentCategories((prev) => {
-      const filtered = prev.filter((c) => c !== code);
-      return [code, ...filtered].slice(0, 3);
-    });
-  };
-
-  const handleCategoryQuickSelect = (code) => {
-    setForm((prev) => ({ ...prev, category: code }));
     setRecentCategories((prev) => {
       const filtered = prev.filter((c) => c !== code);
       return [code, ...filtered].slice(0, 3);

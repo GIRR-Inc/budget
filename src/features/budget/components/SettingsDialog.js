@@ -26,7 +26,7 @@ import {
   addFixedCost,
   updateFixedCost,
   deleteFixedCost,
-} from "../api/budgetApi";
+} from "../../../api/budgetApi";
 import {
   DndContext,
   closestCenter,

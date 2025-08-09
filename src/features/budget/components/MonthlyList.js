@@ -13,14 +13,14 @@ import {
   fetchCategories,
   fetchGroupMembers,
   fetchPersonalExpensesForGroupMembers,
-} from "../api/budgetApi";
+} from "../../../api/budgetApi"
 import "./MonthlyList.css";
 import CloseIcon from "@mui/icons-material/Close";
 import EditIcon from "@mui/icons-material/Edit";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import EditDialog from "./EditDialog";
-import { getMatchedIcon } from "../util/iconMap";
+import { getMatchedIcon } from "../../../shared/utils/iconMap";
 
 const MonthlyList = forwardRef(
   ({ userId, groupId, userColor, hoverColor }, ref) => {

@@ -8,7 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { fetchCategoryExpenseData } from "../api/budgetApi";
+import { fetchCategoryExpenseData } from "../../../api/budgetApi"
 import "./CategoryChart.css";
 
 const CategoryChart = ({

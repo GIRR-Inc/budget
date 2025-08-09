@@ -1,6 +1,6 @@
 // src/components/BudgetSummary.js
 import React, { useEffect, useState } from "react";
-import { saveMonthlyBudget, fetchMonthlySummary } from "../api/budgetApi";
+import { saveMonthlyBudget, fetchMonthlySummary } from "../../../api/budgetApi";
 import MonthlyChart from "./MonthlyChart";
 import CategoryChart from "./CategoryChart";
 import "./BudgetSummary.css";
