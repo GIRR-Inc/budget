@@ -1,7 +1,11 @@
-// src/BudgetLayout.jsx
 import React, { useState, useEffect, useRef } from "react";
 import BudgetInputPage from "../pages/BudgetInputPage";
-import { MonthlyList, BudgetSummary, SettingsDialog, TotalSummary } from "@/features/budget/components";
+import {
+  MonthlyList,
+  BudgetSummary,
+  SettingsDialog,
+  TotalSummary,
+} from "@/features/budget/components";
 import SettingsIcon from "@mui/icons-material/Settings";
 import IconButton from "@mui/material/IconButton";
 import {
@@ -13,6 +17,7 @@ import {
   fetchBudgetData,
 } from "@/api";
 import "@/app/App.css";
+import s from "./BudgetLayout.module.css"; // <<< 추가
 
 export default function BudgetLayout() {
   const [activeTab, setActiveTab] = useState("input");
@@ -28,7 +33,7 @@ export default function BudgetLayout() {
     message: "",
     count: 0,
   });
-  
+
   const [notificationQueue, setNotificationQueue] = useState([]);
   const [isShowingNotification, setIsShowingNotification] = useState(false);
   const [hasAutoInputRun, setHasAutoInputRun] = useState(false);
@@ -44,7 +49,9 @@ export default function BudgetLayout() {
         categories.find((c) => c.code === fixed.category)?.description
       }' 항목${
         fixed.memo ? ` (메모: ${truncateMemo(fixed.memo)})` : ""
-      }을 등록했어요. 총 ${Number(fixed.amount).toLocaleString()}원이 입력되었어요.`,
+      }을 등록했어요. 총 ${Number(
+        fixed.amount
+      ).toLocaleString()}원이 입력되었어요.`,
       amount: fixed.amount,
       category: fixed.category,
     }));
@@ -132,7 +139,10 @@ export default function BudgetLayout() {
           loadedCategories = await loadCategories(activeUser.id, null);
         }
 
-        const fixedCosts = await fetchFixedCosts(activeUser?.id, activeGroup?.id);
+        const fixedCosts = await fetchFixedCosts(
+          activeUser?.id,
+          activeGroup?.id
+        );
         const today = new Date();
         const year = today.getFullYear();
         const month = today.getMonth() + 1;
@@ -171,7 +181,9 @@ export default function BudgetLayout() {
 
           const prevMonthTxs = txs.filter((tx) => {
             const d = new Date(tx.date);
-            return d.getFullYear() === prevYear && d.getMonth() + 1 === prevMonth;
+            return (
+              d.getFullYear() === prevYear && d.getMonth() + 1 === prevMonth
+            );
           });
 
           const alreadyThisMonth = currentMonthTxs.some(
@@ -254,176 +266,68 @@ export default function BudgetLayout() {
   }, [mainColor, hoverColor]);
 
   return (
-    <div style={{ maxWidth: "600px", margin: "auto", padding: "1rem", position: "relative" }}>
+    <div className={s.container}>
       {/* 고정비용 알림 */}
       {fixedCostNotification.show && (
-        <div
-          style={{
-            position: "fixed",
-            top: "16px",
-            left: "50%",
-            transform: "translateX(-50%)",
-            zIndex: 9999,
-            background: "#fff",
-            color: mainColor,
-            padding: "8px 20px",
-            borderRadius: "12px",
-            border: `1.5px solid ${mainColor}`,
-            boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15)",
-            fontFamily: "'GmarketSansMedium', sans-serif",
-            fontSize: "14px",
-            fontWeight: 600,
-            letterSpacing: "0.2px",
-            animation: "notificationSlideDown 0.3s ease-out",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px",
-            backdropFilter: "blur(1.5px)",
-            transition: "all 0.2s ease-in-out",
-            maxWidth: "90%",
-            wordBreak: "keep-all",
-            lineHeight: "1.4",
-          }}
-        >
-          {fixedCostNotification.message}
-        </div>
+        <div className={s.notification}>{fixedCostNotification.message}</div>
       )}
 
       {/* 사용자 탭 */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "center",
-          marginBottom: "1.5rem",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            borderRadius: "30px",
-            overflow: "hidden",
-            border: `2px solid ${mainColor}`,
-            boxShadow: `0 4px 15px ${mainColor}30`,
-            background: "white",
-          }}
-        >
-          {users.map((user, index) => (
-            <button
-              key={user.id}
-              onClick={() => {
-                setActiveUser(user);
-                setActiveGroup(null); // 개인 보기
-              }}
-              style={{
-                padding: "10px 28px",
-                border: "none",
-                background:
-                  activeUser?.id === user.id
-                    ? `linear-gradient(135deg, ${mainColor} 0%, ${hoverColor} 100%)`
-                    : "white",
-                color: activeUser?.id === user.id ? "white" : mainColor,
-                fontWeight: 600,
-                fontFamily: "'GmarketSansMedium', sans-serif",
-                cursor: "pointer",
-                outline: "none",
-                borderRight: index === 0 ? `1px solid ${mainColor}40` : "none",
-                transition: "all 0.3s ease",
-                fontSize: "14px",
-                position: "relative",
-                overflow: "hidden",
-              }}
-              onMouseOver={(e) => {
-                if (activeUser?.id !== user.id) {
-                  e.target.style.background = `linear-gradient(135deg, ${mainColor}20 0%, ${hoverColor}20 100%)`;
-                  e.target.style.transform = "translateY(-1px)";
-                }
-              }}
-              onMouseOut={(e) => {
-                if (activeUser?.id !== user.id) {
-                  e.target.style.background = "white";
-                  e.target.style.transform = "translateY(0)";
-                }
-              }}
-            >
-              {user.username}
-            </button>
-          ))}
-          {sharedGroups.map((group) => (
-            <button
-              key={group.id}
-              onClick={() => {
-                setActiveUser(null);
-                setActiveGroup(group);
-              }}
-              style={{
-                padding: "10px 28px",
-                border: "none",
-                background:
-                  activeGroup?.id === group.id
-                    ? `linear-gradient(135deg, ${mainColor} 0%, ${hoverColor} 100%)`
-                    : "white",
-                color: activeGroup?.id === group.id ? "white" : mainColor,
-                fontWeight: 600,
-                fontFamily: "'GmarketSansMedium', sans-serif",
-                cursor: "pointer",
-                outline: "none",
-                borderLeft: `1px solid ${mainColor}40`,
-                transition: "all 0.3s ease",
-                fontSize: "14px",
-                position: "relative",
-                overflow: "hidden",
-              }}
-              onMouseOver={(e) => {
-                if (activeGroup?.id !== group.id) {
-                  e.target.style.background = `linear-gradient(135deg, ${mainColor}20 0%, ${hoverColor}20 100%)`;
-                  e.target.style.transform = "translateY(-1px)";
-                }
-              }}
-              onMouseOut={(e) => {
-                if (activeGroup?.id !== group.id) {
-                  e.target.style.background = "white";
-                  e.target.style.transform = "translateY(0)";
-                }
-              }}
-            >
-              {group.name}
-            </button>  
-          ))}
+      <div className={s.userTabsWrap}>
+        <div className={s.pillGroup}>
+          {users.map((user) => {
+            const active = activeUser?.id === user.id;
+            return (
+              <button
+                key={user.id}
+                onClick={() => {
+                  setActiveUser(user);
+                  setActiveGroup(null);
+                }}
+                className={`${s.pillBtn} ${active ? s.pillBtnActive : ""}`}
+              >
+                {user.username}
+              </button>
+            );
+          })}
+          {sharedGroups.map((group) => {
+            const active = activeGroup?.id === group.id;
+            return (
+              <button
+                key={group.id}
+                onClick={() => {
+                  setActiveUser(null);
+                  setActiveGroup(group);
+                }}
+                className={`${s.pillBtn} ${active ? s.pillBtnActive : ""}`}
+              >
+                {group.name}
+              </button>
+            );
+          })}
         </div>
       </div>
+
       {/* 톱니바퀴 버튼 */}
-      <div
-        style={{
-          position: "fixed",
-          bottom: "1.5rem",
-          right: "1.5rem",
-          zIndex: 1000,
-          backgroundColor: "white",
-          borderRadius: "50%",
-          boxShadow: `0 4px 10px rgba(0, 0, 0, 0.15), 0 2px 8px ${mainColor}20`,
-          border: `2px solid ${mainColor}`,
-        }}
-      >
+      <div className={s.gearFab}>
         <IconButton
           onClick={() => setSettingsOpen(true)}
           size="large"
           className="settings-icon-button"
-          style={{
-            color: mainColor,
-            backgroundColor: "transparent",
-            background: "transparent",
-          }}
+          style={{ color: "var(--main-color)", background: "transparent" }}
         >
           <SettingsIcon />
         </IconButton>
       </div>
 
-      <h2 style={{ textAlign: "center", fontFamily: "'GmarketSansMedium', sans-serif" }}>
-        {activeGroup ? `우리집 공동 가계부` : `우리 ${activeUser?.username}이의 부자 가계부`}
+      <h2 className={s.title}>
+        {activeGroup
+          ? `우리집 공동 가계부`
+          : `${activeUser?.username} 부자 가계부`}
       </h2>
 
-      {/* 탭 버튼 (그대로) */}
-      <div className="tab-bar">
+      {/* 탭 버튼 */}
+      <div className={s.tabBar}>
         {[
           { label: "입력하기", key: "input" },
           { label: "월별 보기", key: "monthly" },
@@ -435,18 +339,7 @@ export default function BudgetLayout() {
             <button
               key={key}
               onClick={() => setActiveTab(key)}
-              className="tab"
-              style={{
-                backgroundColor: isActive ? mainColor : "white",
-                color: isActive ? "white" : mainColor,
-                border: `2px solid ${mainColor}`,
-              }}
-              onMouseOver={(e) => {
-                e.target.style.backgroundColor = isActive ? hoverColor : "#f9f9f9";
-              }}
-              onMouseOut={(e) => {
-                e.target.style.backgroundColor = isActive ? mainColor : "white";
-              }}
+              className={`${s.tab} ${isActive ? s.tabActive : ""}`}
             >
               {label}
             </button>
@@ -454,7 +347,7 @@ export default function BudgetLayout() {
         })}
       </div>
 
-      {/* 탭 콘텐츠 (그대로) */}
+      {/* 탭 콘텐츠 */}
       {activeTab === "input" && (
         <BudgetInputPage
           categories={categories}
@@ -487,23 +380,18 @@ export default function BudgetLayout() {
           onTxClick={handleTransactionClick}
         />
       )}
-
+      {/* 설정 다이얼로그 */}
       <SettingsDialog
         open={settingsOpen}
         onClose={() => setSettingsOpen(false)}
-        onCategoryChange={() => loadCategories(activeUser?.id ?? null, activeGroup?.id ?? null)}
+        onCategoryChange={() =>
+          loadCategories(activeUser?.id ?? null, activeGroup?.id ?? null)
+        }
         userId={activeUser?.id ?? null}
         groupId={activeGroup?.id ?? null}
         userColor={mainColor}
         hoverColor={hoverColor}
       />
-
-      <style jsx>{`
-        @keyframes notificationSlideDown {
-          from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
-          to   { opacity: 1; transform: translateX(-50%) translateY(0); }
-        }
-      `}</style>
     </div>
   );
 }

@@ -44,6 +44,8 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import "./SettingsDialog.css";
+import FixedCostForm from "@/features/budget/components/FixedCostForm";
+import FixedCostCard from "@/features/budget/components/FixedCostCard";
 
 function generateRandomCode() {
   const random = Math.random().toString(36).substring(2, 6);
@@ -546,111 +548,22 @@ function SettingsDialog({
         )}
         {activeTab === 1 && (
           <>
-            {/* 고정비용 추가 폼 - 모바일 최적화 */}
-            <div className="fixed-cost-inputs">
-              <select
-                value={newFixed.category}
-                onChange={(e) =>
-                  setNewFixed((f) => ({ ...f, category: e.target.value }))
-                }
-                style={{
-                  width: "100%",
-                  fontFamily: "S-CoreDream-3Light",
-                  fontSize: 15,
-                  padding: "12px",
-                  marginBottom: 12,
-                  borderRadius: 8,
-                  border: "1.5px solid #eee",
-                  background: "#fafafa",
-                }}
-              >
-                <option value="">카테고리 선택</option>
-                {categories.map((cat) => (
-                  <option key={cat.code} value={cat.code}>
-                    {cat.description}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="number"
-                placeholder="금액"
-                value={newFixed.amount}
-                onChange={(e) =>
-                  setNewFixed((f) => ({
-                    ...f,
-                    amount: e.target.value.replace(/\D/g, ""),
-                  }))
-                }
-                style={{
-                  width: "100%",
-                  fontFamily: "S-CoreDream-3Light",
-                  fontSize: 15,
-                  padding: "12px",
-                  marginBottom: 12,
-                  borderRadius: 8,
-                  border: "1.5px solid #eee",
-                  background: "#fafafa",
-                }}
-              />
-              <input
-                type="number"
-                min={1}
-                max={28}
-                placeholder="일자"
-                value={newFixed.day}
-                onChange={(e) =>
-                  setNewFixed((f) => ({
-                    ...f,
-                    day: e.target.value.replace(/\D/g, ""),
-                  }))
-                }
-                style={{
-                  width: "100%",
-                  fontFamily: "S-CoreDream-3Light",
-                  fontSize: 15,
-                  padding: "12px",
-                  marginBottom: 12,
-                  borderRadius: 8,
-                  border: "1.5px solid #eee",
-                  background: "#fafafa",
-                }}
-              />
-              <input
-                type="text"
-                placeholder="메모 (선택사항)"
-                value={newFixed.memo}
-                onChange={(e) =>
-                  setNewFixed((f) => ({ ...f, memo: e.target.value }))
-                }
-                style={{
-                  width: "100%",
-                  fontFamily: "S-CoreDream-3Light",
-                  fontSize: 15,
-                  padding: "12px",
-                  marginBottom: 12,
-                  borderRadius: 8,
-                  border: "1.5px solid #eee",
-                  background: "#fafafa",
-                }}
-              />
-              <Button
-                variant="contained"
-                onClick={handleAddFixed}
-                style={{
-                  width: "100%",
-                  borderRadius: 8,
-                  fontWeight: 600,
-                  fontFamily: "S-CoreDream-3Light",
-                  background: `linear-gradient(135deg, ${userColor} 0%, ${hoverColor} 100%)`,
-                  padding: "12px",
-                  fontSize: 16,
-                }}
-              >
-                고정비용 추가
-              </Button>
-            </div>
+            <FixedCostForm
+              categories={categories}
+              userColor={userColor}
+              hoverColor={hoverColor}
+              onSubmit={async (payload) => {
+                // 기존 handleAddFixed 로직과 동일하게 처리
+                await addFixedCost({
+                  ...payload,
+                  userId,
+                  groupId,
+                });
+                await loadFixedCosts();
+              }}
+            />
 
-            {/* 고정비용 목록 - 모바일 카드 레이아웃 */}
+            {/* 목록 카드 */}
             <div
               style={{
                 display: "flex",
@@ -661,317 +574,17 @@ function SettingsDialog({
                 padding: "8px 0",
               }}
             >
-              {fixedCosts.map((item) =>
-                editingFixedId === item.id ? (
-                  // 수정 모드 카드
-                  <div
-                    key={item.id}
-                    className="fixed-cost-inputs editing"
-                    style={{
-                      background: "#fffaf4",
-                      border: `2px solid ${userColor}`,
-                      borderRadius: 12,
-                      padding: 16,
-                      boxShadow: "0 4px 12px rgba(244, 168, 168, 0.15)",
-                    }}
-                  >
-                    <select
-                      value={editFixed.category}
-                      onChange={(e) =>
-                        setEditFixed((f) => ({
-                          ...f,
-                          category: e.target.value,
-                        }))
-                      }
-                      style={{
-                        width: "100%",
-                        fontFamily: "S-CoreDream-3Light",
-                        fontSize: 15,
-                        padding: "10px",
-                        marginBottom: 12,
-                        borderRadius: 8,
-                        border: "1.5px solid #eee",
-                        background: "#fff",
-                      }}
-                    >
-                      <option value="">카테고리 선택</option>
-                      {categories.map((cat) => (
-                        <option key={cat.code} value={cat.code}>
-                          {cat.description}
-                        </option>
-                      ))}
-                    </select>
-                    <input
-                      type="number"
-                      value={editFixed.amount}
-                      onChange={(e) =>
-                        setEditFixed((f) => ({
-                          ...f,
-                          amount: e.target.value.replace(/\D/g, ""),
-                        }))
-                      }
-                      style={{
-                        width: "100%",
-                        fontFamily: "S-CoreDream-3Light",
-                        fontSize: 15,
-                        padding: "10px",
-                        marginBottom: 12,
-                        borderRadius: 8,
-                        border: "1.5px solid #eee",
-                        background: "#fff",
-                      }}
-                    />
-                    <input
-                      type="number"
-                      min={1}
-                      max={28}
-                      value={editFixed.day}
-                      onChange={(e) =>
-                        setEditFixed((f) => ({
-                          ...f,
-                          day: e.target.value.replace(/\D/g, ""),
-                        }))
-                      }
-                      style={{
-                        width: "100%",
-                        fontFamily: "S-CoreDream-3Light",
-                        fontSize: 15,
-                        padding: "10px",
-                        marginBottom: 12,
-                        borderRadius: 8,
-                        border: "1.5px solid #eee",
-                        background: "#fff",
-                      }}
-                    />
-                    <input
-                      type="text"
-                      value={editFixed.memo}
-                      onChange={(e) =>
-                        setEditFixed((f) => ({ ...f, memo: e.target.value }))
-                      }
-                      style={{
-                        width: "100%",
-                        fontFamily: "S-CoreDream-3Light",
-                        fontSize: 15,
-                        padding: "10px",
-                        marginBottom: 12,
-                        borderRadius: 8,
-                        border: "1.5px solid #eee",
-                        background: "#fff",
-                      }}
-                    />
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        marginBottom: 12,
-                      }}
-                    >
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          gap: 8,
-                        }}
-                      >
-                        <Checkbox
-                          checked={editFixed.active}
-                          onChange={(e) =>
-                            setEditFixed((f) => ({
-                              ...f,
-                              active: e.target.checked,
-                            }))
-                          }
-                          size="small"
-                          style={{ color: userColor }}
-                        />
-                        <span
-                          style={{
-                            fontSize: 14,
-                            color: "#666",
-                            fontFamily: "GmarketSansMedium",
-                          }}
-                        >
-                          활성화
-                        </span>
-                      </div>
-                      <div style={{ display: "flex", gap: 8 }}>
-                        <Button
-                          variant="contained"
-                          onClick={() => handleEditFixedSave(item.id)}
-                          style={{
-                            borderRadius: 8,
-                            fontWeight: 600,
-                            fontFamily: "S-CoreDream-3Light",
-                            background: `linear-gradient(135deg, ${userColor} 0%, ${hoverColor} 100%)`,
-                            color: "white",
-                            padding: "8px 16px",
-                            fontSize: 14,
-                          }}
-                        >
-                          저장
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          onClick={handleEditFixedCancel}
-                          style={{
-                            borderRadius: 8,
-                            fontWeight: 600,
-                            fontFamily: "S-CoreDream-3Light",
-                            color: "#666",
-                            background: "#fff",
-                            padding: "8px 16px",
-                            fontSize: 14,
-                            border: "1.5px solid #ddd",
-                          }}
-                        >
-                          취소
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  // 일반 카드
-                  <div
-                    key={item.id}
-                    className="fixed-cost-card"
-                    style={{
-                      background: "#fff",
-                      border: "1.5px solid #eee",
-                      borderRadius: 12,
-                      padding: 16,
-                      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.05)",
-                      opacity: item.active ? 1 : 0.6,
-                    }}
-                  >
-                    {/* 카테고리와 활성화 상태 */}
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        marginBottom: 12,
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontFamily: "GmarketSansMedium",
-                          fontSize: 16,
-                          fontWeight: 600,
-                          color: item.active ? userColor : "#bbb",
-                        }}
-                      >
-                        {categories.find((c) => c.code === item.category)
-                          ?.description || item.category}
-                      </span>
-                      <Checkbox
-                        checked={item.active}
-                        disabled
-                        size="small"
-                        style={{ color: userColor }}
-                      />
-                    </div>
-
-                    {/* 금액과 일자 */}
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        marginBottom: 8,
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontFamily: "S-CoreDream-3Light",
-                          fontSize: 18,
-                          fontWeight: 600,
-                          color: "#333",
-                        }}
-                      >
-                        {item.amount.toLocaleString()}원
-                      </span>
-                      <span
-                        style={{
-                          fontFamily: "S-CoreDream-3Light",
-                          fontSize: 14,
-                          color: "#666",
-                          background: "#f5f5f5",
-                          padding: "4px 8px",
-                          borderRadius: 6,
-                        }}
-                      >
-                        {item.day}일
-                      </span>
-                    </div>
-
-                    {/* 메모 */}
-                    {item.memo && (
-                      <div
-                        style={{
-                          marginBottom: 12,
-                          padding: "8px 12px",
-                          background: "#f9f9f9",
-                          borderRadius: 6,
-                          borderLeft: `3px solid ${userColor}`,
-                        }}
-                      >
-                        <span
-                          style={{
-                            fontFamily: "S-CoreDream-3Light",
-                            fontSize: 13,
-                            color: "#666",
-                            fontStyle: "italic",
-                          }}
-                        >
-                          {item.memo}
-                        </span>
-                      </div>
-                    )}
-
-                    {/* 관리 버튼 */}
-                    <div
-                      style={{
-                        display: "flex",
-                        gap: 8,
-                        justifyContent: "flex-end",
-                      }}
-                    >
-                      <Button
-                        size="small"
-                        onClick={() => handleEditFixedStart(item)}
-                        style={{
-                          borderRadius: 8,
-                          fontWeight: 600,
-                          fontFamily: "S-CoreDream-3Light",
-                          background: hoverColor,
-                          color: "white",
-                          padding: "6px 12px",
-                          fontSize: 13,
-                        }}
-                      >
-                        수정
-                      </Button>
-                      <Button
-                        size="small"
-                        onClick={() => handleDeleteFixed(item.id)}
-                        style={{
-                          borderRadius: 8,
-                          fontWeight: 600,
-                          fontFamily: "S-CoreDream-3Light",
-                          background: "#ff6b6b",
-                          color: "white",
-                          padding: "6px 12px",
-                          fontSize: 13,
-                        }}
-                      >
-                        삭제
-                      </Button>
-                    </div>
-                  </div>
-                )
-              )}
+              {fixedCosts.map((item) => (
+                <FixedCostCard
+                  key={item.id}
+                  item={item}
+                  categories={categories}
+                  userColor={userColor}
+                  hoverColor={hoverColor}
+                  onEdit={() => handleEditFixedStart(item)}
+                  onDelete={() => handleDeleteFixed(item.id)}
+                />
+              ))}
             </div>
           </>
         )}

@@ -197,10 +197,8 @@ button:focus {
   overflow-x: hidden;
 }
 
-
-
 .dropdown-options {
-  max-height: 230px;
+  max-height: 350px;
   overflow-y: auto;
   overflow-x: hidden;
 }

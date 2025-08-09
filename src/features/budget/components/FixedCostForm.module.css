@@ -1,0 +1,26 @@
+/* src/features/budget/components/FixedCostForm.module.css */
+.card {
+  background: #fff;
+  border: 1.5px solid #eee;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.field { margin-bottom: 12px; }
+
+.presetRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+.preset { margin-top: 4px; }
+
+.sliderRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sliderLabel { width: 36px; color:#666; font-size:13px; }
+.slider { flex: 1; }
+.dayInput { width: 76px; }

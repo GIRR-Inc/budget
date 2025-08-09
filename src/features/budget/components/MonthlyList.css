@@ -29,7 +29,7 @@
   align-items: center;
   padding: 0 4px;
   scrollbar-width: thin;
-  scrollbar-color: #f4a8a8 #fff7f7;
+  scrollbar-color: var(--active-color) #fff7f7;
   background: transparent;
 }
 .month-scroll-bar::-webkit-scrollbar {
@@ -39,17 +39,17 @@
   background: transparent;
 }
 .month-scroll-bar::-webkit-scrollbar-thumb {
-  background: #f4a8a8;
+  background: var(--active-color);
   border-radius: 3px;
 }
 .month-scroll-bar::-webkit-scrollbar-thumb:hover {
-  background: #e57373;
+  background: var(--active-color);
 }
 
 .month-tab {
   flex-shrink: 0;
   padding: 7px 18px;
-  border: 1.5px solid #f4a8a8;
+  border: 1.5px solid var(--active-color);
   border-radius: 22px;
   background: linear-gradient(90deg, var(--inactive-color, #fff7f7) 60%, var(--inactive-color2, #ffeaea) 100%);
   font-size: 15px;
@@ -65,15 +65,15 @@
   outline: none;
 }
 .month-tab:hover:not(.active) {
-  background: linear-gradient(90deg, var(--hover-color, #f19191) 60%, #fff7f7 100%);
+  background: linear-gradient(90deg, var(--hover-color) 60%, #fff7f7 100%);
   color: #fff;
-  border-color: var(--hover-color, #f19191);
+  border-color: var(--hover-color);
   box-shadow: 0 4px 12px rgba(244,168,168,0.13);
 }
 .month-tab.active {
   background: linear-gradient(90deg, var(--active-color, #f4a8a8) 60%, var(--active-color2, #f19191) 100%);
   color: #fff;
-  border-color: var(--active-color2, #f19191);
+  border-color: var(--active-color2);
   font-weight: bold;
   box-shadow: 0 4px 16px rgba(244,168,168,0.18);
 }
@@ -96,10 +96,10 @@
   white-space: nowrap;
 }
 .tab.active {
-  background: #f4a8a8;
+  background: var(--active-color);
   color: white;
   font-family: 'S-CoreDream-3Light';
-  border-color: #f4a8a8;
+  border-color: var(--active-color);
 }
 
 .list {
